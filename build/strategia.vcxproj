@@ -369,6 +369,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States.cpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\TestState.cpp" />
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Tile.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\MapGenerator.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
