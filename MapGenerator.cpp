@@ -80,6 +80,10 @@ sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site *site)
         count += 2;
         edge = edge->next;
     }
+    if (count == 0)
+    {
+        return sf::Vector2f(site->p.x, site->p.y);
+    }
     return sf::Vector2f(sumX / count, sumY / count);
 }
 
