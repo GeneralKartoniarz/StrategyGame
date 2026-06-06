@@ -8,15 +8,11 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 60, 1);
+    this->map = mg.GetMap(1920, 1080, 20, 1);
     this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
     this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
     for (const auto &region : this->map)
     {
-        sf::Color regionColor(std::rand() % 150 + 50,
-                              std::rand() % 150 + 50,
-                              std::rand() % 150 + 50);
-
         for (const auto &borderVertex : region.provinceBorders)
         {
             this->borderMesh.append(borderVertex);
@@ -34,9 +30,9 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             {
                 sf::Vector2f p1 = shape.getPoint(i);
                 sf::Vector2f p2 = shape.getPoint(i + 1);
-                this->terrainMesh.append(sf::Vertex{p0, regionColor});
-                this->terrainMesh.append(sf::Vertex{p1, regionColor});
-                this->terrainMesh.append(sf::Vertex{p2, regionColor});
+                this->terrainMesh.append(sf::Vertex{p0, sf::Color(150,0,20)});
+                this->terrainMesh.append(sf::Vertex{p1, sf::Color(150,0,20)});
+                this->terrainMesh.append(sf::Vertex{p2, sf::Color(150,0,20)});
             }
         }
     }
@@ -44,12 +40,10 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
 void TestState::Update(float dt)
 {
-    // Logika aktualizacji
 }
 
 void TestState::Render(sf::RenderWindow *windowPtr)
 {
-    // Czysta moc GPU: cała potężna mapa renderuje się jednym strzałem
     windowPtr->draw(this->terrainMesh);
     windowPtr->draw(this->borderMesh);
 }
