@@ -1,16 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\Strategia\main.cpp">
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\TestState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\janpa\Documents\GitHub\Strategia\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\janpa\Documents\GitHub\StrategyGame\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{FECB9D19-D3F8-30BA-939A-BF099B117FAB}</UniqueIdentifier>
+      <UniqueIdentifier>{D481D0B5-F129-3684-B29A-7CBDD46A4CE2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

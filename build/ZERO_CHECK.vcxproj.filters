@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\janpa\Documents\GitHub\Strategia\build\CMakeFiles\954a42fe4d5bf4f2fe14eefcbfa7fdb2\generate.stamp.rule">
+    <CustomBuild Include="C:\Users\janpa\Documents\GitHub\StrategyGame\build\CMakeFiles\fbcf6490aa914755fc2cc01d4ab59344\generate.stamp.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{C6D5E29A-A78B-3CEB-87AF-EADA77D3274C}</UniqueIdentifier>
+      <UniqueIdentifier>{0003AB0A-A576-3163-B020-6A2CE022C746}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

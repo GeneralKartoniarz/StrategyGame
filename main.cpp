@@ -1,18 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <optional>
-
+#include "Game.hpp"
 int main() {
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "Strategy Game MVP");
-
-    while (window.isOpen()) {
-        while (const std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {
-                window.close();
-            }
-        }
-
-        window.clear(sf::Color::Black);
-        window.display();
-    }
+    Game game;
+    game.Run();
     return 0;
 }

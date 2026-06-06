@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\janpa\Documents\GitHub\Strategia\build\x64\Debug\ZERO_CHECK</FullPath>
+      <FullPath>C:\Users\janpa\Documents\GitHub\StrategyGame\build\x64\Debug\ZERO_CHECK</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>C:\Users\janpa\Documents\GitHub\Strategia\build\Debug\strategia.exe</FullPath>
+      <FullPath>C:\Users\janpa\Documents\GitHub\StrategyGame\build\Debug\strategia.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
