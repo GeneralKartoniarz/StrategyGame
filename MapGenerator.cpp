@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <queue>
 #include <algorithm>
+#include <cmath>
 
 Elevation GetElevation(float noise)
 {
@@ -35,6 +36,7 @@ Moisture GetMoisture(float noise)
         return Moisture::Normal;
     return Moisture::Wet;
 }
+
 BiomeType DetermineBiome(Elevation elev, Temperature temp, Moisture moist)
 {
     if (elev == Elevation::Water)
@@ -65,6 +67,7 @@ BiomeType DetermineBiome(Elevation elev, Temperature temp, Moisture moist)
     }
     return BiomeType::Plains;
 }
+
 sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site *site)
 {
     float sumX = 0, sumY = 0;
@@ -82,6 +85,7 @@ sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site *site)
 
 std::vector<jcv_point> MapGenerator::InitializeSeeds(int mapWidth, int mapHeight, int cellSize)
 {
+
     std::vector<jcv_point> points;
     int margin = 50;
     int cols = (mapWidth - 2 * margin) / cellSize;
@@ -136,12 +140,6 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
             edge = edge->next;
         }
 
-        t.shape.setPointCount(t.vertices.size());
-        for (size_t j = 0; j < t.vertices.size(); j++)
-            t.shape.setPoint(j, t.vertices[j]);
-        t.shape.setFillColor(sf::Color(200, 0, 40));
-        t.shape.setOutlineThickness(0);
-
         tiles[site->index] = t;
     }
     jcv_diagram_free(&diagram);
@@ -154,6 +152,9 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
     std::vector<int> smallToBig(smallTiles.size(), -1);
     std::vector<std::vector<int>> clusters;
 
+    // Jednorazowa alokacja flag kolejkowych zapobiegająca heap thrashingowi
+    std::vector<int> inQueueFlags(smallTiles.size(), -1);
+
     for (size_t i = 0; i < smallTiles.size(); ++i)
     {
         if (isAssigned[i])
@@ -161,10 +162,9 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 
         std::vector<int> currentCluster;
         std::queue<int> q;
-        std::vector<bool> inQueue(smallTiles.size(), false);
 
         q.push(i);
-        inQueue[i] = true;
+        inQueueFlags[i] = i;
 
         while (!q.empty() && currentCluster.size() < static_cast<size_t>(targetClusterSize))
         {
@@ -180,10 +180,10 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 
             for (int neighborID : smallTiles[curr].neighbors)
             {
-                if (!isAssigned[neighborID] && !inQueue[neighborID])
+                if (!isAssigned[neighborID] && inQueueFlags[neighborID] != static_cast<int>(i))
                 {
                     q.push(neighborID);
-                    inQueue[neighborID] = true;
+                    inQueueFlags[neighborID] = i;
                 }
             }
         }
@@ -206,8 +206,7 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
             const Tile &st = smallTiles[smallID];
             centerSum += st.position;
 
-            sf::ConvexShape copyShape = st.shape;
-            lt.subShapes.push_back(copyShape);
+            lt.subPolygons.push_back(st.vertices);
 
             for (const auto &cEdge : st.cellEdges)
             {
@@ -265,7 +264,7 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
     jcv_rect rect = {{50.0f, 50.0f}, {(float)mapWidth - 50.0f, (float)mapHeight - 50.0f}};
     std::random_device rd;
     std::mt19937 seedGen(rd());
-    elevNoise.SetFrequency(0.0045f);
+    elevNoise.SetFrequency(0.0048f);
     tempNoise.SetFrequency(0.003f);
     moistNoise.SetFrequency(0.003f);
     unsigned int elevationSeed = seedGen();
@@ -297,5 +296,5 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
     }
 
     std::vector<Tile> fineSiatka = CreateTiles(points, mapWidth, mapHeight);
-    return MergeTiles(fineSiatka, 6, mapWidth, mapHeight);
+    return MergeTiles(fineSiatka, 3, mapWidth, mapHeight);
 }
