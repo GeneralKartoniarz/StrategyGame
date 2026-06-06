@@ -10,7 +10,12 @@ enum class TerrainType
     Mountain,
     Desert
 };
-
+struct CellEdge
+{
+    sf::Vector2f p1;
+    sf::Vector2f p2;
+    int neighborID;
+};
 struct Tile
 {
     sf::Vector2f position;
@@ -20,6 +25,8 @@ struct Tile
     std::size_t ID;
     float size;
     int ownerID;
+    std::vector<CellEdge> cellEdges;
+    std::vector<sf::Vertex> provinceBorders;
     TerrainType type;
     std::vector<std::size_t> neighbors;
 };
