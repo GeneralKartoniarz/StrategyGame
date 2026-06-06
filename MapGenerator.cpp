@@ -4,6 +4,8 @@
 #include <random>
 #include "Tile.hpp"
 #include <SFML/Graphics.hpp>
+#include <queue>
+#include <algorithm>
 
 sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site* site) {
     float sumX = 0, sumY = 0;
@@ -60,14 +62,80 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point>& points
 
         t.shape.setPointCount(t.vertices.size());
         for (size_t j = 0; j < t.vertices.size(); j++) t.shape.setPoint(j, t.vertices[j]);
-        t.shape.setFillColor(sf::Color::Transparent);
-        t.shape.setOutlineColor(sf::Color::Red);
-        t.shape.setOutlineThickness(1);
+        t.shape.setFillColor(sf::Color(200, 0, 40));
+        t.shape.setOutlineThickness(0);
         
         tiles[site->index] = t;
     }
     jcv_diagram_free(&diagram);
     return tiles;
+}
+
+std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile>& smallTiles, int targetClusterSize) {
+    std::vector<bool> isAssigned(smallTiles.size(), false);
+    std::vector<int> smallToBig(smallTiles.size(), -1);
+    std::vector<std::vector<int>> clusters;
+
+    for (size_t i = 0; i < smallTiles.size(); ++i) {
+        if (isAssigned[i]) continue;
+
+        std::vector<int> currentCluster;
+        std::queue<int> q;
+        std::vector<bool> inQueue(smallTiles.size(), false);
+
+        q.push(i);
+        inQueue[i] = true;
+
+        while (!q.empty() && currentCluster.size() < static_cast<size_t>(targetClusterSize)) {
+            int curr = q.front();
+            q.pop();
+
+            if (isAssigned[curr]) continue;
+
+            isAssigned[curr] = true;
+            currentCluster.push_back(curr);
+            smallToBig[curr] = clusters.size();
+
+            for (int neighborID : smallTiles[curr].neighbors) {
+                if (!isAssigned[neighborID] && !inQueue[neighborID]) {
+                    q.push(neighborID);
+                    inQueue[neighborID] = true;
+                }
+            }
+        }
+        clusters.push_back(currentCluster);
+    }
+
+    std::vector<Tile> largeTiles(clusters.size());
+
+    for (size_t b = 0; b < clusters.size(); ++b) {
+        Tile lt;
+        lt.ID = b;
+        
+        sf::Vector2f centerSum(0.0f, 0.0f);
+        for (int smallID : clusters[b]) {
+            const Tile& st = smallTiles[smallID];
+            centerSum += st.position;
+            
+            sf::ConvexShape copyShape = st.shape; 
+            lt.subShapes.push_back(copyShape);
+        }
+        lt.position = centerSum / static_cast<float>(clusters[b].size());
+
+        for (int smallID : clusters[b]) {
+            for (int smallNeighborID : smallTiles[smallID].neighbors) {
+                int bigNeighborID = smallToBig[smallNeighborID];
+                if (bigNeighborID != -1 && bigNeighborID != static_cast<int>(b)) {
+                    if (std::find(lt.neighbors.begin(), lt.neighbors.end(), bigNeighborID) == lt.neighbors.end()) {
+                        lt.neighbors.push_back(bigNeighborID);
+                    }
+                }
+            }
+        }
+        largeTiles[b] = lt;
+    }
+
+    return largeTiles;
 }
 
 std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations) {
@@ -87,5 +155,7 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
         }
         jcv_diagram_free(&diagram);
     }
-    return CreateTiles(points, mapWidth, mapHeight);
+    
+    std::vector<Tile> fineSiatka = CreateTiles(points, mapWidth, mapHeight);
+    return MergeTiles(fineSiatka, 12);
 }

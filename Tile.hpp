@@ -15,6 +15,7 @@ struct Tile
 {
     sf::Vector2f position;
     std::vector<sf::Vector2f> vertices;
+    std::vector<sf::ConvexShape> subShapes;
     sf::ConvexShape shape;
     std::size_t ID;
     float size;

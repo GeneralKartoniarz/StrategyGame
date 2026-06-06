@@ -1,14 +1,25 @@
 #include "TestState.hpp"
 #include "MapGenerator.hpp"
+#include <cstdlib>
+#include <ctime>
 
 TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 {
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
+
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 60, 2);
-    this->map[106].shape.setFillColor(sf::Color::Blue);
-    for (int i = 0; i < this->map[106].neighbors.size(); i++)
+    this->map = mg.GetMap(1920, 1080, 15, 1);
+
+    for (auto& region : this->map)
     {
-        this->map[this->map[106].neighbors[i]].shape.setFillColor(sf::Color::Red);
+        sf::Color regionColor(std::rand() % 150 + 50, 
+                              std::rand() % 150 + 50, 
+                              std::rand() % 150 + 50);
+        for (auto& shape : region.subShapes)
+        {
+            shape.setFillColor(regionColor);
+            shape.setOutlineThickness(0); 
+        }
     }
 }
 
@@ -18,8 +29,11 @@ void TestState::Update(float dt)
 
 void TestState::Render(sf::RenderWindow *windowPtr)
 {
-    for (size_t i = 0; i < this->map.size(); i++)
+    for (const auto& region : this->map)
     {
-        windowPtr->draw(this->map[i].shape);
+        for (const auto& shape : region.subShapes)
+        {
+            windowPtr->draw(shape);
+        }
     }
 }
