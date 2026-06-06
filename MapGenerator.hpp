@@ -4,7 +4,7 @@
 #include <vector>
 #include <queue>
 #include "Tile.hpp"
-
+#include "FastNoiseLite.h"
 class MapGenerator
 {
 public:
@@ -12,6 +12,10 @@ public:
     std::vector<Tile> GetMap(int mapWidth, int mapHeight, int cellSize, int iterations);
     std::vector<jcv_point> InitializeSeeds(int mapWidth, int mapHeight, int cellSize);
     std::vector<Tile> CreateTiles(const std::vector<jcv_point> &points, int mapWidth, int mapHeight);
+
 private:
-    std::vector<Tile> MergeTiles(const std::vector<Tile>& smallTiles, int targetClusterSize);
+    std::vector<Tile> MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight);
+    FastNoiseLite elevNoise;
+    FastNoiseLite tempNoise;
+    FastNoiseLite moistNoise;
 };

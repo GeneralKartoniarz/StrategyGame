@@ -7,6 +7,64 @@
 #include <queue>
 #include <algorithm>
 
+Elevation GetElevation(float noise)
+{
+    if (noise < -0.4f)
+        return Elevation::Water;
+    if (noise < 0.2f)
+        return Elevation::Plains;
+    if (noise < 0.6f)
+        return Elevation::Hills;
+    return Elevation::Mountains;
+}
+
+Temperature GetTemperature(float noise)
+{
+    if (noise < -0.3f)
+        return Temperature::Cold;
+    if (noise < 0.3f)
+        return Temperature::Temperate;
+    return Temperature::Hot;
+}
+
+Moisture GetMoisture(float noise)
+{
+    if (noise < -0.2f)
+        return Moisture::Dry;
+    if (noise < 0.4f)
+        return Moisture::Normal;
+    return Moisture::Wet;
+}
+BiomeType DetermineBiome(Elevation elev, Temperature temp, Moisture moist)
+{
+    if (elev == Elevation::Water)
+        return BiomeType::Ocean;
+    if (elev == Elevation::Mountains)
+        return BiomeType::MountainPeak;
+
+    switch (temp)
+    {
+    case Temperature::Cold:
+        if (moist == Moisture::Dry)
+            return BiomeType::IceSheet;
+        return BiomeType::Tundra;
+
+    case Temperature::Temperate:
+        if (moist == Moisture::Dry)
+            return BiomeType::Plains;
+        if (moist == Moisture::Normal)
+            return BiomeType::Forest;
+        return BiomeType::Taiga;
+
+    case Temperature::Hot:
+        if (moist == Moisture::Dry)
+            return BiomeType::Desert;
+        if (moist == Moisture::Normal)
+            return BiomeType::Plains;
+        return BiomeType::Rainforest;
+    }
+    return BiomeType::Plains;
+}
 sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site *site)
 {
     float sumX = 0, sumY = 0;
@@ -90,7 +148,7 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
     return tiles;
 }
 
-std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize)
+std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight)
 {
     std::vector<bool> isAssigned(smallTiles.size(), false);
     std::vector<int> smallToBig(smallTiles.size(), -1);
@@ -129,10 +187,13 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
                 }
             }
         }
+
         clusters.push_back(currentCluster);
     }
 
     std::vector<Tile> largeTiles(clusters.size());
+    sf::Vector2f mapCenter(mapWidth / 2.0f, mapHeight / 2.0f);
+    float maxDist = std::min(mapWidth, mapHeight) / 2.0f;
 
     for (size_t b = 0; b < clusters.size(); ++b)
     {
@@ -176,6 +237,22 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
                 }
             }
         }
+        float distToCenter = std::sqrt(std::pow(lt.position.x - mapCenter.x, 2) + std::pow(lt.position.y - mapCenter.y, 2));
+        float falloff = distToCenter / maxDist;
+        falloff = std::pow(falloff, 2.5f);
+
+        float rawElev = elevNoise.GetNoise(lt.position.x, lt.position.y);
+        lt.terrain.elevationNoise = rawElev - falloff;
+
+        lt.terrain.temperatureNoise = tempNoise.GetNoise(lt.position.x, lt.position.y);
+        lt.terrain.moistureNoise = moistNoise.GetNoise(lt.position.x, lt.position.y);
+
+        lt.terrain.elevation = GetElevation(lt.terrain.elevationNoise);
+        lt.terrain.temperature = GetTemperature(lt.terrain.temperatureNoise);
+        lt.terrain.moisture = GetMoisture(lt.terrain.moistureNoise);
+
+        lt.terrain.biome = DetermineBiome(lt.terrain.elevation, lt.terrain.temperature, lt.terrain.moisture);
+
         largeTiles[b] = lt;
     }
 
@@ -186,7 +263,23 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
 {
     std::vector<jcv_point> points = InitializeSeeds(mapWidth, mapHeight, cellSize);
     jcv_rect rect = {{50.0f, 50.0f}, {(float)mapWidth - 50.0f, (float)mapHeight - 50.0f}};
+    std::random_device rd;
+    std::mt19937 seedGen(rd());
+    elevNoise.SetFrequency(0.0045f);
+    tempNoise.SetFrequency(0.003f);
+    moistNoise.SetFrequency(0.003f);
+    unsigned int elevationSeed = seedGen();
+    unsigned int temperatureSeed = seedGen();
+    unsigned int moistureSeed = seedGen();
 
+    elevNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    elevNoise.SetSeed(elevationSeed);
+
+    tempNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    tempNoise.SetSeed(temperatureSeed);
+
+    moistNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    moistNoise.SetSeed(moistureSeed);
     for (int it = 0; it < iterations; ++it)
     {
         jcv_diagram diagram;
@@ -204,5 +297,5 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
     }
 
     std::vector<Tile> fineSiatka = CreateTiles(points, mapWidth, mapHeight);
-    return MergeTiles(fineSiatka, 6);
+    return MergeTiles(fineSiatka, 6, mapWidth, mapHeight);
 }

@@ -3,13 +3,48 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
 using namespace std;
-enum class TerrainType
-{
-    Plains,
+enum class Elevation {
     Water,
-    Mountain,
-    Desert
+    Plains,
+    Hills,
+    Mountains
 };
+
+enum class Temperature {
+    Cold,
+    Temperate,
+    Hot
+};
+
+enum class Moisture {
+    Dry,
+    Normal,
+    Wet
+};
+
+enum class BiomeType {
+    Ocean,
+    IceSheet,
+    Tundra,
+    Desert,
+    Plains,
+    Forest,
+    Taiga,
+    Rainforest,
+    MountainPeak
+};
+
+struct Terrain {
+    float elevationNoise = 0.0f;
+    float temperatureNoise = 0.0f;
+    float moistureNoise = 0.0f;
+
+    Elevation elevation;
+    Temperature temperature;
+    Moisture moisture;
+    BiomeType biome;
+};
+
 struct CellEdge
 {
     sf::Vector2f p1;
@@ -27,6 +62,6 @@ struct Tile
     int ownerID;
     std::vector<CellEdge> cellEdges;
     std::vector<sf::Vertex> provinceBorders;
-    TerrainType type;
+    Terrain terrain;
     std::vector<std::size_t> neighbors;
 };
