@@ -11,6 +11,7 @@ enum class TerrainType {
 
 struct Tile {
     sf::Vector2f position;
+    std::vector<sf::Vector2f> vertices;
     std::size_t ID;
     float size;
     int ownerID;

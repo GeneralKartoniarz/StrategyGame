@@ -1,8 +1,8 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <vector>
-
+#include "Tile.hpp"
 class MapGenerator {
 public:
-    std::vector<sf::Vector2f> GenerateSeeds(int mapWidth, int mapHeight, int cellSize);
+    std::vector<Tile> GenerateSeeds(int mapWidth, int mapHeight, int cellSize);
 };
