@@ -4,13 +4,12 @@
 TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 {
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 60, 1);
+    this->map = mg.GetMap(1920, 1080, 60, 2);
     this->map[106].shape.setFillColor(sf::Color::Blue);
     for (int i = 0; i < this->map[106].neighbors.size(); i++)
     {
         this->map[this->map[106].neighbors[i]].shape.setFillColor(sf::Color::Red);
     }
-    
 }
 
 void TestState::Update(float dt)

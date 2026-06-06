@@ -88,4 +88,4 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
         jcv_diagram_free(&diagram);
     }
     return CreateTiles(points, mapWidth, mapHeight);
-}   
+}
