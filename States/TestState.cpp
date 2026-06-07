@@ -36,7 +36,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     normalWorld.normalThreshold = 1.35f;
 
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 6, 1, normalWorld);
+    this->map = mg.GetMap(1920, 1080, 5, 1, normalWorld);
 
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
 

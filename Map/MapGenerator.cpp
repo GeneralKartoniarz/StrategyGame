@@ -114,7 +114,7 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
     memset(&diagram, 0, sizeof(jcv_diagram));
     jcv_diagram_generate(points.size(), points.data(), &rect, 0, &diagram);
 
-    std::vector<Tile> tiles(diagram.numsites);
+    std::vector<Tile> tiles(points.size());
     const jcv_site *sites = jcv_diagram_get_sites(&diagram);
 
     for (int i = 0; i < diagram.numsites; ++i)
@@ -148,14 +148,13 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
     jcv_diagram_free(&diagram);
     return tiles;
 }
-
 std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight, const ClimateConfig &config)
 {
     std::vector<bool> isAssigned(smallTiles.size(), false);
     std::vector<int> smallToBig(smallTiles.size(), -1);
     std::vector<std::vector<int>> clusters;
 
-    std::vector<bool> inQueueGlobal(smallTiles.size(), false);
+    std::vector<bool> inQueue(smallTiles.size(), false);
 
     for (size_t i = 0; i < smallTiles.size(); ++i)
     {
@@ -165,8 +164,11 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
         std::vector<int> currentCluster;
         std::queue<int> q;
 
+        std::vector<int> nodesToReset;
+
         q.push(static_cast<int>(i));
-        inQueueGlobal[i] = true;
+        inQueue[i] = true;
+        nodesToReset.push_back(static_cast<int>(i));
 
         while (!q.empty() && currentCluster.size() < static_cast<size_t>(targetClusterSize))
         {
@@ -182,11 +184,20 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 
             for (int neighborID : smallTiles[curr].neighbors)
             {
-                if (!isAssigned[neighborID] && !inQueueGlobal[neighborID])
+                if (!isAssigned[neighborID] && !inQueue[neighborID])
                 {
                     q.push(neighborID);
-                    inQueueGlobal[neighborID] = true;
+                    inQueue[neighborID] = true;
+                    nodesToReset.push_back(neighborID);
                 }
+            }
+        }
+
+        for (int node : nodesToReset)
+        {
+            if (!isAssigned[node])
+            {
+                inQueue[node] = false;
             }
         }
 
@@ -262,7 +273,6 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 
     return largeTiles;
 }
-
 std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations, ClimateConfig config)
 {
     std::vector<jcv_point> points = InitializeSeeds(mapWidth, mapHeight, cellSize);
@@ -270,7 +280,7 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
     std::random_device rd;
     std::mt19937 seedGen(rd());
 
-    elevNoise.SetFrequency(0.000040f);
+    elevNoise.SetFrequency(0.0040f);
     tempNoise.SetFrequency(0.0038f);
     moistNoise.SetFrequency(0.0038f);
     continentalNoise.SetFrequency(0.004f);
@@ -290,6 +300,7 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
 
     continentalNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     continentalNoise.SetSeed(seedGen());
+
     for (int it = 0; it < iterations; ++it)
     {
         jcv_diagram diagram;
@@ -300,8 +311,8 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
         for (int i = 0; i < diagram.numsites; ++i)
         {
             sf::Vector2f centroid = CalculateCentroid(&sites[i]);
-            points[i].x = static_cast<double>(centroid.x);
-            points[i].y = static_cast<double>(centroid.y);
+            points[sites[i].index].x = static_cast<double>(centroid.x);
+            points[sites[i].index].y = static_cast<double>(centroid.y);
         }
         jcv_diagram_free(&diagram);
     }
