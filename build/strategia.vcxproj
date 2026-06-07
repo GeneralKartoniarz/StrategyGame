@@ -371,6 +371,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Tile.hpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\MapGenerator.cpp" />
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\jc_voronoi.h" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\InputController.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

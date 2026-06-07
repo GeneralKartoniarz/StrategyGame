@@ -1,5 +1,4 @@
 #define JC_VORONOI_IMPLEMENTATION
-#include "jc_voronoi.h"
 #include "MapGenerator.hpp"
 #include <random>
 #include "Tile.hpp"
@@ -8,31 +7,31 @@
 #include <algorithm>
 #include <cmath>
 
-Elevation GetElevation(float noise)
+Elevation GetElevation(float noise, const ClimateConfig &config)
 {
-    if (noise < -0.4f)
+    if (noise < config.waterThreshold)
         return Elevation::Water;
-    if (noise < 0.2f)
+    if (noise < config.plainsThreshold)
         return Elevation::Plains;
-    if (noise < 0.6f)
+    if (noise < config.hillsThreshold)
         return Elevation::Hills;
     return Elevation::Mountains;
 }
 
-Temperature GetTemperature(float noise)
+Temperature GetTemperature(float noise, const ClimateConfig &config)
 {
-    if (noise < -0.3f)
+    if (noise < config.coldThreshold)
         return Temperature::Cold;
-    if (noise < 0.3f)
+    if (noise < config.temperateThreshold)
         return Temperature::Temperate;
     return Temperature::Hot;
 }
 
-Moisture GetMoisture(float noise)
+Moisture GetMoisture(float noise, const ClimateConfig &config)
 {
-    if (noise < -0.2f)
+    if (noise < config.dryThreshold)
         return Moisture::Dry;
-    if (noise < 0.4f)
+    if (noise < config.normalThreshold)
         return Moisture::Normal;
     return Moisture::Wet;
 }
@@ -50,14 +49,12 @@ BiomeType DetermineBiome(Elevation elev, Temperature temp, Moisture moist)
         if (moist == Moisture::Dry)
             return BiomeType::IceSheet;
         return BiomeType::Tundra;
-
     case Temperature::Temperate:
         if (moist == Moisture::Dry)
             return BiomeType::Plains;
         if (moist == Moisture::Normal)
             return BiomeType::Forest;
         return BiomeType::Taiga;
-
     case Temperature::Hot:
         if (moist == Moisture::Dry)
             return BiomeType::Desert;
@@ -70,9 +67,10 @@ BiomeType DetermineBiome(Elevation elev, Temperature temp, Moisture moist)
 
 sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site *site)
 {
-    float sumX = 0, sumY = 0;
+    double sumX = 0.0, sumY = 0.0;
     int count = 0;
     const jcv_graphedge *edge = site->edges;
+
     while (edge)
     {
         sumX += edge->pos[0].x + edge->pos[1].x;
@@ -80,16 +78,16 @@ sf::Vector2f MapGenerator::CalculateCentroid(const jcv_site *site)
         count += 2;
         edge = edge->next;
     }
+
     if (count == 0)
     {
-        return sf::Vector2f(site->p.x, site->p.y);
+        return sf::Vector2f(static_cast<float>(site->p.x), static_cast<float>(site->p.y));
     }
-    return sf::Vector2f(sumX / count, sumY / count);
+    return sf::Vector2f(static_cast<float>(sumX / count), static_cast<float>(sumY / count));
 }
 
 std::vector<jcv_point> MapGenerator::InitializeSeeds(int mapWidth, int mapHeight, int cellSize)
 {
-
     std::vector<jcv_point> points;
     int margin = 50;
     int cols = (mapWidth - 2 * margin) / cellSize;
@@ -101,9 +99,9 @@ std::vector<jcv_point> MapGenerator::InitializeSeeds(int mapWidth, int mapHeight
     {
         for (int x = 0; x < cols; ++x)
         {
-            std::uniform_real_distribution<float> distX(margin + x * cellSize, margin + (x + 1) * cellSize);
-            std::uniform_real_distribution<float> distY(margin + y * cellSize, margin + (y + 1) * cellSize);
-            points.push_back({distX(gen), distY(gen)});
+            std::uniform_real_distribution<double> distX(margin + x * cellSize, margin + (x + 1) * cellSize);
+            std::uniform_real_distribution<double> distY(margin + y * cellSize, margin + (y + 1) * cellSize);
+            points.push_back({static_cast<jcv_real>(distX(gen)), static_cast<jcv_real>(distY(gen))});
         }
     }
     return points;
@@ -112,7 +110,7 @@ std::vector<jcv_point> MapGenerator::InitializeSeeds(int mapWidth, int mapHeight
 std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points, int mapWidth, int mapHeight)
 {
     jcv_diagram diagram;
-    jcv_rect rect = {{50.0f, 50.0f}, {(float)mapWidth - 50.0f, (float)mapHeight - 50.0f}};
+    jcv_rect rect = {{50.0, 50.0}, {static_cast<double>(mapWidth) - 50.0, static_cast<double>(mapHeight) - 50.0}};
     memset(&diagram, 0, sizeof(jcv_diagram));
     jcv_diagram_generate(points.size(), points.data(), &rect, 0, &diagram);
 
@@ -124,12 +122,13 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
         const jcv_site *site = &sites[i];
         Tile t;
         t.ID = site->index;
-        t.position = {site->p.x, site->p.y};
+
+        t.position = {static_cast<float>(site->p.x), static_cast<float>(site->p.y)};
 
         const jcv_graphedge *edge = site->edges;
         while (edge)
         {
-            t.vertices.push_back({edge->pos[0].x, edge->pos[0].y});
+            t.vertices.push_back({static_cast<float>(edge->pos[0].x), static_cast<float>(edge->pos[0].y)});
 
             int nID = edge->neighbor ? edge->neighbor->index : -1;
             if (nID != -1)
@@ -137,8 +136,8 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
                 t.neighbors.push_back(nID);
             }
 
-            t.cellEdges.push_back({sf::Vector2f(edge->pos[0].x, edge->pos[0].y),
-                                   sf::Vector2f(edge->pos[1].x, edge->pos[1].y),
+            t.cellEdges.push_back({sf::Vector2f(static_cast<float>(edge->pos[0].x), static_cast<float>(edge->pos[0].y)),
+                                   sf::Vector2f(static_cast<float>(edge->pos[1].x), static_cast<float>(edge->pos[1].y)),
                                    nID});
 
             edge = edge->next;
@@ -150,12 +149,13 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
     return tiles;
 }
 
-std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight)
+std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight, const ClimateConfig &config)
 {
     std::vector<bool> isAssigned(smallTiles.size(), false);
     std::vector<int> smallToBig(smallTiles.size(), -1);
     std::vector<std::vector<int>> clusters;
-    std::vector<int> inQueueFlags(smallTiles.size(), -1);
+
+    std::vector<bool> inQueueGlobal(smallTiles.size(), false);
 
     for (size_t i = 0; i < smallTiles.size(); ++i)
     {
@@ -165,8 +165,8 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
         std::vector<int> currentCluster;
         std::queue<int> q;
 
-        q.push(i);
-        inQueueFlags[i] = i;
+        q.push(static_cast<int>(i));
+        inQueueGlobal[i] = true;
 
         while (!q.empty() && currentCluster.size() < static_cast<size_t>(targetClusterSize))
         {
@@ -178,14 +178,14 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 
             isAssigned[curr] = true;
             currentCluster.push_back(curr);
-            smallToBig[curr] = clusters.size();
+            smallToBig[curr] = static_cast<int>(clusters.size());
 
             for (int neighborID : smallTiles[curr].neighbors)
             {
-                if (!isAssigned[neighborID] && inQueueFlags[neighborID] != static_cast<int>(i))
+                if (!isAssigned[neighborID] && !inQueueGlobal[neighborID])
                 {
                     q.push(neighborID);
-                    inQueueFlags[neighborID] = i;
+                    inQueueGlobal[neighborID] = true;
                 }
             }
         }
@@ -242,15 +242,18 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
         float falloff = distToCenter / maxDist;
         falloff = std::pow(falloff, 2.5f);
 
-        float rawElev = elevNoise.GetNoise(lt.position.x, lt.position.y);
-        lt.terrain.elevationNoise = rawElev - falloff;
+        float continental = continentalNoise.GetNoise(lt.position.x, lt.position.y);
+        float detailElevation = elevNoise.GetNoise(lt.position.x, lt.position.y);
+        float combinedElev = continental + (detailElevation * 0.4f);
+
+        lt.terrain.elevationNoise = combinedElev - falloff;
 
         lt.terrain.temperatureNoise = tempNoise.GetNoise(lt.position.x, lt.position.y);
         lt.terrain.moistureNoise = moistNoise.GetNoise(lt.position.x, lt.position.y);
 
-        lt.terrain.elevation = GetElevation(lt.terrain.elevationNoise);
-        lt.terrain.temperature = GetTemperature(lt.terrain.temperatureNoise);
-        lt.terrain.moisture = GetMoisture(lt.terrain.moistureNoise);
+        lt.terrain.elevation = GetElevation(lt.terrain.elevationNoise, config);
+        lt.terrain.temperature = GetTemperature(lt.terrain.temperatureNoise, config);
+        lt.terrain.moisture = GetMoisture(lt.terrain.moistureNoise, config);
 
         lt.terrain.biome = DetermineBiome(lt.terrain.elevation, lt.terrain.temperature, lt.terrain.moisture);
 
@@ -260,15 +263,18 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
     return largeTiles;
 }
 
-std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations)
+std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations, ClimateConfig config)
 {
     std::vector<jcv_point> points = InitializeSeeds(mapWidth, mapHeight, cellSize);
-    jcv_rect rect = {{50.0f, 50.0f}, {(float)mapWidth - 50.0f, (float)mapHeight - 50.0f}};
+    jcv_rect rect = {{50.0, 50.0}, {static_cast<double>(mapWidth) - 50.0, static_cast<double>(mapHeight) - 50.0}};
     std::random_device rd;
     std::mt19937 seedGen(rd());
-    elevNoise.SetFrequency(0.0048f);
-    tempNoise.SetFrequency(0.003f);
-    moistNoise.SetFrequency(0.003f);
+
+    elevNoise.SetFrequency(0.000040f);
+    tempNoise.SetFrequency(0.0038f);
+    moistNoise.SetFrequency(0.0038f);
+    continentalNoise.SetFrequency(0.004f);
+
     unsigned int elevationSeed = seedGen();
     unsigned int temperatureSeed = seedGen();
     unsigned int moistureSeed = seedGen();
@@ -281,6 +287,9 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
 
     moistNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     moistNoise.SetSeed(moistureSeed);
+
+    continentalNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    continentalNoise.SetSeed(seedGen());
     for (int it = 0; it < iterations; ++it)
     {
         jcv_diagram diagram;
@@ -291,12 +300,12 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
         for (int i = 0; i < diagram.numsites; ++i)
         {
             sf::Vector2f centroid = CalculateCentroid(&sites[i]);
-            points[i].x = centroid.x;
-            points[i].y = centroid.y;
+            points[i].x = static_cast<double>(centroid.x);
+            points[i].y = static_cast<double>(centroid.y);
         }
         jcv_diagram_free(&diagram);
     }
 
     std::vector<Tile> fineSiatka = CreateTiles(points, mapWidth, mapHeight);
-    return MergeTiles(fineSiatka, 3, mapWidth, mapHeight);
+    return MergeTiles(fineSiatka, 2, mapWidth, mapHeight, config);
 }

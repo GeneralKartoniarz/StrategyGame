@@ -12,6 +12,7 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(strategia main.cpp Game.cpp States.cpp TestState.cpp Tile.hpp
     MapGenerator.cpp
-    jc_voronoi.h)
+    jc_voronoi.h
+    InputController.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)

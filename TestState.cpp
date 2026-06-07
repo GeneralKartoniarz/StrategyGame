@@ -2,6 +2,7 @@
 #include "MapGenerator.hpp"
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 #include <SFML/Graphics.hpp>
 
 sf::Color GetBiomeColor(BiomeType biome)
@@ -23,12 +24,21 @@ sf::Color GetBiomeColor(BiomeType biome)
 
 TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 {
-    this->camera = windowPtr->getDefaultView();
-    this->camera.zoom(0.3f);
     std::srand(static_cast<unsigned>(std::time(nullptr)));
+    ClimateConfig normalWorld;
+
+    normalWorld.waterThreshold = -0.5f;
+    normalWorld.plainsThreshold = 0.70f;
+    normalWorld.hillsThreshold = 0.90f;
+    normalWorld.coldThreshold = -0.70f;  
+    normalWorld.temperateThreshold = 0.5f;
+    normalWorld.dryThreshold = -0.20f;
+    normalWorld.normalThreshold = 0.35f;
 
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 2, 1);
+    this->map = mg.GetMap(1920, 1080, 8, 1, normalWorld);
+
+    this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
 
     this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
     this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -67,12 +77,9 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)
             {
-                sf::Vector2f p1 = poly[i];
-                sf::Vector2f p2 = poly[i + 1];
-
                 this->terrainMesh.append(sf::Vertex{p0, finalColor});
-                this->terrainMesh.append(sf::Vertex{p1, finalColor});
-                this->terrainMesh.append(sf::Vertex{p2, finalColor});
+                this->terrainMesh.append(sf::Vertex{poly[i], finalColor});
+                this->terrainMesh.append(sf::Vertex{poly[i + 1], finalColor});
             }
         }
     }
@@ -80,69 +87,43 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
 void TestState::Update(float dt)
 {
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-    {
-        sf::Vector2i currentMousePos = sf::Mouse::getPosition(*this->windowPtr);
+    this->inputCtrl->Update(dt);
+}
 
-        if (this->isDragging)
-        {
-            sf::Vector2f oldWorldPos = this->windowPtr->mapPixelToCoords(this->lastMousePos, this->camera);
-            sf::Vector2f newWorldPos = this->windowPtr->mapPixelToCoords(currentMousePos, this->camera);
-
-            sf::Vector2f delta = oldWorldPos - newWorldPos;
-            this->camera.move(delta);
-        }
-
-        this->isDragging = true;
-        this->lastMousePos = currentMousePos;
-    }
-    else
-    {
-        this->isDragging = false;
-    }
-    sf::Vector2f viewSize = this->camera.getSize();
-    sf::Vector2f viewCenter = this->camera.getCenter();
-
-    float minX = viewSize.x / 2.0f;
-    float maxX = 1920.0f - minX;
-    
-    float minY = viewSize.y / 2.0f;
-    float maxY = 1080.0f - minY;
-
-    viewCenter.x = std::clamp(viewCenter.x, minX, maxX);
-    viewCenter.y = std::clamp(viewCenter.y, minY, maxY);
-
-    this->camera.setCenter(viewCenter);
+void TestState::HandleEvent(const sf::Event &event)
+{
+    this->inputCtrl->HandleEvent(event);
 }
 
 void TestState::Render(sf::RenderWindow *windowPtr)
 {
-    windowPtr->setView(this->camera);
+    windowPtr->setView(this->inputCtrl->GetCamera());
 
     windowPtr->draw(this->terrainMesh);
-    windowPtr->draw(this->borderMesh);
-    
-    windowPtr->setView(windowPtr->getDefaultView());
-}
 
-void TestState::HandleEvent(const sf::Event& event)
-{
-    if (const auto* scrollEvent = event.getIf<sf::Event::MouseWheelScrolled>())
+    int selectedID = this->inputCtrl->GetSelectedTileID();
+    if (selectedID != -1 && static_cast<size_t>(selectedID) < this->map.size())
     {
-        if (scrollEvent->wheel == sf::Mouse::Wheel::Vertical)
+        const auto& selectedRegion = this->map[selectedID];
+        sf::VertexArray highlightMesh(sf::PrimitiveType::Triangles);
+        
+        sf::Color highlightColor(255, 255, 255, 80); 
+
+        for (const auto &poly : selectedRegion.subPolygons)
         {
-            if (scrollEvent->delta > 0.0f)
+            size_t pointCount = poly.size();
+            if (pointCount < 3) continue;
+
+            sf::Vector2f p0 = poly[0];
+            for (size_t i = 1; i < pointCount - 1; ++i)
             {
-                this->camera.zoom(0.9f);
-                if (this->camera.getSize().x < 50.0f)
-                    this->camera.zoom(1.0f / 0.9f);
-            }
-            else
-            {
-                this->camera.zoom(1.1f);
-                if (this->camera.getSize().x > 350.0f)
-                    this->camera.zoom(1.0f / 1.1f);
+                highlightMesh.append(sf::Vertex{p0, highlightColor});
+                highlightMesh.append(sf::Vertex{poly[i], highlightColor});
+                highlightMesh.append(sf::Vertex{poly[i + 1], highlightColor});
             }
         }
+        windowPtr->draw(highlightMesh);
     }
+    windowPtr->draw(this->borderMesh);
+    windowPtr->setView(windowPtr->getDefaultView());
 }
