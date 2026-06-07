@@ -69,7 +69,6 @@ void InputController::Update(float dt)
 
 void InputController::HandleEvent(const sf::Event& event)
 {
-    // TUTAJ W PRZYSZŁOŚCI WEJDZIE SPRAWDZANIE KLIKNIĘĆ W INTERFEJS 
 
     if (const auto* mouseEvent = event.getIf<sf::Event::MouseButtonPressed>())
     {
@@ -101,6 +100,7 @@ void InputController::HandleEvent(const sf::Event& event)
 
                 if (insideRegion)
                 {
+                    this->selectedTileID = static_cast<int>(region.ID);
                     break;
                 }
             }

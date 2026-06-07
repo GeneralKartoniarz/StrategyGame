@@ -4,7 +4,7 @@
 #include <memory>
 #include "Label.hpp"
 #include "Button.hpp"
-
+#include "SidePanel.hpp"
 class GameInterface
 {
 public:
@@ -15,6 +15,7 @@ public:
     void Draw(sf::RenderWindow *window);
     bool IsMouseOverUI(const sf::Vector2i &mousePos) const;
     int GetTurnCount() const { return this->turnCount; }
+    void UpdateSelection(const Tile *tile);
 
 private:
     void NextTurn();
@@ -26,6 +27,6 @@ private:
     std::vector<std::unique_ptr<Label>> statLabels;
     std::unique_ptr<Label> turnCounterLabel;
     std::unique_ptr<Button> nextTurnButton;
-
+    std::unique_ptr<SidePanel> sidePanel;
     int turnCount;
 };
