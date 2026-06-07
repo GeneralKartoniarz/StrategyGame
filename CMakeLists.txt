@@ -10,9 +10,18 @@ FetchContent_Declare(SFML
 )
 FetchContent_MakeAvailable(SFML)
 
-add_executable(strategia main.cpp Game.cpp States.cpp TestState.cpp Tile.hpp
-    MapGenerator.cpp
-    jc_voronoi.h
-    InputController.cpp)
+add_executable(strategia 
+    main.cpp 
+    Game.cpp 
+    States/States.cpp 
+    States/TestState.cpp 
+    Map/MapGenerator.cpp 
+    UI/InputController.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
+target_include_directories(strategia PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Map
+    ${CMAKE_CURRENT_SOURCE_DIR}/States
+    ${CMAKE_CURRENT_SOURCE_DIR}/UI
+)

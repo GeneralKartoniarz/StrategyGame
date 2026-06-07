@@ -1,6 +1,6 @@
 C:\Users\janpa\Documents\GitHub\StrategyGame\main.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\main.obj
 C:\Users\janpa\Documents\GitHub\StrategyGame\Game.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\Game.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\States.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\States.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\TestState.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\TestState.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\MapGenerator.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\MapGenerator.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\InputController.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\InputController.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\States\States.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\States.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\States\TestState.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\TestState.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapGenerator.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\MapGenerator.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\InputController.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Release\InputController.obj

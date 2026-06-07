@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -111,10 +111,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;SFML_STATIC;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -167,10 +167,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;SFML_STATIC;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -197,7 +197,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -223,10 +223,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;SFML_STATIC;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -253,7 +253,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <BufferSecurityCheck></BufferSecurityCheck>
@@ -278,10 +278,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;SFML_STATIC;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\janpa\Documents\GitHub\StrategyGame;C:\Users\janpa\Documents\GitHub\StrategyGame\Map;C:\Users\janpa\Documents\GitHub\StrategyGame\States;C:\Users\janpa\Documents\GitHub\StrategyGame\UI;C:\Users\janpa\Documents\GitHub\StrategyGame\build\_deps\sfml-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -366,12 +366,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\main.cpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Game.cpp" />
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States.cpp" />
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\TestState.cpp" />
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Tile.hpp" />
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\MapGenerator.cpp" />
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\jc_voronoi.h" />
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\InputController.cpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\States.cpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\TestState.cpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapGenerator.cpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\InputController.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

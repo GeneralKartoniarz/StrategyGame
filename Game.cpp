@@ -3,8 +3,8 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
-#include "States.hpp"
-#include "TestState.hpp"
+#include "States/States.hpp"
+#include "States/TestState.hpp"
 #include <vector>
 using namespace std;
 Game::Game()

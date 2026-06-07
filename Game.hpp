@@ -1,11 +1,9 @@
-/*
-Zarządca maszyny stanów.
-*/
+
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <memory>
-#include "States.hpp"
+#include "States/States.hpp"
 
 class Game {
 private:
