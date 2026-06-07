@@ -101,8 +101,6 @@ void InputController::HandleEvent(const sf::Event& event)
 
                 if (insideRegion)
                 {
-                    this->selectedTileID = static_cast<int>(region.ID);
-                    std::cout<< this->selectedTileID << std::endl;
                     break;
                 }
             }

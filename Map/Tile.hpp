@@ -2,7 +2,7 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
-
+#include <string>
 using namespace std;
 
 enum class Elevation {
@@ -62,6 +62,7 @@ struct Tile
     std::size_t ID;
     float size;
     int ownerID;
+    string name;
     std::vector<CellEdge> cellEdges;
     std::vector<sf::Vertex> provinceBorders;
     Terrain terrain;

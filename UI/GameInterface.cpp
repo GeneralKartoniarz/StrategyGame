@@ -29,7 +29,29 @@ GameInterface::GameInterface(sf::RenderWindow* window) : turnCount(1)
 
     this->nextTurnButton = std::make_unique<Button>(sf::Vector2f({1780.0f, 940.0f}), 50.0f, this->font, "NEXT", &GameInterface::OnNextTurnClick);
 }
+bool GameInterface::IsMouseOverUI(const sf::Vector2i& mousePos) const
+{
+    sf::Vector2f fMousePos = static_cast<sf::Vector2f>(mousePos);
+    if (this->nextTurnButton && this->nextTurnButton->Contains(fMousePos))
+    {
+        return true;
+    }
 
+    if (this->turnCounterLabel && this->turnCounterLabel->Contains(fMousePos))
+    {
+        return true;
+    }
+
+    for (const auto& label : this->statLabels)
+    {
+        if (label && label->Contains(fMousePos))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 GameInterface::~GameInterface()
 {
     if (instance == this)

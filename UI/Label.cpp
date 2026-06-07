@@ -31,3 +31,7 @@ void Label::Draw(sf::RenderWindow *window)
     window->draw(this->background);
     window->draw(this->shapeText);
 }
+bool Label::Contains(const sf::Vector2f& point) const
+{
+    return this->background.getGlobalBounds().contains(point);
+}

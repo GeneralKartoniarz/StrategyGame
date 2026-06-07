@@ -374,6 +374,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.cpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\GameInterface.cpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NameGenerator.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

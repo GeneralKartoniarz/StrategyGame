@@ -6,7 +6,7 @@
 #include <queue>
 #include <algorithm>
 #include <cmath>
-
+#include "NameGenerator.hpp"
 Elevation GetElevation(float noise, const ClimateConfig &config)
 {
     if (noise < config.waterThreshold)
@@ -150,6 +150,7 @@ std::vector<Tile> MapGenerator::CreateTiles(const std::vector<jcv_point> &points
 }
 std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight, const ClimateConfig &config)
 {
+    NameGenerator::ResetMemory();
     std::vector<bool> isAssigned(smallTiles.size(), false);
     std::vector<int> smallToBig(smallTiles.size(), -1);
     std::vector<std::vector<int>> clusters;
@@ -267,7 +268,14 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
         lt.terrain.moisture = GetMoisture(lt.terrain.moistureNoise, config);
 
         lt.terrain.biome = DetermineBiome(lt.terrain.elevation, lt.terrain.temperature, lt.terrain.moisture);
-
+        if (lt.terrain.biome != BiomeType::Ocean)
+        {
+            lt.name = NameGenerator::GetRandomName();
+        }
+        else
+        {
+            lt.name = "Bezkresny Ocean";
+        }
         largeTiles[b] = lt;
     }
 
@@ -275,6 +283,7 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 }
 std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations, ClimateConfig config)
 {
+
     std::vector<jcv_point> points = InitializeSeeds(mapWidth, mapHeight, cellSize);
     jcv_rect rect = {{50.0, 50.0}, {static_cast<double>(mapWidth) - 50.0, static_cast<double>(mapHeight) - 50.0}};
     std::random_device rd;

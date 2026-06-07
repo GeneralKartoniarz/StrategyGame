@@ -25,20 +25,18 @@ sf::Color GetBiomeColor(BiomeType biome)
 TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
-    ClimateConfig normalWorld;
 
+    ClimateConfig normalWorld;
     normalWorld.waterThreshold = -0.5f;
     normalWorld.plainsThreshold = 0.80f;
     normalWorld.hillsThreshold = 0.80f;
-    normalWorld.coldThreshold = -0.70f;  
+    normalWorld.coldThreshold = -0.70f;
     normalWorld.temperateThreshold = 0.5f;
     normalWorld.dryThreshold = -0.20f;
     normalWorld.normalThreshold = 1.35f;
 
     MapGenerator mg;
     this->map = mg.GetMap(1920, 1080, 5, 1, normalWorld);
-
-    this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
 
     this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
     this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -53,8 +51,8 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
         sf::Color baseColor = GetBiomeColor(region.terrain.biome);
         float heightFactor = region.terrain.elevationNoise;
         int brightnessAdjustment = static_cast<int>(heightFactor * 30.0f);
-
         sf::Color finalColor;
+
         if (region.terrain.biome == BiomeType::Ocean)
         {
             finalColor.r = std::max(0, std::min(255, baseColor.r + brightnessAdjustment / 2));
@@ -71,8 +69,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
         for (const auto &poly : region.subPolygons)
         {
             size_t pointCount = poly.size();
-            if (pointCount < 3)
-                continue;
+            if (pointCount < 3) continue;
 
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)
@@ -83,6 +80,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             }
         }
     }
+
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
     this->gui = std::make_unique<GameInterface>(windowPtr);
 }
@@ -91,12 +89,32 @@ void TestState::Update(float dt)
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
     bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    
     this->gui->Update(dt, mousePos, mouseClicked);
-    this->inputCtrl->Update(dt);
+
+    if (!this->gui->IsMouseOverUI(mousePos))
+    {
+        this->inputCtrl->Update(dt);
+    }
 }
 
 void TestState::HandleEvent(const sf::Event &event)
 {
+    if (const auto* mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
+    {
+        if (this->gui->IsMouseOverUI(mouseBtnDown->position)) return;
+    }
+    
+    if (const auto* mouseBtnUp = event.getIf<sf::Event::MouseButtonReleased>())
+    {
+        if (this->gui->IsMouseOverUI(mouseBtnUp->position)) return;
+    }
+    
+    if (const auto* mouseScroll = event.getIf<sf::Event::MouseWheelScrolled>())
+    {
+        if (this->gui->IsMouseOverUI(mouseScroll->position)) return;
+    }
+
     this->inputCtrl->HandleEvent(event);
 }
 
@@ -108,9 +126,9 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     int selectedID = this->inputCtrl->GetSelectedTileID();
     if (selectedID != -1 && static_cast<size_t>(selectedID) < this->map.size())
     {
-        const auto& selectedRegion = this->map[selectedID];
+        const auto &selectedRegion = this->map[selectedID];
         sf::VertexArray highlightMesh(sf::PrimitiveType::Triangles);
-        sf::Color highlightColor(255, 255, 255, 80); 
+        sf::Color highlightColor(255, 255, 255, 80);
 
         for (const auto &poly : selectedRegion.subPolygons)
         {
@@ -127,6 +145,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         }
         windowPtr->draw(highlightMesh);
     }
+
     windowPtr->draw(this->borderMesh);
     windowPtr->setView(windowPtr->getDefaultView());
     this->gui->Draw(windowPtr);

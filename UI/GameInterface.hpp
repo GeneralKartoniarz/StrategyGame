@@ -8,19 +8,19 @@
 class GameInterface
 {
 public:
-    GameInterface(sf::RenderWindow* window);
+    GameInterface(sf::RenderWindow *window);
     ~GameInterface();
 
-    void Update(float dt, const sf::Vector2i& mousePos, bool mouseClicked);
-    void Draw(sf::RenderWindow* window);
-
+    void Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked);
+    void Draw(sf::RenderWindow *window);
+    bool IsMouseOverUI(const sf::Vector2i &mousePos) const;
     int GetTurnCount() const { return this->turnCount; }
 
 private:
     void NextTurn();
 
     static void OnNextTurnClick();
-    static GameInterface* instance;
+    static GameInterface *instance;
 
     sf::Font font;
     std::vector<std::unique_ptr<Label>> statLabels;
