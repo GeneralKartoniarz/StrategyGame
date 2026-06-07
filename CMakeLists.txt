@@ -16,7 +16,11 @@ add_executable(strategia
     States/States.cpp 
     States/TestState.cpp 
     Map/MapGenerator.cpp 
-    UI/InputController.cpp)
+    UI/InputController.cpp
+    UI/Label.cpp
+    UI/Button.hpp
+    UI/Button.cpp
+    UI/GameInterface.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
 target_include_directories(strategia PRIVATE 

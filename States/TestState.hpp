@@ -4,6 +4,7 @@
 #include <memory>
 #include "Map/Tile.hpp"
 #include "UI/InputController.hpp"
+#include "UI/GameInterface.hpp"
 #include <SFML/Graphics.hpp>
 
 class TestState : public States
@@ -21,4 +22,5 @@ private:
     sf::VertexArray borderMesh;
     std::vector<Tile> map;
     std::unique_ptr<InputController> inputCtrl;
+    std::unique_ptr<GameInterface> gui;
 };

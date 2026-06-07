@@ -83,10 +83,15 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             }
         }
     }
+    this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
+    this->gui = std::make_unique<GameInterface>(windowPtr);
 }
 
 void TestState::Update(float dt)
 {
+    sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+    bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    this->gui->Update(dt, mousePos, mouseClicked);
     this->inputCtrl->Update(dt);
 }
 
@@ -98,7 +103,6 @@ void TestState::HandleEvent(const sf::Event &event)
 void TestState::Render(sf::RenderWindow *windowPtr)
 {
     windowPtr->setView(this->inputCtrl->GetCamera());
-
     windowPtr->draw(this->terrainMesh);
 
     int selectedID = this->inputCtrl->GetSelectedTileID();
@@ -106,7 +110,6 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     {
         const auto& selectedRegion = this->map[selectedID];
         sf::VertexArray highlightMesh(sf::PrimitiveType::Triangles);
-        
         sf::Color highlightColor(255, 255, 255, 80); 
 
         for (const auto &poly : selectedRegion.subPolygons)
@@ -126,4 +129,5 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     }
     windowPtr->draw(this->borderMesh);
     windowPtr->setView(windowPtr->getDefaultView());
+    this->gui->Draw(windowPtr);
 }

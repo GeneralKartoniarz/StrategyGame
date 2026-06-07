@@ -19,11 +19,28 @@
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\InputController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Label.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\GameInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\janpa\Documents\GitHub\StrategyGame\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{74B4C94C-BFAA-343D-ABDE-C5DE523C13F6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{D481D0B5-F129-3684-B29A-7CBDD46A4CE2}</UniqueIdentifier>
     </Filter>
