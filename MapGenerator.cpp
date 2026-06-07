@@ -155,8 +155,6 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
     std::vector<bool> isAssigned(smallTiles.size(), false);
     std::vector<int> smallToBig(smallTiles.size(), -1);
     std::vector<std::vector<int>> clusters;
-
-    // Jednorazowa alokacja flag kolejkowych zapobiegająca heap thrashingowi
     std::vector<int> inQueueFlags(smallTiles.size(), -1);
 
     for (size_t i = 0; i < smallTiles.size(); ++i)

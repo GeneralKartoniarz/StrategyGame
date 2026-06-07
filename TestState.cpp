@@ -28,7 +28,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 3, 1);
+    this->map = mg.GetMap(1920, 1080, 2, 1);
 
     this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
     this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
