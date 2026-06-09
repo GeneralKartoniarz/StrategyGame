@@ -45,6 +45,8 @@ struct Terrain {
     Temperature temperature;
     Moisture moisture;
     BiomeType biome;
+
+    string resourceName = "Brak";
 };
 
 struct CellEdge

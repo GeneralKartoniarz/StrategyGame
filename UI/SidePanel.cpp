@@ -48,7 +48,7 @@ void SidePanel::UpdateSelection(const Tile* tile)
 
         this->idText.setString("ID: " + std::to_string(tile->ID));
         
-        std::string biomeStr = "Teren: " + BiomeToString(tile->terrain.biome);
+        std::string biomeStr = "Teren: " + BiomeToString(tile->terrain.biome) + "\nSurowiec: "+ tile->terrain.resourceName;
         this->biomeText.setString(sf::String::fromUtf8(biomeStr.begin(), biomeStr.end()));
     }
     else

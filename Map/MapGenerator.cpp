@@ -7,6 +7,51 @@
 #include <algorithm>
 #include <cmath>
 #include "NameGenerator.hpp"
+
+enum class BiomeFlag : uint32_t 
+{
+    None         = 0,
+    Ocean        = 1 << 0,
+    IceSheet     = 1 << 1,
+    Tundra       = 1 << 2,
+    Taiga        = 1 << 3,
+    Forest       = 1 << 4,
+    Rainforest   = 1 << 5,
+    Plains       = 1 << 6,
+    Desert       = 1 << 7,
+    MountainPeak = 1 << 8
+};
+
+inline BiomeFlag operator|(BiomeFlag a, BiomeFlag b) 
+{
+    return static_cast<BiomeFlag>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+}
+
+BiomeFlag GetBiomeFlag(BiomeType type)
+{
+    switch(type)
+    {
+        case BiomeType::Ocean: return BiomeFlag::Ocean;
+        case BiomeType::IceSheet: return BiomeFlag::IceSheet;
+        case BiomeType::Tundra: return BiomeFlag::Tundra;
+        case BiomeType::Taiga: return BiomeFlag::Taiga;
+        case BiomeType::Forest: return BiomeFlag::Forest;
+        case BiomeType::Rainforest: return BiomeFlag::Rainforest;
+        case BiomeType::Plains: return BiomeFlag::Plains;
+        case BiomeType::Desert: return BiomeFlag::Desert;
+        case BiomeType::MountainPeak: return BiomeFlag::MountainPeak;
+        default: return BiomeFlag::None;
+    }
+}
+
+struct ResourceConfig 
+{
+    int resourceID;
+    std::string name;
+    float baseSpawnChance;
+    BiomeFlag allowedBiomesMask; 
+};
+
 Elevation GetElevation(float noise, const ClimateConfig &config)
 {
     if (noise < config.waterThreshold)
@@ -208,6 +253,23 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
     std::vector<Tile> largeTiles(clusters.size());
     sf::Vector2f mapCenter(mapWidth / 2.0f, mapHeight / 2.0f);
     float maxDist = std::min(mapWidth, mapHeight) / 2.0f;
+    
+    FastNoiseLite resourceNoise;
+    std::random_device rd;
+    resourceNoise.SetSeed(rd());
+    resourceNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    resourceNoise.SetFrequency(0.05f); 
+
+    std::vector<ResourceConfig> possibleResources = {
+        {1, "Ruda Żelaza", 0.6f, (BiomeFlag::MountainPeak | BiomeFlag::Tundra | BiomeFlag::Taiga)},
+        {2, "Złoto", 0.8f, (BiomeFlag::MountainPeak | BiomeFlag::Desert | BiomeFlag::Rainforest)}, 
+        {3, "Żyzna Gleba", 0.5f, (BiomeFlag::Plains | BiomeFlag::Forest)},
+        {4, "Wieloryby", 0.75f, BiomeFlag::Ocean},
+        {5, "Perły", 0.85f, BiomeFlag::Ocean},
+        {6, "Ławica Ryb", 0.4f, BiomeFlag::Ocean},
+        {7, "Zwierzęta Futerkowe", 0.5f, (BiomeFlag::Tundra | BiomeFlag::Taiga)},
+        {8, "Kakao", 0.4f, BiomeFlag::Rainforest}
+    };
 
     for (size_t b = 0; b < clusters.size(); ++b)
     {
@@ -259,7 +321,6 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
         float combinedElev = continental + (detailElevation * 0.4f);
 
         lt.terrain.elevationNoise = combinedElev - falloff;
-
         lt.terrain.temperatureNoise = tempNoise.GetNoise(lt.position.x, lt.position.y);
         lt.terrain.moistureNoise = moistNoise.GetNoise(lt.position.x, lt.position.y);
 
@@ -268,22 +329,33 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
         lt.terrain.moisture = GetMoisture(lt.terrain.moistureNoise, config);
 
         lt.terrain.biome = DetermineBiome(lt.terrain.elevation, lt.terrain.temperature, lt.terrain.moisture);
-        if (lt.terrain.biome != BiomeType::Ocean)
+        
+        lt.name = (lt.terrain.biome == BiomeType::Ocean) ? "Bezkresny Ocean" : NameGenerator::GetRandomName();
+        lt.terrain.resourceName = "Brak";
+            
+        BiomeFlag currentTileFlag = GetBiomeFlag(lt.terrain.biome);
+        float resValue = (resourceNoise.GetNoise(lt.position.x, lt.position.y) + 1.0f) / 2.0f;
+            
+        for(const auto& res : possibleResources)
         {
-            lt.name = NameGenerator::GetRandomName();
+            if((static_cast<uint32_t>(currentTileFlag) & static_cast<uint32_t>(res.allowedBiomesMask)) != 0)
+            {
+                if(resValue > res.baseSpawnChance)
+                {
+                    lt.terrain.resourceName = res.name;
+                    break; 
+                }
+            }
         }
-        else
-        {
-            lt.name = "Bezkresny Ocean";
-        }
+        
         largeTiles[b] = lt;
     }
 
     return largeTiles;
 }
+
 std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations, ClimateConfig config)
 {
-
     std::vector<jcv_point> points = InitializeSeeds(mapWidth, mapHeight, cellSize);
     jcv_rect rect = {{50.0, 50.0}, {static_cast<double>(mapWidth) - 50.0, static_cast<double>(mapHeight) - 50.0}};
     std::random_device rd;
@@ -291,7 +363,7 @@ std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize
 
     elevNoise.SetFrequency(0.0040f);
     tempNoise.SetFrequency(0.0038f);
-    moistNoise.SetFrequency(0.0038f);
+    moistNoise.SetFrequency(0.018f);
     continentalNoise.SetFrequency(0.004f);
 
     unsigned int elevationSeed = seedGen();

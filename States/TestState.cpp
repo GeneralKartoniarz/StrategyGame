@@ -9,16 +9,26 @@ sf::Color GetBiomeColor(BiomeType biome)
 {
     switch (biome)
     {
-    case BiomeType::Ocean:        return sf::Color(28, 81, 141);
-    case BiomeType::IceSheet:     return sf::Color(230, 245, 250);
-    case BiomeType::Tundra:       return sf::Color(145, 165, 140);
-    case BiomeType::Desert:       return sf::Color(225, 190, 110);
-    case BiomeType::Plains:       return sf::Color(120, 175, 90);
-    case BiomeType::Forest:       return sf::Color(55, 120, 65);
-    case BiomeType::Taiga:        return sf::Color(40, 95, 70);
-    case BiomeType::Rainforest:   return sf::Color(15, 85, 45);
-    case BiomeType::MountainPeak: return sf::Color(110, 115, 120);
-    default:                      return sf::Color(100, 100, 100);
+    case BiomeType::Ocean:
+        return sf::Color(28, 81, 141);
+    case BiomeType::IceSheet:
+        return sf::Color(230, 245, 250);
+    case BiomeType::Tundra:
+        return sf::Color(145, 165, 140);
+    case BiomeType::Desert:
+        return sf::Color(225, 190, 110);
+    case BiomeType::Plains:
+        return sf::Color(120, 175, 90);
+    case BiomeType::Forest:
+        return sf::Color(55, 120, 65);
+    case BiomeType::Taiga:
+        return sf::Color(40, 95, 70);
+    case BiomeType::Rainforest:
+        return sf::Color(45, 80, 15);
+    case BiomeType::MountainPeak:
+        return sf::Color(110, 115, 120);
+    default:
+        return sf::Color(100, 100, 100);
     }
 }
 
@@ -28,12 +38,14 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
     ClimateConfig normalWorld;
     normalWorld.waterThreshold = -0.5f;
-    normalWorld.plainsThreshold = 0.80f;
-    normalWorld.hillsThreshold = 0.80f;
-    normalWorld.coldThreshold = -0.70f;
-    normalWorld.temperateThreshold = 0.5f;
-    normalWorld.dryThreshold = -0.20f;
-    normalWorld.normalThreshold = 1.35f;
+    normalWorld.plainsThreshold = 0.3f;
+    normalWorld.hillsThreshold = 0.75f;
+
+    normalWorld.coldThreshold = -0.65f;
+    normalWorld.temperateThreshold = 0.15f;
+
+    normalWorld.dryThreshold = -0.45f;
+    normalWorld.normalThreshold = 0.15f;
 
     MapGenerator mg;
     this->map = mg.GetMap(1920, 1080, 5, 1, normalWorld);
@@ -69,7 +81,8 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
         for (const auto &poly : region.subPolygons)
         {
             size_t pointCount = poly.size();
-            if (pointCount < 3) continue;
+            if (pointCount < 3)
+                continue;
 
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)
@@ -90,7 +103,7 @@ void TestState::Update(float dt)
     sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
     bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
     int selectedID = this->inputCtrl->GetSelectedTileID();
-    const Tile* selectedTile = nullptr;
+    const Tile *selectedTile = nullptr;
     if (selectedID != -1 && static_cast<size_t>(selectedID) < this->map.size())
     {
         selectedTile = &this->map[selectedID];
@@ -106,19 +119,22 @@ void TestState::Update(float dt)
 
 void TestState::HandleEvent(const sf::Event &event)
 {
-    if (const auto* mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
+    if (const auto *mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
     {
-        if (this->gui->IsMouseOverUI(mouseBtnDown->position)) return;
+        if (this->gui->IsMouseOverUI(mouseBtnDown->position))
+            return;
     }
-    
-    if (const auto* mouseBtnUp = event.getIf<sf::Event::MouseButtonReleased>())
+
+    if (const auto *mouseBtnUp = event.getIf<sf::Event::MouseButtonReleased>())
     {
-        if (this->gui->IsMouseOverUI(mouseBtnUp->position)) return;
+        if (this->gui->IsMouseOverUI(mouseBtnUp->position))
+            return;
     }
-    
-    if (const auto* mouseScroll = event.getIf<sf::Event::MouseWheelScrolled>())
+
+    if (const auto *mouseScroll = event.getIf<sf::Event::MouseWheelScrolled>())
     {
-        if (this->gui->IsMouseOverUI(mouseScroll->position)) return;
+        if (this->gui->IsMouseOverUI(mouseScroll->position))
+            return;
     }
 
     this->inputCtrl->HandleEvent(event);
@@ -139,7 +155,8 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         for (const auto &poly : selectedRegion.subPolygons)
         {
             size_t pointCount = poly.size();
-            if (pointCount < 3) continue;
+            if (pointCount < 3)
+                continue;
 
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)

@@ -1,0 +1,11 @@
+C:\Users\janpa\Documents\GitHub\StrategyGame\main.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\main.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Game.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\Game.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\States\States.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\States.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\States\TestState.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\TestState.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapGenerator.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\MapGenerator.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\InputController.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\InputController.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Label.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\Label.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\Button.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\GameInterface.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\GameInterface.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NameGenerator.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\NameGenerator.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\SidePanel.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.dir\Debug\SidePanel.obj

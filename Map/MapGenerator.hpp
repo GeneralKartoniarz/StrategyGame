@@ -10,18 +10,15 @@
 #include "FastNoiseLite.h"
 struct ClimateConfig
 {
-    // Wysokość terenu
     float waterThreshold = -0.4f;
     float plainsThreshold = 0.2f;
     float hillsThreshold = 0.6f;
 
-    // Temperatura
-    float coldThreshold = -0.3f;
-    float temperateThreshold = 0.3f;
+    float coldThreshold = -0.2f;
+    float temperateThreshold = 0.2f;
 
-    // Wilgotność
-    float dryThreshold = -0.2f;
-    float normalThreshold = 0.4f;
+    float dryThreshold = -0.3f;
+    float normalThreshold = 0.0f; 
 };
 class MapGenerator
 {
