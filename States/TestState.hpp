@@ -20,6 +20,7 @@ public:
 private:
     sf::VertexArray terrainMesh;
     sf::VertexArray borderMesh;
+    sf::VertexArray riverMesh;
     std::vector<Tile> map;
     std::unique_ptr<InputController> inputCtrl;
     std::unique_ptr<GameInterface> gui;

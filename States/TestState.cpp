@@ -49,7 +49,28 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
     MapGenerator mg;
     this->map = mg.GetMap(1920, 1080, 5, 1, normalWorld);
+    TopologyGraph graph = mg.ExtractTopology(this->map, 1920, 1080, normalWorld);
+    mg.GenerateRivers(graph, 400); 
 
+    this->riverMesh.setPrimitiveType(sf::PrimitiveType::Lines);
+
+    for (size_t i = 0; i < graph.nodes.size(); ++i)
+    {
+        const auto &node = graph.nodes[i];
+        if (!node.isRiver)
+            continue;
+
+        for (int nIdx : node.neighbors)
+        {
+            const auto &neighbor = graph.nodes[nIdx];
+            if (neighbor.isRiver && nIdx > static_cast<int>(i))
+            {
+                sf::Color riverColor(30, 144, 255); 
+                this->riverMesh.append(sf::Vertex{node.position, riverColor});
+                this->riverMesh.append(sf::Vertex{neighbor.position, riverColor});
+            }
+        }
+    }
     this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
     this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
 
@@ -170,6 +191,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     }
 
     windowPtr->draw(this->borderMesh);
+    windowPtr->draw(this->riverMesh);
     windowPtr->setView(windowPtr->getDefaultView());
     this->gui->Draw(windowPtr);
 }

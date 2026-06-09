@@ -18,8 +18,22 @@ struct ClimateConfig
     float temperateThreshold = 0.2f;
 
     float dryThreshold = -0.3f;
-    float normalThreshold = 0.0f; 
+    float normalThreshold = 0.0f;
 };
+struct TopologyNode
+{
+    sf::Vector2f position;
+    float elevation;
+    bool isWater;
+    bool isRiver = false;
+    std::vector<int> neighbors;
+};
+
+struct TopologyGraph
+{
+    std::vector<TopologyNode> nodes;
+};
+
 class MapGenerator
 {
 public:
@@ -27,6 +41,8 @@ public:
     std::vector<Tile> GetMap(int mapWidth, int mapHeight, int cellSize, int iterations, ClimateConfig config = ClimateConfig());
     std::vector<jcv_point> InitializeSeeds(int mapWidth, int mapHeight, int cellSize);
     std::vector<Tile> CreateTiles(const std::vector<jcv_point> &points, int mapWidth, int mapHeight);
+    TopologyGraph ExtractTopology(const std::vector<Tile> &map, int mapWidth, int mapHeight, const ClimateConfig &config);
+    void GenerateRivers(TopologyGraph& graph, int numRivers);
 
 private:
     std::vector<Tile> MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight, const ClimateConfig &config);
