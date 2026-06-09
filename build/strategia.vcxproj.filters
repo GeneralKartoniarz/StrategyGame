@@ -34,9 +34,15 @@
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\SidePanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

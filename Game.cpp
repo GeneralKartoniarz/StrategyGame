@@ -5,6 +5,7 @@
 #include <SFML/Audio.hpp>
 #include "States/States.hpp"
 #include "States/TestState.hpp"
+#include "States/MenuState.hpp"
 #include <vector>
 using namespace std;
 Game::Game()
@@ -25,7 +26,7 @@ void Game::InitWindow()
 
 void Game::InitStates()
 {
-    this->states.push_back(std::make_unique<TestState>(this->windowPtr));
+    this->states.push_back(std::make_unique<MenuState>(this->windowPtr));
 }
 
 void Game::Run()

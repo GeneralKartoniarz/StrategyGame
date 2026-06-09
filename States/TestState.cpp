@@ -48,9 +48,22 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     normalWorld.normalThreshold = 0.15f;
 
     MapGenerator mg;
-    this->map = mg.GetMap(1920, 1080, 5, 1, normalWorld);
-    TopologyGraph graph = mg.ExtractTopology(this->map, 1920, 1080, normalWorld);
-    mg.GenerateRivers(graph, 400); 
+    TopologyGraph graph;
+    bool isValidMap = false;
+    while (!isValidMap)
+    {
+        this->map.clear();
+        this->map = mg.GetMap(1920, 1080, 5, 1);
+
+        graph = mg.ExtractTopology(this->map, 1920, 1080, ClimateConfig());
+
+        if (!graph.nodes.empty())
+        {
+            isValidMap = true;
+        }
+    }
+
+    mg.GenerateRivers(graph, 150);
 
     this->riverMesh.setPrimitiveType(sf::PrimitiveType::Lines);
 
@@ -65,7 +78,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             const auto &neighbor = graph.nodes[nIdx];
             if (neighbor.isRiver && nIdx > static_cast<int>(i))
             {
-                sf::Color riverColor(30, 144, 255); 
+                sf::Color riverColor(30, 144, 255);
                 this->riverMesh.append(sf::Vertex{node.position, riverColor});
                 this->riverMesh.append(sf::Vertex{neighbor.position, riverColor});
             }
