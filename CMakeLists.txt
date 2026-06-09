@@ -24,7 +24,17 @@ add_executable(strategia
     Map/NameGenerator.cpp
     UI/SidePanel.cpp
     States/MenuState.hpp
-    States/MenuState.cpp)
+    States/MenuState.cpp
+    Pop.hpp
+    PopManager.hpp
+    PopManager.cpp
+    City.hpp
+    Empire.hpp
+    Empire.cpp
+    GameManager.hpp
+    GameManager.cpp
+    PoliticalSetup.hpp
+    PoliticalSetup.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
 target_include_directories(strategia PRIVATE 

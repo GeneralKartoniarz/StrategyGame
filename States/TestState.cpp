@@ -4,6 +4,7 @@
 #include <ctime>
 #include <algorithm>
 #include <SFML/Graphics.hpp>
+#include "../PoliticalSetup.hpp"
 
 sf::Color GetBiomeColor(BiomeType biome)
 {
@@ -127,7 +128,37 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             }
         }
     }
+    PoliticalSetup::CreateTestEmpire(this->gm, this->map);
 
+    this->politicalMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+
+    for (const auto &city : this->gm.GetAllCities())
+    {
+        const Empire &owner = this->gm.GetEmpire(city.ownerEmpireID);
+
+        sf::Color polColor = owner.GetColor();
+        polColor.a = 80;
+
+        for (int32_t tileID : city.jurisdictionTiles)
+        {
+            const auto &region = this->map[tileID];
+
+            for (const auto &poly : region.subPolygons)
+            {
+                size_t pointCount = poly.size();
+                if (pointCount < 3)
+                    continue;
+
+                sf::Vector2f p0 = poly[0];
+                for (size_t i = 1; i < pointCount - 1; ++i)
+                {
+                    this->politicalMesh.append(sf::Vertex{p0, polColor});
+                    this->politicalMesh.append(sf::Vertex{poly[i], polColor});
+                    this->politicalMesh.append(sf::Vertex{poly[i + 1], polColor});
+                }
+            }
+        }
+    }
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
     this->gui = std::make_unique<GameInterface>(windowPtr);
 }
@@ -205,6 +236,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
 
     windowPtr->draw(this->borderMesh);
     windowPtr->draw(this->riverMesh);
+    windowPtr->draw(this->politicalMesh);
     windowPtr->setView(windowPtr->getDefaultView());
     this->gui->Draw(windowPtr);
 }

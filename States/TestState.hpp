@@ -6,6 +6,8 @@
 #include "UI/InputController.hpp"
 #include "UI/GameInterface.hpp"
 #include <SFML/Graphics.hpp>
+#include "GameManager.hpp"
+#include "../PoliticalSetup.hpp"
 
 class TestState : public States
 {
@@ -18,6 +20,8 @@ public:
     void HandleEvent(const sf::Event &event) override;
 
 private:
+    GameManager gm;
+    sf::VertexArray politicalMesh;
     sf::VertexArray terrainMesh;
     sf::VertexArray borderMesh;
     sf::VertexArray riverMesh;

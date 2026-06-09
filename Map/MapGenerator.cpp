@@ -137,6 +137,7 @@ std::vector<jcv_point> MapGenerator::InitializeSeeds(int mapWidth, int mapHeight
     int margin = 50;
     int cols = (mapWidth - 2 * margin) / cellSize;
     int rows = (mapHeight - 2 * margin) / cellSize;
+    points.reserve(cols * rows);
     std::random_device rd;
     std::mt19937 gen(rd());
 
