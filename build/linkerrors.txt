@@ -1,8 +1,6 @@
 ================================================================================
 Linker Errors
-Generated: 2026-06-09T11:33:37.594Z
-Total Errors: 1
+Generated: 2026-06-10T12:22:52.061Z
+Total Errors: 3
 ================================================================================
 
-[LNK1168] (MSVC)
-nie można otworzyć pliku C:\Users\janpa\Documents\GitHub\StrategyGame\build\Debug\strategia.exe do zapisu [C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.vcxproj]

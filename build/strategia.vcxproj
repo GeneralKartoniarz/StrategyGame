@@ -338,6 +338,16 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\SidePanel.cpp" />
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.hpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Pop.hpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PopManager.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PopManager.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\City.hpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empire.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empire.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
