@@ -157,13 +157,6 @@ void TestState::Update(float dt)
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
     bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
-    int selectedID = this->inputCtrl->GetSelectedTileID();
-    const Tile *selectedTile = nullptr;
-    if (selectedID != -1 && static_cast<size_t>(selectedID) < this->map.size())
-    {
-        selectedTile = &this->map[selectedID];
-    }
-    this->gui->UpdateSelection(selectedTile);
     this->gui->Update(dt, mousePos, mouseClicked);
 
     if (!this->gui->IsMouseOverUI(mousePos))
