@@ -7,9 +7,9 @@
 #include "UI/GameInterface.hpp"
 #include <SFML/Graphics.hpp>
 #include "GameManager.hpp"
-#include "../PoliticalSetup.hpp"
+#include "Empires/PoliticalSetup.hpp"
 #include "ClimateEngine.hpp"
-
+#include "Map/NavigationGraph.hpp"
 class TestState : public States
 {
 public:

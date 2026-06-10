@@ -4,7 +4,6 @@
 #include <ctime>
 #include <algorithm>
 #include <SFML/Graphics.hpp>
-#include "../PoliticalSetup.hpp"
 
 sf::Color GetBiomeColor(BiomeType biome)
 {
@@ -117,6 +116,8 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             }
         }
     }
+    NavigationGraph roadGraph = mg.BuildNavigationGraph(this->map);
+    this->gm.SetNavGraph(roadGraph);
     PoliticalSetup::CreateTestEmpire(this->gm, this->map);
 
     this->politicalMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
@@ -222,7 +223,20 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         }
         windowPtr->draw(highlightMesh);
     }
+    for (const auto &unit : this->gm.GetAllUnits())
+    {
+        sf::CircleShape unitShape(2.0f);
+        unitShape.setOrigin({12.0f, 12.0f});
+        unitShape.setPosition(unit.position);
 
+        if (unit.type == UnitType::Settler)
+        {
+            unitShape.setFillColor(sf::Color::Cyan);
+            unitShape.setOutlineThickness(.5f);
+            unitShape.setOutlineColor(sf::Color::Black);
+        }
+        windowPtr->draw(unitShape);
+    }
     windowPtr->draw(this->borderMesh);
     windowPtr->draw(this->riverMesh);
     windowPtr->draw(this->politicalMesh);

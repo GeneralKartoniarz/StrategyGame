@@ -25,20 +25,26 @@ add_executable(strategia
     UI/SidePanel.cpp
     States/MenuState.hpp
     States/MenuState.cpp
-    Pop.hpp
-    PopManager.hpp
-    PopManager.cpp
-    City.hpp
-    Empire.hpp
-    Empire.cpp
+    Empires/Pop.hpp
+    Empires/PopManager.hpp
+    Empires/PopManager.cpp
+    Empires/City.hpp
+    Empires/Empire.hpp
+    Empires/Empire.cpp
     GameManager.hpp
     GameManager.cpp
-    PoliticalSetup.hpp
-    PoliticalSetup.cpp
+    Empires/PoliticalSetup.hpp
+    Empires/PoliticalSetup.cpp
     Map/VoronoiBuilder.hpp
     Map/VoronoiBuilder.cpp
     Map/ClimateEngine.hpp
-    Map/ClimateEngine.cpp)
+    Map/ClimateEngine.cpp
+    Map/NavigationGraph.hpp
+    Unit.hpp
+    PathFinder.hpp
+    PathFinder.cpp
+    UI/UnitPanel.hpp
+    UI/UnitPanel.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
 target_include_directories(strategia PRIVATE 
@@ -46,4 +52,5 @@ target_include_directories(strategia PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Map
     ${CMAKE_CURRENT_SOURCE_DIR}/States
     ${CMAKE_CURRENT_SOURCE_DIR}/UI
+    ${CMAKE_CURRENT_SOURCE_DIR}/Empires
 )

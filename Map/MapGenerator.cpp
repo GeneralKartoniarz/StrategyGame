@@ -5,6 +5,64 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
+
+NavigationGraph MapGenerator::BuildNavigationGraph(const std::vector<Tile>& map)
+{
+    NavigationGraph navGraph;
+    std::unordered_map<int64_t, int32_t> vertexMap;
+
+    auto getHash = [](const sf::Vector2f& p) -> int64_t 
+    {
+        int64_t x = static_cast<int64_t>(std::round(p.x * 10.0f));
+        int64_t y = static_cast<int64_t>(std::round(p.y * 10.0f));
+        return (x << 32) | (y & 0xFFFFFFFF);
+    };
+
+    for (const auto& tile : map)
+    {
+        for (const auto& edge : tile.cellEdges)
+        {
+            int64_t hash1 = getHash(edge.p1);
+            int64_t hash2 = getHash(edge.p2);
+            int32_t idx1 = -1, idx2 = -1;
+
+            if (vertexMap.find(hash1) == vertexMap.end())
+            {
+                idx1 = static_cast<int32_t>(navGraph.nodes.size());
+                vertexMap[hash1] = idx1;
+                NavNode node;
+                node.position = edge.p1;
+                navGraph.nodes.push_back(node);
+            }
+            else
+            {
+                idx1 = vertexMap[hash1];
+            }
+
+            if (vertexMap.find(hash2) == vertexMap.end())
+            {
+                idx2 = static_cast<int32_t>(navGraph.nodes.size());
+                vertexMap[hash2] = idx2;
+                NavNode node;
+                node.position = edge.p2;
+                navGraph.nodes.push_back(node);
+            }
+            else
+            {
+                idx2 = vertexMap[hash2];
+            }
+
+            auto& n1 = navGraph.nodes[idx1].connectedNodes;
+            if (std::find(n1.begin(), n1.end(), idx2) == n1.end()) n1.push_back(idx2);
+
+            auto& n2 = navGraph.nodes[idx2].connectedNodes;
+            if (std::find(n2.begin(), n2.end(), idx1) == n2.end()) n2.push_back(idx1);
+        }
+    }
+
+    return navGraph;
+}
+
 TopologyGraph MapGenerator::ExtractTopology(const std::vector<Tile>& map, int mapWidth, int mapHeight, const ClimateEngine& climate)
 {
     TopologyGraph graph;

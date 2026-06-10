@@ -29,32 +29,45 @@ GameInterface::GameInterface(sf::RenderWindow *window) : turnCount(1)
     this->nextTurnButton = std::make_unique<Button>(sf::Vector2f({1780.0f, 940.0f}), 50.0f, this->font, "NEXT", &GameInterface::OnNextTurnClick);
 
     this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
+    this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 170.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
 }
 
 bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
 {
     sf::Vector2f fMousePos = static_cast<sf::Vector2f>(mousePos);
-    if (this->sidePanel && this->sidePanel->Contains(fMousePos)) return true;
-    if (this->nextTurnButton && this->nextTurnButton->Contains(fMousePos)) return true;
-    if (this->turnCounterLabel && this->turnCounterLabel->Contains(fMousePos)) return true;
+    if (this->sidePanel && this->sidePanel->Contains(fMousePos))
+        return true;
+    if (this->unitPanel && this->unitPanel->Contains(fMousePos))
+        return true;
+    if (this->nextTurnButton && this->nextTurnButton->Contains(fMousePos))
+        return true;
+    if (this->turnCounterLabel && this->turnCounterLabel->Contains(fMousePos))
+        return true;
 
     for (const auto &label : this->statLabels)
     {
-        if (label && label->Contains(fMousePos)) return true;
+        if (label && label->Contains(fMousePos))
+            return true;
     }
     return false;
 }
 
 GameInterface::~GameInterface()
 {
-    if (instance == this) instance = nullptr;
+    if (instance == this)
+        instance = nullptr;
 }
 
 void GameInterface::OnNextTurnClick()
 {
-    if (instance) instance->NextTurn();
+    if (instance)
+        instance->NextTurn();
 }
-
+void GameInterface::UpdateUnitSelection(const Unit *unit)
+{
+    if (this->unitPanel)
+        this->unitPanel->UpdateSelection(unit);
+}
 void GameInterface::NextTurn()
 {
     this->turnCount++;
@@ -69,13 +82,16 @@ void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseCli
 
 void GameInterface::Draw(sf::RenderWindow *window)
 {
-    for (auto &label : this->statLabels) label->Draw(window);
+    for (auto &label : this->statLabels)
+        label->Draw(window);
     this->sidePanel->Draw(window);
     this->turnCounterLabel->Draw(window);
     this->nextTurnButton->Draw(window);
+    this->unitPanel->Draw(window);
 }
 
-void GameInterface::UpdateSelection(const Tile* tile)
+void GameInterface::UpdateSelection(const Tile *tile)
 {
-    if (this->sidePanel) this->sidePanel->UpdateSelection(tile);
+    if (this->sidePanel)
+        this->sidePanel->UpdateSelection(tile);
 }

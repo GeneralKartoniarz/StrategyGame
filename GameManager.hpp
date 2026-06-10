@@ -2,24 +2,35 @@
 #include <vector>
 #include <cstdint>
 #include "City.hpp"
-#include "Empire.hpp"
-
-class GameManager 
+#include "Empires/Empire.hpp"
+#include "Map/NavigationGraph.hpp"
+#include "Unit.hpp"
+class GameManager
 {
 public:
     GameManager() = default;
     ~GameManager() = default;
 
-    void AddCity(const City& city);
-    void AddEmpire(const Empire& empire);
+    void AddCity(const City &city);
+    void AddEmpire(const Empire &empire);
 
-    City& GetCity(int32_t id);
-    Empire& GetEmpire(int32_t id);
+    City &GetCity(int32_t id);
+    Empire &GetEmpire(int32_t id);
 
-    const std::vector<City>& GetAllCities() const { return cities; }
-    const std::vector<Empire>& GetAllEmpires() const { return empires; }
+    const std::vector<City> &GetAllCities() const { return cities; }
+    const std::vector<Empire> &GetAllEmpires() const { return empires; }
+
+    void AddUnit(const Unit &unit) { units.push_back(unit); }
+    const std::vector<Unit> &GetAllUnits() const { return units; }
+
+    int32_t GetNearestNodeID(sf::Vector2f worldPos) const;
+
+    void SetNavGraph(const NavigationGraph &graph) { navGraph = graph; }
+    NavigationGraph &GetNavGraph() { return navGraph; }
 
 private:
+    NavigationGraph navGraph;
     std::vector<City> cities;
     std::vector<Empire> empires;
+    std::vector<Unit> units;
 };
