@@ -29,4 +29,5 @@ private:
     std::vector<Tile> map;
     std::unique_ptr<InputController> inputCtrl;
     std::unique_ptr<GameInterface> gui;
+    int32_t selectedUnitID = -1;
 };

@@ -31,8 +31,20 @@ void PoliticalSetup::CreateTestEmpire(GameManager &gm, const std::vector<Tile> &
         settler.ID = static_cast<int32_t>(gm.GetAllUnits().size());
         settler.ownerEmpireID = 0;
         settler.type = UnitType::Settler;
+
         sf::Vector2f firstBorderVertex = map[centerTileID].cellEdges.empty() ? map[centerTileID].position : map[centerTileID].cellEdges[0].p1;
-        settler.position = firstBorderVertex;
+
+        settler.currentNodeID = gm.GetNearestNodeID(firstBorderVertex);
+
+        if (settler.currentNodeID != -1)
+        {
+            settler.position = gm.GetNavGraph().nodes[settler.currentNodeID].position;
+        }
+        else
+        {
+            settler.position = firstBorderVertex;
+        }
+
         settler.maxMovementPoints = 3;
         settler.currentMovementPoints = 3;
 

@@ -2,16 +2,17 @@
 #include <algorithm>
 #include <iostream>
 
-InputController::InputController(sf::RenderWindow* window, std::vector<Tile>& mapRef)
-    : windowPtr(window), map(mapRef), isDragging(false), selectedTileID(-1)
+InputController::InputController(sf::RenderWindow *window, std::vector<Tile> &mapRef, GameManager &gmRef, GameInterface *guiPtr)
+    : windowPtr(window), map(mapRef), gm(gmRef), gui(guiPtr), isDragging(false), selectedTileID(-1), selectedUnitID(-1)
 {
     this->camera = windowPtr->getDefaultView();
-    this->camera.zoom(0.3f); 
+    this->camera.zoom(0.3f);
 }
 
-bool InputController::IsPointInTriangle(const sf::Vector2f& p, const sf::Vector2f& a, const sf::Vector2f& b, const sf::Vector2f& c)
+bool InputController::IsPointInTriangle(const sf::Vector2f &p, const sf::Vector2f &a, const sf::Vector2f &b, const sf::Vector2f &c)
 {
-    auto crossProduct = [](const sf::Vector2f& p1, const sf::Vector2f& p2, const sf::Vector2f& p3) {
+    auto crossProduct = [](const sf::Vector2f &p1, const sf::Vector2f &p2, const sf::Vector2f &p3)
+    {
         return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
     };
 
@@ -43,7 +44,7 @@ void InputController::ClampCamera()
 
 void InputController::Update(float dt)
 {
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Middle))
     {
         sf::Vector2i currentMousePos = sf::Mouse::getPosition(*this->windowPtr);
 
@@ -67,24 +68,28 @@ void InputController::Update(float dt)
     this->ClampCamera();
 }
 
-void InputController::HandleEvent(const sf::Event& event)
+void InputController::HandleEvent(const sf::Event &event)
 {
-
-    if (const auto* mouseEvent = event.getIf<sf::Event::MouseButtonPressed>())
+    if (const auto *mouseEvent = event.getIf<sf::Event::MouseButtonPressed>())
     {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+        sf::Vector2f worldPos = this->windowPtr->mapPixelToCoords(mousePos, this->camera);
+
         if (mouseEvent->button == sf::Mouse::Button::Left)
         {
-            sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
-            sf::Vector2f worldPos = this->windowPtr->mapPixelToCoords(mousePos, this->camera);
+            if (this->gui && this->gui->IsMouseOverUI(mousePos))
+                return;
 
-            for (const auto& region : this->map)
+            this->selectedTileID = -1;
+            for (const auto &region : this->map)
             {
                 bool insideRegion = false;
 
-                for (const auto& poly : region.subPolygons)
+                for (const auto &poly : region.subPolygons)
                 {
                     size_t pointCount = poly.size();
-                    if (pointCount < 3) continue;
+                    if (pointCount < 3)
+                        continue;
 
                     sf::Vector2f p0 = poly[0];
                     for (size_t i = 1; i < pointCount - 1; ++i)
@@ -95,7 +100,8 @@ void InputController::HandleEvent(const sf::Event& event)
                             break;
                         }
                     }
-                    if (insideRegion) break;
+                    if (insideRegion)
+                        break;
                 }
 
                 if (insideRegion)
@@ -104,10 +110,47 @@ void InputController::HandleEvent(const sf::Event& event)
                     break;
                 }
             }
+
+            if (this->gui)
+            {
+                const Tile *clickedTile = (this->selectedTileID != -1) ? &this->map[this->selectedTileID] : nullptr;
+                this->gui->UpdateSelection(clickedTile);
+            }
+
+            this->selectedUnitID = -1;
+            float clickToleranceSq = 18.0f * 18.0f;
+
+            for (const auto &unit : this->gm.GetAllUnits())
+            {
+                float dx = worldPos.x - unit.position.x;
+                float dy = worldPos.y - unit.position.y;
+                if (dx * dx + dy * dy <= clickToleranceSq)
+                {
+                    this->selectedUnitID = unit.ID;
+                    break;
+                }
+            }
+
+            if (this->gui)
+            {
+                const Unit *clickedUnit = (this->selectedUnitID != -1) ? &this->gm.GetUnit(this->selectedUnitID) : nullptr;
+                this->gui->UpdateUnitSelection(clickedUnit);
+            }
+        }
+        else if (mouseEvent->button == sf::Mouse::Button::Right)
+        {
+            if (this->selectedUnitID != -1 && !this->gm.GetAllUnits().empty())
+            {
+                int32_t targetNodeID = this->gm.GetNearestNodeID(worldPos);
+                Unit &activeUnit = this->gm.GetUnit(this->selectedUnitID);
+
+                activeUnit.movementPath = Pathfinder::FindPath(this->gm.GetNavGraph(), activeUnit.currentNodeID, targetNodeID);
+                std::cout << "Sciezka wyznaczona. Liczba wezlow: " << activeUnit.movementPath.size() << "\n";
+            }
         }
     }
 
-    if (const auto* scrollEvent = event.getIf<sf::Event::MouseWheelScrolled>())
+    if (const auto *scrollEvent = event.getIf<sf::Event::MouseWheelScrolled>())
     {
         if (scrollEvent->wheel == sf::Mouse::Wheel::Vertical)
         {
@@ -120,7 +163,7 @@ void InputController::HandleEvent(const sf::Event& event)
             else
             {
                 this->camera.zoom(1.1f);
-                if (this->camera.getSize().y > 980.0f) 
+                if (this->camera.getSize().y > 980.0f)
                     this->camera.zoom(1.0f / 1.1f);
             }
         }

@@ -28,6 +28,8 @@ public:
     void SetNavGraph(const NavigationGraph &graph) { navGraph = graph; }
     NavigationGraph &GetNavGraph() { return navGraph; }
 
+    Unit& GetUnit(int32_t id);
+
 private:
     NavigationGraph navGraph;
     std::vector<City> cities;

@@ -1,26 +1,30 @@
 #include "GameManager.hpp"
-void GameManager::AddCity(const City& city)
+void GameManager::AddCity(const City &city)
 {
     this->cities.push_back(city);
 }
 
-void GameManager::AddEmpire(const Empire& empire)
+void GameManager::AddEmpire(const Empire &empire)
 {
     this->empires.push_back(empire);
 }
 
-City& GameManager::GetCity(int32_t id)
+City &GameManager::GetCity(int32_t id)
 {
     return this->cities[id];
 }
 
-Empire& GameManager::GetEmpire(int32_t id)
+Empire &GameManager::GetEmpire(int32_t id)
 {
     return this->empires[id];
 }
+Unit &GameManager::GetUnit(int32_t id)
+{
+    return this->units[id];
+}
 int32_t GameManager::GetNearestNodeID(sf::Vector2f worldPos) const
 {
-    if (this->navGraph.nodes.empty()) 
+    if (this->navGraph.nodes.empty())
         return -1;
 
     int32_t nearestID = -1;

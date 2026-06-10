@@ -149,8 +149,8 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
             }
         }
     }
-    this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map);
     this->gui = std::make_unique<GameInterface>(windowPtr);
+    this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
 }
 
 void TestState::Update(float dt)
@@ -226,7 +226,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     for (const auto &unit : this->gm.GetAllUnits())
     {
         sf::CircleShape unitShape(2.0f);
-        unitShape.setOrigin({12.0f, 12.0f});
+        unitShape.setOrigin({2.0f, 2.0f});
         unitShape.setPosition(unit.position);
 
         if (unit.type == UnitType::Settler)
