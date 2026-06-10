@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 #include "GameManager.hpp"
 #include "../PoliticalSetup.hpp"
+#include "ClimateEngine.hpp"
 
 class TestState : public States
 {

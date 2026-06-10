@@ -34,7 +34,11 @@ add_executable(strategia
     GameManager.hpp
     GameManager.cpp
     PoliticalSetup.hpp
-    PoliticalSetup.cpp)
+    PoliticalSetup.cpp
+    Map/VoronoiBuilder.hpp
+    Map/VoronoiBuilder.cpp
+    Map/ClimateEngine.hpp
+    Map/ClimateEngine.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
 target_include_directories(strategia PRIVATE 

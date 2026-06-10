@@ -348,6 +348,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.cpp" />
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.hpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

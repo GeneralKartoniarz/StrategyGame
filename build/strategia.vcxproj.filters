@@ -49,6 +49,12 @@
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp">
@@ -73,6 +79,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

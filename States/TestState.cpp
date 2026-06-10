@@ -37,17 +37,6 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-    ClimateConfig normalWorld;
-    normalWorld.waterThreshold = -0.5f;
-    normalWorld.plainsThreshold = 0.3f;
-    normalWorld.hillsThreshold = 0.75f;
-
-    normalWorld.coldThreshold = -0.65f;
-    normalWorld.temperateThreshold = 0.15f;
-
-    normalWorld.dryThreshold = -0.45f;
-    normalWorld.normalThreshold = 0.15f;
-
     MapGenerator mg;
     TopologyGraph graph;
     bool isValidMap = false;
@@ -56,7 +45,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
         this->map.clear();
         this->map = mg.GetMap(1920, 1080, 5, 1);
 
-        graph = mg.ExtractTopology(this->map, 1920, 1080, ClimateConfig());
+        graph = mg.ExtractTopology(this->map, 1920, 1080, ClimateEngine(std::random_device{}()));
 
         if (!graph.nodes.empty())
         {

@@ -1,6 +1,8 @@
 ================================================================================
 Linker Errors
-Generated: 2026-06-10T12:22:52.061Z
-Total Errors: 3
+Generated: 2026-06-10T19:44:14.320Z
+Total Errors: 1
 ================================================================================
 
+[LNK1201] (MSVC)
+błąd zapisu do bazy danych "C:\Users\janpa\Documents\GitHub\StrategyGame\build\Debug\strategia.pdb" programu; sprawdź, czy ilość miejsca na dysku jest wystarczająca, czy ścieżka jest prawidłowa i czy uprawnienia są wystarczające [C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.vcxproj]

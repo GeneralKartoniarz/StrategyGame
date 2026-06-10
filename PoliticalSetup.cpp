@@ -1,12 +1,11 @@
 #include "PoliticalSetup.hpp"
-
 /*
  * GENERACJA TESTOWEGO PAŃSTWA
  */
 void PoliticalSetup::CreateTestEmpire(GameManager& gm, const std::vector<Tile>& map)
 {
     Empire testEmpire(0, "Cesarstwo Testowe", sf::Color::Red);
-    std::vector<int32_t> centerIndices = { 100, 750, 1400 };
+    std::vector<int32_t> centerIndices = { 4500, 5800, 7400 };
     
     for (size_t i = 0; i < centerIndices.size(); ++i)
     {
@@ -30,4 +29,13 @@ void PoliticalSetup::CreateTestEmpire(GameManager& gm, const std::vector<Tile>& 
     }
     
     gm.AddEmpire(testEmpire);
+}
+static void CreateEmpires(GameManager& gm, const std::vector<Tile>& map, int count){
+    std::random_device rd;
+    for (int i = 0; i < count; i++)
+    {
+      // Empire em(i, "temp", sf::Color::Red);
+
+    }
+    
 }
