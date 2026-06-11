@@ -16,6 +16,7 @@ public:
 
     const sf::View &GetCamera() const { return this->camera; }
     int GetSelectedTileID() const { return this->selectedTileID; }
+    int32_t GetSelectedUnitID() const { return this->selectedUnitID; }
 
 private:
     bool IsPointInTriangle(const sf::Vector2f &p, const sf::Vector2f &a, const sf::Vector2f &b, const sf::Vector2f &c);

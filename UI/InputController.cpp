@@ -118,7 +118,7 @@ void InputController::HandleEvent(const sf::Event &event)
             }
 
             this->selectedUnitID = -1;
-            float clickToleranceSq = 18.0f * 18.0f;
+            float clickToleranceSq = 9.0f * 9.0f;
 
             for (const auto &unit : this->gm.GetAllUnits())
             {
@@ -144,8 +144,13 @@ void InputController::HandleEvent(const sf::Event &event)
                 int32_t targetNodeID = this->gm.GetNearestNodeID(worldPos);
                 Unit &activeUnit = this->gm.GetUnit(this->selectedUnitID);
 
-                activeUnit.movementPath = Pathfinder::FindPath(this->gm.GetNavGraph(), activeUnit.currentNodeID, targetNodeID);
-                std::cout << "Sciezka wyznaczona. Liczba wezlow: " << activeUnit.movementPath.size() << "\n";
+                int32_t startNode = (activeUnit.nextNodeID != -1) ? activeUnit.nextNodeID : activeUnit.currentNodeID;
+                activeUnit.movementPath = Pathfinder::FindPath(this->gm.GetNavGraph(), startNode, targetNodeID);
+
+                if (!activeUnit.movementPath.empty() && activeUnit.movementPath.front() == startNode)
+                {
+                    activeUnit.movementPath.erase(activeUnit.movementPath.begin());
+                }
             }
         }
     }

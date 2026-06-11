@@ -19,7 +19,7 @@ struct Unit
 
     int32_t currentNodeID = -1;
     std::vector<int32_t> movementPath;
-
+    int32_t nextNodeID = -1; 
     int32_t currentMovementPoints;
     int32_t maxMovementPoints;
 };

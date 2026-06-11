@@ -14,7 +14,7 @@ Projekt wykorzystuje system budowania CMake. Do uruchomienia potrzebujesz kompil
 
 <ul>
     <li> LPM - Wybranie pola lub jednostki
-    <li> PPN - Kiedy wybrano jednostke (widać to w panelu po prawo) wydaje rozkaz ruchu na kliknięte pole
+    <li> PPM - Kiedy wybrano jednostke (widać to w panelu po prawo) wydaje rozkaz ruchu na kliknięte pole
     <li> Scroll - Oddalanie/przybliżanie
     <li> Scroll wciśnięty - Przesuwanie po mapie
 </ul>

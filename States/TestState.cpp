@@ -5,39 +5,14 @@
 #include <algorithm>
 #include <SFML/Graphics.hpp>
 
-sf::Color GetBiomeColor(BiomeType biome)
-{
-    switch (biome)
-    {
-    case BiomeType::Ocean:
-        return sf::Color(28, 81, 141);
-    case BiomeType::IceSheet:
-        return sf::Color(230, 245, 250);
-    case BiomeType::Tundra:
-        return sf::Color(145, 165, 140);
-    case BiomeType::Desert:
-        return sf::Color(225, 190, 110);
-    case BiomeType::Plains:
-        return sf::Color(120, 175, 90);
-    case BiomeType::Forest:
-        return sf::Color(55, 120, 65);
-    case BiomeType::Taiga:
-        return sf::Color(40, 95, 70);
-    case BiomeType::Rainforest:
-        return sf::Color(45, 80, 15);
-    case BiomeType::MountainPeak:
-        return sf::Color(110, 115, 120);
-    default:
-        return sf::Color(100, 100, 100);
-    }
-}
-
 TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
     MapGenerator mg;
     TopologyGraph graph;
+    
+    // 1. GENEROWANIE I WALIDACJA GEOMETRII ŚWIATA
     bool isValidMap = false;
     while (!isValidMap)
     {
@@ -52,137 +27,60 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
         }
     }
 
+    // 2. SYMULACJA HYDROLOGICZNA (RZEKI)
     mg.GenerateRivers(graph, 150);
 
-    this->riverMesh.setPrimitiveType(sf::PrimitiveType::Lines);
-
-    for (size_t i = 0; i < graph.nodes.size(); ++i)
-    {
-        const auto &node = graph.nodes[i];
-        if (!node.isRiver)
-            continue;
-
-        for (int nIdx : node.neighbors)
-        {
-            const auto &neighbor = graph.nodes[nIdx];
-            if (neighbor.isRiver && nIdx > static_cast<int>(i))
-            {
-                sf::Color riverColor(30, 144, 255);
-                this->riverMesh.append(sf::Vertex{node.position, riverColor});
-                this->riverMesh.append(sf::Vertex{neighbor.position, riverColor});
-            }
-        }
-    }
-    this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
-    this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
-
-    for (const auto &region : this->map)
-    {
-        for (const auto &borderVertex : region.provinceBorders)
-        {
-            this->borderMesh.append(borderVertex);
-        }
-
-        sf::Color baseColor = GetBiomeColor(region.terrain.biome);
-        float heightFactor = region.terrain.elevationNoise;
-        int brightnessAdjustment = static_cast<int>(heightFactor * 30.0f);
-        sf::Color finalColor;
-
-        if (region.terrain.biome == BiomeType::Ocean)
-        {
-            finalColor.r = std::max(0, std::min(255, baseColor.r + brightnessAdjustment / 2));
-            finalColor.g = std::max(0, std::min(255, baseColor.g + brightnessAdjustment / 2));
-            finalColor.b = std::max(0, std::min(255, baseColor.b + brightnessAdjustment));
-        }
-        else
-        {
-            finalColor.r = std::max(0, std::min(255, baseColor.r + brightnessAdjustment));
-            finalColor.g = std::max(0, std::min(255, baseColor.g + brightnessAdjustment));
-            finalColor.b = std::max(0, std::min(255, baseColor.b + brightnessAdjustment));
-        }
-
-        for (const auto &poly : region.subPolygons)
-        {
-            size_t pointCount = poly.size();
-            if (pointCount < 3)
-                continue;
-
-            sf::Vector2f p0 = poly[0];
-            for (size_t i = 1; i < pointCount - 1; ++i)
-            {
-                this->terrainMesh.append(sf::Vertex{p0, finalColor});
-                this->terrainMesh.append(sf::Vertex{poly[i], finalColor});
-                this->terrainMesh.append(sf::Vertex{poly[i + 1], finalColor});
-            }
-        }
-    }
+    // 3. BUDOWANIE GRAFU DRÓG DLA JEDNOSTEK (A*)
     NavigationGraph roadGraph = mg.BuildNavigationGraph(this->map);
     this->gm.SetNavGraph(roadGraph);
+    
+    // 4. INSTALACJA STARTOWYCH IMPERIÓW I MIAST
     PoliticalSetup::CreateTestEmpire(this->gm, this->map);
 
-    this->politicalMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    // 5. CACHOWANIE GRAFIKI W REDERERZE MAPY
+    this->mapRenderer = std::make_unique<MapRenderer>();
+    this->mapRenderer->BuildMeshes(this->map, graph, this->gm);
 
-    for (const auto &city : this->gm.GetAllCities())
-    {
-        const Empire &owner = this->gm.GetEmpire(city.ownerEmpireID);
-
-        sf::Color polColor = owner.GetColor();
-        polColor.a = 80;
-
-        for (int32_t tileID : city.jurisdictionTiles)
-        {
-            const auto &region = this->map[tileID];
-
-            for (const auto &poly : region.subPolygons)
-            {
-                size_t pointCount = poly.size();
-                if (pointCount < 3)
-                    continue;
-
-                sf::Vector2f p0 = poly[0];
-                for (size_t i = 1; i < pointCount - 1; ++i)
-                {
-                    this->politicalMesh.append(sf::Vertex{p0, polColor});
-                    this->politicalMesh.append(sf::Vertex{poly[i], polColor});
-                    this->politicalMesh.append(sf::Vertex{poly[i + 1], polColor});
-                }
-            }
-        }
-    }
+    // 6. INICJALIZACJA INTERFEJSU I KONTROLERA WEJŚCIA
     this->gui = std::make_unique<GameInterface>(windowPtr);
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
+    
+    // REAKCJA NA KLIKNIĘCIE "NEXT TURN" W UI
+    this->gui->onNextTurnAction = [this]() {
+        this->gm.ResetMovementPoints();
+    };
 }
 
 void TestState::Update(float dt)
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
     bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
+    
     this->gui->Update(dt, mousePos, mouseClicked);
 
     if (!this->gui->IsMouseOverUI(mousePos))
     {
         this->inputCtrl->Update(dt);
     }
+    
+    this->gm.UpdateUnits(dt);
 }
 
 void TestState::HandleEvent(const sf::Event &event)
 {
     if (const auto *mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
     {
-        if (this->gui->IsMouseOverUI(mouseBtnDown->position))
-            return;
+        if (this->gui->IsMouseOverUI(mouseBtnDown->position)) return;
     }
 
     if (const auto *mouseBtnUp = event.getIf<sf::Event::MouseButtonReleased>())
     {
-        if (this->gui->IsMouseOverUI(mouseBtnUp->position))
-            return;
+        if (this->gui->IsMouseOverUI(mouseBtnUp->position)) return;
     }
 
     if (const auto *mouseScroll = event.getIf<sf::Event::MouseWheelScrolled>())
     {
-        if (this->gui->IsMouseOverUI(mouseScroll->position))
-            return;
+        if (this->gui->IsMouseOverUI(mouseScroll->position)) return;
     }
 
     this->inputCtrl->HandleEvent(event);
@@ -191,7 +89,8 @@ void TestState::HandleEvent(const sf::Event &event)
 void TestState::Render(sf::RenderWindow *windowPtr)
 {
     windowPtr->setView(this->inputCtrl->GetCamera());
-    windowPtr->draw(this->terrainMesh);
+    
+    this->mapRenderer->DrawTerrain(windowPtr);
 
     int selectedID = this->inputCtrl->GetSelectedTileID();
     if (selectedID != -1 && static_cast<size_t>(selectedID) < this->map.size())
@@ -203,8 +102,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         for (const auto &poly : selectedRegion.subPolygons)
         {
             size_t pointCount = poly.size();
-            if (pointCount < 3)
-                continue;
+            if (pointCount < 3) continue;
 
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)
@@ -216,6 +114,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         }
         windowPtr->draw(highlightMesh);
     }
+    
     for (const auto &unit : this->gm.GetAllUnits())
     {
         sf::CircleShape unitShape(2.0f);
@@ -230,9 +129,38 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         }
         windowPtr->draw(unitShape);
     }
-    windowPtr->draw(this->borderMesh);
-    windowPtr->draw(this->riverMesh);
-    windowPtr->draw(this->politicalMesh);
+
+    this->mapRenderer->DrawBordersAndRivers(windowPtr);
+    
+    this->mapRenderer->DrawPolitical(windowPtr);
+
+    int32_t activeUnitID = this->inputCtrl->GetSelectedUnitID();
+    if (activeUnitID != -1)
+    {
+        const Unit &selectedUnit = this->gm.GetUnit(activeUnitID);
+
+        if (!selectedUnit.movementPath.empty())
+        {
+            sf::VertexArray pathLine(sf::PrimitiveType::LineStrip);
+            sf::Color pathColor(255, 255, 0, 200);
+
+            for (int32_t nodeID : selectedUnit.movementPath)
+            {
+                sf::Vector2f nodePos = this->gm.GetNavGraph().nodes[nodeID].position;
+                pathLine.append(sf::Vertex{nodePos, pathColor});
+            }
+
+            windowPtr->draw(pathLine);
+
+            sf::Vector2f targetPos = this->gm.GetNavGraph().nodes[selectedUnit.movementPath.back()].position;
+            sf::CircleShape targetMarker(2.0f);
+            targetMarker.setOrigin({2.0f, 2.0f});
+            targetMarker.setPosition(targetPos);
+            targetMarker.setFillColor(sf::Color::Yellow);
+            windowPtr->draw(targetMarker);
+        }
+    }
+
     windowPtr->setView(windowPtr->getDefaultView());
     this->gui->Draw(windowPtr);
 }

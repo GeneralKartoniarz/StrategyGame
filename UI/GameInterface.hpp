@@ -6,6 +6,7 @@
 #include "Button.hpp"
 #include "SidePanel.hpp"
 #include "UnitPanel.hpp"
+#include <functional>
 class GameInterface
 {
 public:
@@ -17,7 +18,8 @@ public:
     bool IsMouseOverUI(const sf::Vector2i &mousePos) const;
     int GetTurnCount() const { return this->turnCount; }
     void UpdateSelection(const Tile *tile);
-    void UpdateUnitSelection(const Unit* unit);
+    void UpdateUnitSelection(const Unit *unit);
+    std::function<void()> onNextTurnAction;
 
 private:
     void NextTurn();

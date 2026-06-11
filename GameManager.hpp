@@ -15,8 +15,7 @@ public:
     void AddEmpire(const Empire &empire);
 
     City &GetCity(int32_t id);
-    Empire &GetEmpire(int32_t id);
-
+    const Empire &GetEmpire(int32_t id) const;
     const std::vector<City> &GetAllCities() const { return cities; }
     const std::vector<Empire> &GetAllEmpires() const { return empires; }
 
@@ -28,7 +27,10 @@ public:
     void SetNavGraph(const NavigationGraph &graph) { navGraph = graph; }
     NavigationGraph &GetNavGraph() { return navGraph; }
 
-    Unit& GetUnit(int32_t id);
+    Unit &GetUnit(int32_t id);
+
+    void UpdateUnits(float dt);
+    void ResetMovementPoints();
 
 private:
     NavigationGraph navGraph;

@@ -358,6 +358,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PathFinder.cpp" />
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\UnitPanel.hpp" />
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\UnitPanel.cpp" />
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.hpp" />
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

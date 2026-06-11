@@ -10,6 +10,7 @@
 #include "Empires/PoliticalSetup.hpp"
 #include "ClimateEngine.hpp"
 #include "Map/NavigationGraph.hpp"
+#include "Map/MapRenderer.hpp"
 class TestState : public States
 {
 public:
@@ -22,10 +23,7 @@ public:
 
 private:
     GameManager gm;
-    sf::VertexArray politicalMesh;
-    sf::VertexArray terrainMesh;
-    sf::VertexArray borderMesh;
-    sf::VertexArray riverMesh;
+    std::unique_ptr<MapRenderer> mapRenderer;
     std::vector<Tile> map;
     std::unique_ptr<InputController> inputCtrl;
     std::unique_ptr<GameInterface> gui;

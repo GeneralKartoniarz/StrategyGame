@@ -73,8 +73,12 @@ void GameInterface::NextTurn()
     this->turnCount++;
     this->turnCounterLabel->SetText("TURA " + std::to_string(this->turnCount));
     std::cout << "Menedzer interfejsu: Rozpoczeto ture numer " << this->turnCount << std::endl;
+    
+    if (this->onNextTurnAction)
+    {
+        this->onNextTurnAction();
+    }
 }
-
 void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked)
 {
     this->nextTurnButton->Update(mousePos, mouseClicked);
