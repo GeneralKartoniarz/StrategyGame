@@ -12,7 +12,6 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     MapGenerator mg;
     TopologyGraph graph;
     
-    // 1. GENEROWANIE I WALIDACJA GEOMETRII ŚWIATA
     bool isValidMap = false;
     while (!isValidMap)
     {
@@ -27,27 +26,24 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
         }
     }
 
-    // 2. SYMULACJA HYDROLOGICZNA (RZEKI)
     mg.GenerateRivers(graph, 150);
 
-    // 3. BUDOWANIE GRAFU DRÓG DLA JEDNOSTEK (A*)
     NavigationGraph roadGraph = mg.BuildNavigationGraph(this->map);
     this->gm.SetNavGraph(roadGraph);
     
-    // 4. INSTALACJA STARTOWYCH IMPERIÓW I MIAST
     PoliticalSetup::CreateTestEmpire(this->gm, this->map);
 
-    // 5. CACHOWANIE GRAFIKI W REDERERZE MAPY
     this->mapRenderer = std::make_unique<MapRenderer>();
     this->mapRenderer->BuildMeshes(this->map, graph, this->gm);
 
-    // 6. INICJALIZACJA INTERFEJSU I KONTROLERA WEJŚCIA
     this->gui = std::make_unique<GameInterface>(windowPtr);
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
     
-    // REAKCJA NA KLIKNIĘCIE "NEXT TURN" W UI
     this->gui->onNextTurnAction = [this]() {
         this->gm.ResetMovementPoints();
+    };
+    this->inputCtrl->onMapChanged = [this]() {
+        this->mapRenderer->RebuildPoliticalMesh(this->map, this->gm);
     };
 }
 

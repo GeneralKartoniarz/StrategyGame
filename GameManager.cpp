@@ -1,5 +1,9 @@
 #include "GameManager.hpp"
 #include <cmath>
+#include "Map/Tile.hpp"
+#include <iostream>
+#include <algorithm>
+
 void GameManager::AddCity(const City &city)
 {
     this->cities.push_back(city);
@@ -19,10 +23,12 @@ const Empire& GameManager::GetEmpire(int32_t id) const
 {
     return this->empires[id];
 }
+
 Unit &GameManager::GetUnit(int32_t id)
 {
     return this->units[id];
 }
+
 int32_t GameManager::GetNearestNodeID(sf::Vector2f worldPos) const
 {
     if (this->navGraph.nodes.empty())
@@ -45,7 +51,6 @@ int32_t GameManager::GetNearestNodeID(sf::Vector2f worldPos) const
     }
     return nearestID;
 }
-
 
 void GameManager::UpdateUnits(float dt)
 {
@@ -85,5 +90,78 @@ void GameManager::ResetMovementPoints()
     for (auto& unit : this->units)
     {
         unit.currentMovementPoints = unit.maxMovementPoints;
+    }
+}
+
+bool GameManager::CanFoundCity(int32_t tileID, const std::vector<Tile>& map) const
+{
+    if (map[tileID].terrain.biome == BiomeType::Ocean) return false;
+
+    std::vector<int32_t> visited;
+    std::vector<int32_t> queue;
+    
+    queue.push_back(tileID);
+    visited.push_back(tileID);
+
+    for (int step = 0; step < 2; ++step)
+    {
+        std::vector<int32_t> nextWave;
+        for (int32_t currentID : queue)
+        {
+            for (std::size_t nIdx : map[currentID].neighbors)
+            {
+                int32_t neighborID = static_cast<int32_t>(nIdx);
+                if (std::find(visited.begin(), visited.end(), neighborID) == visited.end())
+                {
+                    visited.push_back(neighborID);
+                    nextWave.push_back(neighborID);
+                }
+            }
+        }
+        queue = nextWave;
+    }
+
+    for (const auto& city : this->cities)
+    {
+        if (std::find(visited.begin(), visited.end(), city.centerTileID) != visited.end())
+        {
+            return false; 
+        }
+    }
+
+    return true;
+}
+
+void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, const std::vector<Tile>& map)
+{
+    if (!this->CanFoundCity(tileID, map))
+    {
+        return;
+    }
+
+    Unit& settler = this->units[unitID];
+    int32_t empireID = settler.ownerEmpireID;
+
+    City newCity;
+    newCity.nameID = 0; 
+    newCity.centerTileID = tileID;
+    newCity.ownerEmpireID = empireID;
+
+    newCity.jurisdictionTiles.push_back(tileID);
+    //może to zostawie idk
+    for (std::size_t nIdx : map[tileID].neighbors)
+    {
+        newCity.jurisdictionTiles.push_back(static_cast<int32_t>(nIdx));
+    }
+
+    this->cities.push_back(newCity);
+    
+    int32_t newCityID = static_cast<int32_t>(this->cities.size() - 1);
+    this->empires[empireID].AddCity(newCityID); 
+
+    this->units.erase(this->units.begin() + unitID);
+    for (size_t i = 0; i < this->units.size(); ++i)
+    {
+        this->units[i].ID = static_cast<int32_t>(i);
     }
 }

@@ -14,6 +14,7 @@ public:
     void DrawTerrain(sf::RenderWindow* window) const;
     void DrawBordersAndRivers(sf::RenderWindow* window) const;
     void DrawPolitical(sf::RenderWindow* window) const;
+    void RebuildPoliticalMesh(const std::vector<Tile>& map, const GameManager& gm);
 
 private:
     sf::VertexArray terrainMesh;

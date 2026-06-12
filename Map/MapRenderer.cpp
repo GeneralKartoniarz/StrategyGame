@@ -31,7 +31,6 @@ void MapRenderer::BuildMeshes(const std::vector<Tile>& map, const TopologyGraph&
     this->terrainMesh.clear();
     this->borderMesh.clear();
     this->riverMesh.clear();
-    this->politicalMesh.clear();
 
     for (size_t i = 0; i < topoGraph.nodes.size(); ++i)
     {
@@ -90,14 +89,30 @@ void MapRenderer::BuildMeshes(const std::vector<Tile>& map, const TopologyGraph&
         }
     }
 
+    this->RebuildPoliticalMesh(map, gm);
+}
+void MapRenderer::RebuildPoliticalMesh(const std::vector<Tile>& map, const GameManager& gm)
+{
+    this->politicalMesh.clear();
+
     for (const auto& city : gm.GetAllCities())
     {
         const Empire& owner = gm.GetEmpire(city.ownerEmpireID);
-        sf::Color polColor = owner.GetColor();
-        polColor.a = 80;
+        sf::Color baseColor = owner.GetColor(); // Pobieramy czysty, bazowy kolor
 
         for (int32_t tileID : city.jurisdictionTiles)
         {
+            sf::Color tileColor = baseColor;
+            
+            if (tileID == city.centerTileID)
+            {
+                tileColor.a = 180; 
+            }
+            else
+            {
+                tileColor.a = 60;
+            }
+
             const auto& region = map[tileID];
             for (const auto& poly : region.subPolygons)
             {
@@ -107,9 +122,9 @@ void MapRenderer::BuildMeshes(const std::vector<Tile>& map, const TopologyGraph&
                 sf::Vector2f p0 = poly[0];
                 for (size_t i = 1; i < pointCount - 1; ++i)
                 {
-                    this->politicalMesh.append(sf::Vertex{p0, polColor});
-                    this->politicalMesh.append(sf::Vertex{poly[i], polColor});
-                    this->politicalMesh.append(sf::Vertex{poly[i + 1], polColor});
+                    this->politicalMesh.append(sf::Vertex{p0, tileColor});
+                    this->politicalMesh.append(sf::Vertex{poly[i], tileColor});
+                    this->politicalMesh.append(sf::Vertex{poly[i + 1], tileColor});
                 }
             }
         }

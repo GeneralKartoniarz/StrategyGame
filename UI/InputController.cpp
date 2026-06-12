@@ -173,4 +173,37 @@ void InputController::HandleEvent(const sf::Event &event)
             }
         }
     }
+    if (const auto *keyEvent = event.getIf<sf::Event::KeyPressed>())
+    {
+        if (keyEvent->code == sf::Keyboard::Key::B)
+        {
+            if (this->selectedUnitID != -1)
+            {
+                Unit &activeUnit = this->gm.GetUnit(this->selectedUnitID);
+
+                if (activeUnit.colonization.has_value())
+                {
+                    this->gm.TransformSettlerToCity(this->selectedUnitID, this->selectedTileID, this->map);
+                    this->selectedUnitID = -1;
+
+                    if (this->onMapChanged)
+                    {
+                        this->onMapChanged();
+                    }
+                    else
+                    {
+                        std::cout << "[LOG] ERROR: Delegat onMapChanged jest pusty (niepodpiety w TestState)!\n";
+                    }
+                }
+                else
+                {
+                    std::cout << "[LOG] Odrzucono: Wybrana jednostka nie ma modulu kolonizacji.\n";
+                }
+            }
+            else
+            {
+                std::cout << "[LOG] Odrzucono: Brak zaznaczonej jednostki (ID = -1).\n";
+            }
+        }
+    }
 }

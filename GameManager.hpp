@@ -5,6 +5,9 @@
 #include "Empires/Empire.hpp"
 #include "Map/NavigationGraph.hpp"
 #include "Unit.hpp"
+
+struct Tile;
+
 class GameManager
 {
 public:
@@ -31,6 +34,9 @@ public:
 
     void UpdateUnits(float dt);
     void ResetMovementPoints();
+
+    bool CanFoundCity(int32_t tileID, const std::vector<Tile>& map) const;
+    void TransformSettlerToCity(int32_t unitID, int32_t tileID, const std::vector<Tile>& map);
 
 private:
     NavigationGraph navGraph;

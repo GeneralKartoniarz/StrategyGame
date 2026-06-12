@@ -5,6 +5,7 @@
 #include "GameManager.hpp"
 #include "GameInterface.hpp"
 #include "Pathfinder.hpp"
+#include <functional>
 class InputController
 {
 public:
@@ -17,6 +18,7 @@ public:
     const sf::View &GetCamera() const { return this->camera; }
     int GetSelectedTileID() const { return this->selectedTileID; }
     int32_t GetSelectedUnitID() const { return this->selectedUnitID; }
+    std::function<void()> onMapChanged;
 
 private:
     bool IsPointInTriangle(const sf::Vector2f &p, const sf::Vector2f &a, const sf::Vector2f &b, const sf::Vector2f &c);
