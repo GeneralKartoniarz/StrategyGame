@@ -173,7 +173,7 @@ void InputController::HandleEvent(const sf::Event &event)
             }
         }
     }
-    if (const auto *keyEvent = event.getIf<sf::Event::KeyPressed>())
+   if (const auto *keyEvent = event.getIf<sf::Event::KeyPressed>())
     {
         if (keyEvent->code == sf::Keyboard::Key::B)
         {
@@ -183,27 +183,54 @@ void InputController::HandleEvent(const sf::Event &event)
 
                 if (activeUnit.colonization.has_value())
                 {
-                    this->gm.TransformSettlerToCity(this->selectedUnitID, this->selectedTileID, this->map);
+                    int32_t realTileID = this->selectedTileID;
+                    for (const auto &region : this->map)
+                    {
+                        bool insideRegion = false;
+                        for (const auto &poly : region.subPolygons)
+                        {
+                            size_t pointCount = poly.size();
+                            if (pointCount < 3) continue;
+
+                            sf::Vector2f p0 = poly[0];
+                            for (size_t i = 1; i < pointCount - 1; ++i)
+                            {
+                                if (IsPointInTriangle(activeUnit.position, p0, poly[i], poly[i + 1]))
+                                {
+                                    insideRegion = true;
+                                    break;
+                                }
+                            }
+                            if (insideRegion) break;
+                        }
+
+                        if (insideRegion)
+                        {
+                            realTileID = static_cast<int32_t>(region.ID);
+                            break;
+                        }
+                    }
+
+                    this->gm.TransformSettlerToCity(this->selectedUnitID, realTileID, this->map);
                     this->selectedUnitID = -1;
 
                     if (this->onMapChanged)
                     {
                         this->onMapChanged();
                     }
-                    else
-                    {
-                        std::cout << "[LOG] ERROR: Delegat onMapChanged jest pusty (niepodpiety w TestState)!\n";
-                    }
-                }
-                else
-                {
-                    std::cout << "[LOG] Odrzucono: Wybrana jednostka nie ma modulu kolonizacji.\n";
                 }
             }
-            else
-            {
-                std::cout << "[LOG] Odrzucono: Brak zaznaczonej jednostki (ID = -1).\n";
-            }
+        }
+    }
+}
+void InputController::RefreshSelectedUnitUI()
+{
+    if (this->gui && this->selectedUnitID != -1)
+    {
+        if (this->selectedUnitID < static_cast<int32_t>(this->gm.GetAllUnits().size()))
+        {
+            const Unit& activeUnit = this->gm.GetUnit(this->selectedUnitID);
+            this->gui->UpdateUnitSelection(&activeUnit);
         }
     }
 }

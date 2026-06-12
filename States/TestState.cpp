@@ -11,7 +11,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
     MapGenerator mg;
     TopologyGraph graph;
-    
+
     bool isValidMap = false;
     while (!isValidMap)
     {
@@ -30,7 +30,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
     NavigationGraph roadGraph = mg.BuildNavigationGraph(this->map);
     this->gm.SetNavGraph(roadGraph);
-    
+
     PoliticalSetup::CreateTestEmpire(this->gm, this->map);
 
     this->mapRenderer = std::make_unique<MapRenderer>();
@@ -38,11 +38,14 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
 
     this->gui = std::make_unique<GameInterface>(windowPtr);
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
-    
-    this->gui->onNextTurnAction = [this]() {
+
+    this->gui->onNextTurnAction = [this]()
+    {
         this->gm.ResetMovementPoints();
+        this->inputCtrl->RefreshSelectedUnitUI();
     };
-    this->inputCtrl->onMapChanged = [this]() {
+    this->inputCtrl->onMapChanged = [this]()
+    {
         this->mapRenderer->RebuildPoliticalMesh(this->map, this->gm);
     };
 }
@@ -51,14 +54,14 @@ void TestState::Update(float dt)
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
     bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
-    
+
     this->gui->Update(dt, mousePos, mouseClicked);
 
     if (!this->gui->IsMouseOverUI(mousePos))
     {
         this->inputCtrl->Update(dt);
     }
-    
+
     this->gm.UpdateUnits(dt);
 }
 
@@ -66,17 +69,20 @@ void TestState::HandleEvent(const sf::Event &event)
 {
     if (const auto *mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
     {
-        if (this->gui->IsMouseOverUI(mouseBtnDown->position)) return;
+        if (this->gui->IsMouseOverUI(mouseBtnDown->position))
+            return;
     }
 
     if (const auto *mouseBtnUp = event.getIf<sf::Event::MouseButtonReleased>())
     {
-        if (this->gui->IsMouseOverUI(mouseBtnUp->position)) return;
+        if (this->gui->IsMouseOverUI(mouseBtnUp->position))
+            return;
     }
 
     if (const auto *mouseScroll = event.getIf<sf::Event::MouseWheelScrolled>())
     {
-        if (this->gui->IsMouseOverUI(mouseScroll->position)) return;
+        if (this->gui->IsMouseOverUI(mouseScroll->position))
+            return;
     }
 
     this->inputCtrl->HandleEvent(event);
@@ -85,7 +91,7 @@ void TestState::HandleEvent(const sf::Event &event)
 void TestState::Render(sf::RenderWindow *windowPtr)
 {
     windowPtr->setView(this->inputCtrl->GetCamera());
-    
+
     this->mapRenderer->DrawTerrain(windowPtr);
 
     int selectedID = this->inputCtrl->GetSelectedTileID();
@@ -98,7 +104,8 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         for (const auto &poly : selectedRegion.subPolygons)
         {
             size_t pointCount = poly.size();
-            if (pointCount < 3) continue;
+            if (pointCount < 3)
+                continue;
 
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)
@@ -110,7 +117,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         }
         windowPtr->draw(highlightMesh);
     }
-    
+
     for (const auto &unit : this->gm.GetAllUnits())
     {
         sf::CircleShape unitShape(2.0f);
@@ -127,7 +134,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     }
 
     this->mapRenderer->DrawBordersAndRivers(windowPtr);
-    
+
     this->mapRenderer->DrawPolitical(windowPtr);
 
     int32_t activeUnitID = this->inputCtrl->GetSelectedUnitID();

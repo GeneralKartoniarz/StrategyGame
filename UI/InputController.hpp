@@ -19,6 +19,7 @@ public:
     int GetSelectedTileID() const { return this->selectedTileID; }
     int32_t GetSelectedUnitID() const { return this->selectedUnitID; }
     std::function<void()> onMapChanged;
+    void RefreshSelectedUnitUI();
 
 private:
     bool IsPointInTriangle(const sf::Vector2f &p, const sf::Vector2f &a, const sf::Vector2f &b, const sf::Vector2f &c);
