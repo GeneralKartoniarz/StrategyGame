@@ -17,4 +17,5 @@ private:
     std::unique_ptr<Label> typeLabel;
     std::unique_ptr<Label> movementLabel;
     std::unique_ptr<Label> actionLabel;
+    bool isVisible = false;
 };

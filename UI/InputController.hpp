@@ -21,6 +21,8 @@ public:
     std::function<void()> onMapChanged;
     void RefreshSelectedUnitUI();
 
+    void DrawCityPlanningHighlights(sf::RenderWindow *window);
+
 private:
     bool IsPointInTriangle(const sf::Vector2f &p, const sf::Vector2f &a, const sf::Vector2f &b, const sf::Vector2f &c);
     void ClampCamera();
@@ -36,4 +38,13 @@ private:
     GameManager &gm;
     GameInterface *gui;
     int32_t selectedUnitID;
+
+    bool isPlanningCity = false;
+    int32_t settlerUnitIDForCity = -1;
+    std::vector<int32_t> validCityTiles;
+
+    bool isTypingCityName = false;
+    int32_t pendingCityTileID = -1;
+    std::string typedCityName = "";
+    sf::Font font;
 };

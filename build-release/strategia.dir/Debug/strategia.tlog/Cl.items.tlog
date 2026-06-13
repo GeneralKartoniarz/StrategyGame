@@ -10,7 +10,12 @@ C:\Users\janpa\Documents\GitHub\StrategyGame\UI\GameInterface.cpp;C:\Users\janpa
 C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NameGenerator.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\NameGenerator.obj
 C:\Users\janpa\Documents\GitHub\StrategyGame\UI\SidePanel.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\SidePanel.obj
 C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\MenuState.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\PopManager.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\PopManager.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\Empire.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\Empire.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PopManager.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\PopManager.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\Empire.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\Empire.obj
 C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\GameManager.obj
-C:\Users\janpa\Documents\GitHub\StrategyGame\PoliticalSetup.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\PoliticalSetup.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PoliticalSetup.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\PoliticalSetup.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\VoronoiBuilder.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\ClimateEngine.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\PathFinder.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\PathFinder.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\UI\UnitPanel.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\UnitPanel.obj
+C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.cpp;C:\Users\janpa\Documents\GitHub\StrategyGame\build-release\strategia.dir\Debug\MapRenderer.obj

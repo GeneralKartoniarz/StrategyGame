@@ -1,6 +1,6 @@
 ^C:\USERS\JANPA\DOCUMENTS\GITHUB\STRATEGYGAME\BUILD\CMAKEFILES\FBCF6490AA914755FC2CC01D4AB59344\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/janpa/Documents/GitHub/StrategyGame -BC:/Users/janpa/Documents/GitHub/StrategyGame/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/janpa/Documents/GitHub/StrategyGame/build/strategia.sln
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/janpa/Documents/GitHub/StrategyGame -BC:/Users/janpa/Documents/GitHub/StrategyGame/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/janpa/Documents/GitHub/StrategyGame/build/strategia.sln
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

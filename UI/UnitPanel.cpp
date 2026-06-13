@@ -1,6 +1,6 @@
 #include "UnitPanel.hpp"
 
-UnitPanel::UnitPanel(const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font)
+UnitPanel::UnitPanel(const sf::Vector2f &position, const sf::Vector2f &size, const sf::Font &font)
 {
     this->background.setPosition(position);
     this->background.setSize(size);
@@ -9,7 +9,7 @@ UnitPanel::UnitPanel(const sf::Vector2f& position, const sf::Vector2f& size, con
     this->background.setOutlineColor(sf::Color(110, 160, 180));
 
     sf::Vector2f labelSize(size.x - 30.0f, 25.0f);
-    
+
     this->typeLabel = std::make_unique<Label>(sf::Vector2f(position.x + 15.0f, position.y + 15.0f), labelSize, font, "Brak aktywnej jednostki", 14);
     this->movementLabel = std::make_unique<Label>(sf::Vector2f(position.x + 15.0f, position.y + 45.0f), labelSize, font, "Ruch: --", 14);
     this->actionLabel = std::make_unique<Label>(sf::Vector2f(position.x + 15.0f, position.y + 75.0f), labelSize, font, "", 14);
@@ -17,8 +17,17 @@ UnitPanel::UnitPanel(const sf::Vector2f& position, const sf::Vector2f& size, con
     this->UpdateSelection(nullptr);
 }
 
-void UnitPanel::UpdateSelection(const Unit* unit)
+void UnitPanel::UpdateSelection(const Unit *unit)
 {
+
+    if (!unit)
+    {
+        this->isVisible = false;
+        return;
+    }
+
+    this->isVisible = true;
+
     if (unit)
     {
         std::string typeStr = (unit->type == UnitType::Settler) ? "Jednostka: Osadnik" : "Jednostka: Wojownik";
@@ -38,15 +47,22 @@ void UnitPanel::UpdateSelection(const Unit* unit)
     }
 }
 
-void UnitPanel::Draw(sf::RenderWindow* window)
+void UnitPanel::Draw(sf::RenderWindow *window)
 {
+    if (!this->isVisible) return;
+
     window->draw(this->background);
-    if (this->typeLabel) this->typeLabel->Draw(window);
-    if (this->movementLabel) this->movementLabel->Draw(window);
-    if (this->actionLabel) this->actionLabel->Draw(window);
+    if (this->typeLabel)
+        this->typeLabel->Draw(window);
+    if (this->movementLabel)
+        this->movementLabel->Draw(window);
+    if (this->actionLabel)
+        this->actionLabel->Draw(window);
 }
 
-bool UnitPanel::Contains(const sf::Vector2f& point) const
+bool UnitPanel::Contains(const sf::Vector2f &point) const
 {
+    if (!this->isVisible) return false;
+
     return this->background.getGlobalBounds().contains(point);
 }

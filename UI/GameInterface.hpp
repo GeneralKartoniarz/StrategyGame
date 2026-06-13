@@ -6,11 +6,15 @@
 #include "Button.hpp"
 #include "SidePanel.hpp"
 #include "UnitPanel.hpp"
+#include "CityPanel.hpp"
 #include <functional>
+
+class GameManager;
+
 class GameInterface
 {
 public:
-    GameInterface(sf::RenderWindow *window);
+    GameInterface(sf::RenderWindow *window, GameManager &gm);
     ~GameInterface();
 
     void Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked);
@@ -20,19 +24,23 @@ public:
     void UpdateSelection(const Tile *tile);
     void UpdateUnitSelection(const Unit *unit);
     std::function<void()> onNextTurnAction;
+    void UpdateCitySelection(const City *city, const std::string &empireName);
 
 private:
     void NextTurn();
 
     static void OnNextTurnClick();
     static GameInterface *instance;
-
+    GameManager &gm;
     sf::Font font;
     std::vector<std::unique_ptr<Label>> statLabels;
     std::unique_ptr<Label> turnCounterLabel;
     std::unique_ptr<Button> nextTurnButton;
     std::unique_ptr<SidePanel> sidePanel;
     std::unique_ptr<UnitPanel> unitPanel;
-
+    std::unique_ptr<CityPanel> cityPanel;
     int turnCount;
+
+    bool isUnitSelected = false;
+    void UpdateCityPanelPosition();
 };

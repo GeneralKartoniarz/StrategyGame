@@ -64,6 +64,9 @@
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\CityPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp">
@@ -109,6 +112,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\CityPanel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -46,7 +46,9 @@ add_executable(strategia
     UI/UnitPanel.hpp
     UI/UnitPanel.cpp
     Map/MapRenderer.hpp
-    Map/MapRenderer.cpp)
+    Map/MapRenderer.cpp
+    UI/CityPanel.hpp
+    UI/CityPanel.cpp)
 target_compile_features(strategia PRIVATE cxx_std_17)
 target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
 target_include_directories(strategia PRIVATE 

@@ -26,7 +26,12 @@ void Label::SetText(const std::string &text)
     this->shapeText.setOrigin({textBounds.position.x + textBounds.size.x / 2.0f, textBounds.position.y + textBounds.size.y / 2.0f});
     this->shapeText.setString(sf::String::fromUtf8(text.begin(), text.end()));
 }
-
+void Label::SetPosition(sf::Vector2f newPos)
+{
+    sf::Vector2f delta = newPos - this->background.getPosition();
+    this->background.move(delta);
+    this->shapeText.move(delta);
+}
 void Label::Draw(sf::RenderWindow *window)
 {
     window->draw(this->background);

@@ -1,0 +1,54 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"build-release/_deps/libssh2-src/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 178,
+				"parent" : 0
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "share/doc/SFML",
+			"paths" : 
+			[
+				"build-release/_deps/libssh2-src/COPYING",
+				"build-release/_deps/libssh2-src/NEWS",
+				"build-release/_deps/libssh2-src/README",
+				"build-release/_deps/libssh2-src/RELEASE-NOTES",
+				"build-release/_deps/libssh2-src/docs/AUTHORS",
+				"build-release/_deps/libssh2-src/docs/BINDINGS.md",
+				"build-release/_deps/libssh2-src/docs/HACKING.md"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "_deps/libssh2-build",
+		"source" : "build-release/_deps/libssh2-src"
+	}
+}

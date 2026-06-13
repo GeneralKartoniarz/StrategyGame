@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <cstdint>
+#include <string>
+#include <unordered_map>
 #include "City.hpp"
 #include "Empires/Empire.hpp"
 #include "Map/NavigationGraph.hpp"
@@ -22,6 +24,9 @@ public:
     const std::vector<City> &GetAllCities() const { return cities; }
     const std::vector<Empire> &GetAllEmpires() const { return empires; }
 
+    uint32_t RegisterCityName(const std::string &name);
+    std::string GetCityName(uint32_t nameID) const;
+
     void AddUnit(const Unit &unit) { units.push_back(unit); }
     const std::vector<Unit> &GetAllUnits() const { return units; }
 
@@ -35,12 +40,15 @@ public:
     void UpdateUnits(float dt);
     void ResetMovementPoints();
 
-    bool CanFoundCity(int32_t tileID, const std::vector<Tile>& map) const;
-    void TransformSettlerToCity(int32_t unitID, int32_t tileID, const std::vector<Tile>& map);
+    bool CanFoundCity(int32_t tileID, const std::vector<Tile> &map) const;
+    void TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile> &map);
 
 private:
     NavigationGraph navGraph;
     std::vector<City> cities;
     std::vector<Empire> empires;
     std::vector<Unit> units;
+
+    std::unordered_map<uint32_t, std::string> cityNamesRegistry;
+    uint32_t nextCityNameID = 0;
 };

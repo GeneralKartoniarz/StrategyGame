@@ -36,7 +36,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     this->mapRenderer = std::make_unique<MapRenderer>();
     this->mapRenderer->BuildMeshes(this->map, graph, this->gm);
 
-    this->gui = std::make_unique<GameInterface>(windowPtr);
+    this->gui = std::make_unique<GameInterface>(windowPtr, this->gm);
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
 
     this->gui->onNextTurnAction = [this]()
@@ -165,5 +165,6 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     }
 
     windowPtr->setView(windowPtr->getDefaultView());
+    this->inputCtrl->DrawCityPlanningHighlights(this->windowPtr);
     this->gui->Draw(windowPtr);
 }

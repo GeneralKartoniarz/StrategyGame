@@ -3,7 +3,7 @@
 
 GameInterface *GameInterface::instance = nullptr;
 
-GameInterface::GameInterface(sf::RenderWindow *window) : turnCount(1)
+GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm), turnCount(1)
 {
     instance = this;
 
@@ -30,6 +30,7 @@ GameInterface::GameInterface(sf::RenderWindow *window) : turnCount(1)
 
     this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
     this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 170.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
+    this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1650.0f, 320.0f}), sf::Vector2f({250.0f, 120.0f}), this->font);
 }
 
 bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
@@ -43,7 +44,8 @@ bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
         return true;
     if (this->turnCounterLabel && this->turnCounterLabel->Contains(fMousePos))
         return true;
-
+    if (this->cityPanel && this->cityPanel->Contains(fMousePos))
+        return true;
     for (const auto &label : this->statLabels)
     {
         if (label && label->Contains(fMousePos))
@@ -63,16 +65,11 @@ void GameInterface::OnNextTurnClick()
     if (instance)
         instance->NextTurn();
 }
-void GameInterface::UpdateUnitSelection(const Unit *unit)
-{
-    if (this->unitPanel)
-        this->unitPanel->UpdateSelection(unit);
-}
 void GameInterface::NextTurn()
 {
     this->turnCount++;
     this->turnCounterLabel->SetText("TURA " + std::to_string(this->turnCount));
-    
+
     if (this->onNextTurnAction)
     {
         this->onNextTurnAction();
@@ -91,10 +88,34 @@ void GameInterface::Draw(sf::RenderWindow *window)
     this->turnCounterLabel->Draw(window);
     this->nextTurnButton->Draw(window);
     this->unitPanel->Draw(window);
+    this->cityPanel->Draw(window);
 }
 
 void GameInterface::UpdateSelection(const Tile *tile)
 {
     if (this->sidePanel)
         this->sidePanel->UpdateSelection(tile);
+}
+void GameInterface::UpdateCitySelection(const City* city, const std::string& empireName)
+{
+    if (this->cityPanel)
+        this->cityPanel->UpdateSelection(city, empireName, this->gm);
+}
+void GameInterface::UpdateUnitSelection(const Unit* unit)
+{
+    this->isUnitSelected = (unit != nullptr);
+    
+    if (this->unitPanel)
+        this->unitPanel->UpdateSelection(unit);
+        
+    this->UpdateCityPanelPosition();
+}
+
+void GameInterface::UpdateCityPanelPosition()
+{
+    if (this->cityPanel)
+    {
+        float targetY = this->isUnitSelected ? 320.0f : 170.0f;
+        this->cityPanel->SetPosition(sf::Vector2f(1650.0f, targetY));
+    }
 }

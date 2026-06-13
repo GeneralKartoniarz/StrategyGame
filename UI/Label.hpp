@@ -10,7 +10,7 @@ public:
     bool Contains(const sf::Vector2f &point) const;
     void SetText(const std::string &text);
     void Draw(sf::RenderWindow *window);
-
+    void SetPosition(sf::Vector2f pos);
 private:
     sf::RectangleShape background;
     sf::Text shapeText;

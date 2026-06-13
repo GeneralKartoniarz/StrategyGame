@@ -132,7 +132,7 @@ bool GameManager::CanFoundCity(int32_t tileID, const std::vector<Tile>& map) con
     return true;
 }
 
-void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, const std::vector<Tile>& map)
+void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile>& map)
 {
     if (!this->CanFoundCity(tileID, map))
     {
@@ -164,4 +164,19 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, const s
     {
         this->units[i].ID = static_cast<int32_t>(i);
     }
+}
+uint32_t GameManager::RegisterCityName(const std::string& name)
+{
+    uint32_t assignedID = this->nextCityNameID++;
+    this->cityNamesRegistry[assignedID] = name;
+    return assignedID;
+}
+std::string GameManager::GetCityName(uint32_t nameID) const
+{
+    auto it = this->cityNamesRegistry.find(nameID);
+    if (it != this->cityNamesRegistry.end())
+    {
+        return it->second;
+    }
+    return "Nieznane Miasto";
 }
