@@ -4,28 +4,31 @@
 #include <SFML/Graphics.hpp>
 #include "PopManager.hpp"
 #include "../Unit.hpp"
-class Empire 
+#include "../Map/Tile.hpp"
+#include "City.hpp"
+class Empire
 {
 public:
-    Empire(int32_t id, const std::string& name, sf::Color color);
+    Empire(int32_t id, const std::string &name, sf::Color color);
     ~Empire() = default;
 
     int32_t GetID() const { return empireID; }
     sf::Color GetColor() const { return mapColor; }
-    const std::string& GetName() const { return name; }
-    
-    PopManager& GetPopManager() { return popManager; }
+    const std::string &GetName() const { return name; }
+
+    PopManager &GetPopManager() { return popManager; }
 
     void AddCity(int32_t cityID);
     void RemoveCity(int32_t cityID);
-    const std::vector<int32_t>& GetCities() const { return controlledCitiesIDs; }
-
+    const std::vector<int32_t> &GetCities() const { return controlledCitiesIDs; }
+    void UpdateTurn(std::vector<Tile> &map, const std::vector<City> &allCities);
     void AddUnit(int32_t unitID) { controlledUnitsIDs.push_back(unitID); }
+
 private:
     int32_t empireID;
     std::string name;
     sf::Color mapColor;
-    
+
     PopManager popManager;
     std::vector<int32_t> controlledCitiesIDs;
 

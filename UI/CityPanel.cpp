@@ -1,20 +1,97 @@
 #include "CityPanel.hpp"
+#include <algorithm>
 
-CityPanel::CityPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font& font)
+
+CityPanel::CityPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font &font)
     : isVisible(false)
 {
-    this->background.setPosition(position);
-    this->background.setSize(size);
-    this->background.setFillColor(sf::Color(30, 30, 35, 220));
-    this->background.setOutlineThickness(2.0f);
-    this->background.setOutlineColor(sf::Color(100, 100, 105));
+    if (size.x < 460.0f) size.x = 460.0f;
+    if (size.y < 180.0f) size.y = 180.0f;
 
-    this->cityNameLabel = std::make_unique<Label>(position + sf::Vector2f(10.0f, 10.0f), sf::Vector2f(size.x - 20.0f, 30.0f), font, "Miasto", 16);
-    this->ownerLabel = std::make_unique<Label>(position + sf::Vector2f(10.0f, 45.0f), sf::Vector2f(size.x - 20.0f, 25.0f), font, "Właściciel: ", 12);
-    this->tilesCountLabel = std::make_unique<Label>(position + sf::Vector2f(10.0f, 75.0f), sf::Vector2f(size.x - 20.0f, 25.0f), font, "Terytorium: 0", 12);
+    this->background.setFillColor(sf::Color(25, 25, 30, 240));
+    this->background.setOutlineThickness(1.0f);
+    this->background.setOutlineColor(sf::Color(80, 80, 85));
+    this->background.setSize(size);
+
+    float margin = 10.0f;
+    float spacing = 10.0f;
+    float fullWidth = size.x - (2.0f * margin);
+    float halfWidth = (fullWidth - spacing) / 2.0f;
+
+    this->cityNameLabel = std::make_unique<Label>(position, sf::Vector2f(fullWidth, 30.0f), font, "Miasto", 16);
+    this->ownerLabel = std::make_unique<Label>(position, sf::Vector2f(halfWidth, 25.0f), font, "Władca: ", 12);
+    this->tilesCountLabel = std::make_unique<Label>(position, sf::Vector2f(halfWidth, 25.0f), font, "Prowincje: 0", 12);
+    this->totalPopLabel = std::make_unique<Label>(position, sf::Vector2f(halfWidth, 25.0f), font, "Ludność: 0", 12);
+    this->satisfactionLabel = std::make_unique<Label>(position, sf::Vector2f(halfWidth, 25.0f), font, "Zadowolenie: 100%", 12);
+    this->ClassDistributionLabel = std::make_unique<Label>(position, sf::Vector2f(fullWidth, 50.0f), font, "Struktura...", 11);
+
+    this->SetPosition(position);
 }
 
-void CityPanel::UpdateSelection(const City* city, const std::string& empireName, const GameManager& gm)
+void CityPanel::SetPosition(sf::Vector2f position)
+{
+    this->background.setPosition(position);
+    sf::Vector2f size = this->background.getSize();
+    
+    float margin = 10.0f;
+    float spacing = 10.0f;
+    float fullWidth = size.x - (2.0f * margin);
+    float halfWidth = (fullWidth - spacing) / 2.0f;
+
+    float leftX = position.x + margin;
+    float rightX = position.x + margin + halfWidth + spacing;
+
+    this->cityNameLabel->SetPosition(sf::Vector2f(leftX, position.y + 10.0f));
+    this->ownerLabel->SetPosition(sf::Vector2f(leftX, position.y + 45.0f));
+    this->tilesCountLabel->SetPosition(sf::Vector2f(leftX, position.y + 75.0f));
+    this->totalPopLabel->SetPosition(sf::Vector2f(rightX, position.y + 45.0f));
+    this->satisfactionLabel->SetPosition(sf::Vector2f(rightX, position.y + 75.0f));
+    this->ClassDistributionLabel->SetPosition(sf::Vector2f(leftX, position.y + 105.0f));
+}
+
+void CityPanel::UpdateCityData(const City &city, const PopManager &popMgr)
+{
+    std::vector<const Pop *> cityPops;
+    const auto &allEmpirePops = popMgr.GetAllPops();
+
+    for (const auto &pop : allEmpirePops)
+    {
+        auto it = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID);
+        if (it != city.jurisdictionTiles.end())
+        {
+            cityPops.push_back(&pop);
+        }
+    }
+
+    size_t totalPeopleCount = cityPops.size() * 100;
+    this->totalPopLabel->SetText("Ludn.: " + std::to_string(totalPeopleCount));
+
+    float avgSat = popMgr.GetAverageSatisfaction(cityPops);
+    int satisfactionPercent = static_cast<int>((avgSat / 255.0f) * 100.0f);
+    this->satisfactionLabel->SetText("Zadow.: " + std::to_string(satisfactionPercent) + "%");
+
+    int32_t slaves = 0, serfs = 0, farmers = 0, workers = 0, intellectuals = 0, nobles = 0;
+
+    for (const auto *popPtr : cityPops)
+    {
+        switch (popPtr->group)
+        {
+        case PopGroup::Slave: slaves++; break;
+        case PopGroup::Serf: serfs++; break;
+        case PopGroup::FreeFarmer: farmers++; break;
+        case PopGroup::Worker: workers++; break;
+        case PopGroup::Intellectual: intellectuals++; break;
+        case PopGroup::Noble: nobles++; break;
+        default: break;
+        }
+    }
+
+    std::string distStr = "Niewolnicy: " + std::to_string(slaves) + " | Chłopi: " + std::to_string(serfs) + " | Rolnicy: " + std::to_string(farmers) + "\n" +
+                          "Robotnicy: " + std::to_string(workers) + " | Inteligencja: " + std::to_string(intellectuals) + " | Szlachta: " + std::to_string(nobles);
+    this->ClassDistributionLabel->SetText(distStr);
+}
+
+void CityPanel::UpdateSelection(const City *city, const std::string &empireName, const GameManager &gm)
 {
     if (!city)
     {
@@ -23,32 +100,29 @@ void CityPanel::UpdateSelection(const City* city, const std::string& empireName,
     }
 
     this->isVisible = true;
-
-    std::string cityName = gm.GetCityName(city->nameID);
-    this->cityNameLabel->SetText(cityName);
-
-    this->ownerLabel->SetText("Wlasciciel: " + empireName);
-    this->tilesCountLabel->SetText("Terytorium: " + std::to_string(city->jurisdictionTiles.size()) + " hexow");
+    this->cityNameLabel->SetText(gm.GetCityName(city->nameID));
+    this->ownerLabel->SetText("Władca: " + empireName);
+    this->tilesCountLabel->SetText("Prowincje: " + std::to_string(city->jurisdictionTiles.size()));
 }
 
-void CityPanel::Draw(sf::RenderWindow* window)
+void CityPanel::Draw(sf::RenderWindow *window)
 {
-    if (!this->isVisible) return;
+    if (!this->isVisible) return;   
+    sf::View oldView = window->getView();
+    window->setView(window->getDefaultView());
 
     window->draw(this->background);
     this->cityNameLabel->Draw(window);
     this->ownerLabel->Draw(window);
     this->tilesCountLabel->Draw(window);
+    this->totalPopLabel->Draw(window);
+    this->satisfactionLabel->Draw(window);
+    this->ClassDistributionLabel->Draw(window);
+
+    window->setView(oldView);
 }
 
 bool CityPanel::Contains(sf::Vector2f point) const
 {
     return this->isVisible && this->background.getGlobalBounds().contains(point);
-}
-void CityPanel::SetPosition(sf::Vector2f position)
-{
-    this->background.setPosition(position);
-    this->cityNameLabel->SetPosition(sf::Vector2f(position.x + 10.0f, position.y + 10.0f));
-    this->ownerLabel->SetPosition(sf::Vector2f(position.x + 10.0f, position.y + 45.0f));
-    this->tilesCountLabel->SetPosition(sf::Vector2f(position.x + 10.0f, position.y + 75.0f));
 }

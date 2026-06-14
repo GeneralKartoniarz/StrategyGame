@@ -30,7 +30,8 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
 
     this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
     this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 170.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
-    this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1650.0f, 320.0f}), sf::Vector2f({250.0f, 120.0f}), this->font);
+    // TODO stale wartosci nie mam sily juz freezuje na amen wystarczy dodac zmienne w klasie
+    this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1450.0f, 320.0f}), sf::Vector2f({400.0f, 180.0f}), this->font);
 }
 
 bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
@@ -96,18 +97,18 @@ void GameInterface::UpdateSelection(const Tile *tile)
     if (this->sidePanel)
         this->sidePanel->UpdateSelection(tile);
 }
-void GameInterface::UpdateCitySelection(const City* city, const std::string& empireName)
+void GameInterface::UpdateCitySelection(const City *city, const std::string &empireName)
 {
     if (this->cityPanel)
         this->cityPanel->UpdateSelection(city, empireName, this->gm);
 }
-void GameInterface::UpdateUnitSelection(const Unit* unit)
+void GameInterface::UpdateUnitSelection(const Unit *unit)
 {
     this->isUnitSelected = (unit != nullptr);
-    
+
     if (this->unitPanel)
         this->unitPanel->UpdateSelection(unit);
-        
+
     this->UpdateCityPanelPosition();
 }
 
@@ -116,6 +117,7 @@ void GameInterface::UpdateCityPanelPosition()
     if (this->cityPanel)
     {
         float targetY = this->isUnitSelected ? 320.0f : 170.0f;
-        this->cityPanel->SetPosition(sf::Vector2f(1650.0f, targetY));
     }
+
+    
 }

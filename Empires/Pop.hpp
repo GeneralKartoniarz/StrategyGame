@@ -13,31 +13,37 @@ enum class WealthLevel : uint8_t
 enum class PopGroup : uint8_t 
 {
     None,
-    Farmer,
-    Worker,
-    Intellectual,
-    Noble
+    Slave,          
+    Serf,           
+    FreeFarmer,   
+    Worker,        
+    Intellectual,   
+    Noble 
 };
-
-/*
- * Pamięciowy układ struktury (Data Alignment):
- * int32_t  (4 bajty) - ID kafelka
- * uint16_t (2 bajty) - ID imienia
- * uint16_t (2 bajty) - ID nazwiska
- * uint16_t (2 bajty) - ID kultury
- * uint16_t (2 bajty) - wiek
- * uint8_t  (1 bajt)  - zawód
- * uint8_t  (1 bajt)  - majątek
- * -----------------------------------------
- * Suma: 14 bajtów twardych danych + 2 bajty wyrównania.
- */
+enum class ReligionGroup : uint8_t
+{
+    None
+};
 struct Pop 
 {
     int32_t locationTileID;
-    uint16_t firstNameID;
-    uint16_t lastNameID;
-    uint16_t cultureID;
-    uint16_t age;
-    PopGroup group;
-    WealthLevel wealth;
+    uint16_t firstNameID;    
+    uint16_t lastNameID;    
+    uint16_t cultureID;     
+    uint16_t age;           
+    PopGroup group;         
+    WealthLevel wealth;      
+    ReligionGroup religion;  
+    
+    uint8_t demographicsFlags; 
+    
+    uint8_t satisfaction;
+
+    inline bool IsFemale() const { return (demographicsFlags & 0x01) != 0; }
+    inline bool IsMale() const { return (demographicsFlags & 0x01) == 0; }
+    inline bool IsAssimilated() const { return (demographicsFlags & 0x02) != 0; }
+
+    inline void SetFemale() { demographicsFlags |= 0x01; }
+    inline void SetMale() { demographicsFlags &= ~0x01; }
+    inline void SetAssimilated(bool v) { v ? demographicsFlags |= 0x02 : demographicsFlags &= ~0x02; }
 };

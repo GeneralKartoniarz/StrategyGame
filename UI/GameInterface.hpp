@@ -25,6 +25,7 @@ public:
     void UpdateUnitSelection(const Unit *unit);
     std::function<void()> onNextTurnAction;
     void UpdateCitySelection(const City *city, const std::string &empireName);
+    CityPanel *GetCityPanel() const { return this->cityPanel.get(); }
 
 private:
     void NextTurn();

@@ -21,6 +21,7 @@ public:
 
     City &GetCity(int32_t id);
     const Empire &GetEmpire(int32_t id) const;
+    
     const std::vector<City> &GetAllCities() const { return cities; }
     const std::vector<Empire> &GetAllEmpires() const { return empires; }
 
@@ -42,7 +43,7 @@ public:
 
     bool CanFoundCity(int32_t tileID, const std::vector<Tile> &map) const;
     void TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile> &map);
-
+    void NextTurn(std::vector<Tile>& map);
 private:
     NavigationGraph navGraph;
     std::vector<City> cities;

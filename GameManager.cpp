@@ -84,7 +84,15 @@ void GameManager::UpdateUnits(float dt)
         }
     }
 }
+void GameManager::NextTurn(std::vector<Tile>& map)
+{
+    for (auto& empire : this->empires)
+    {
+        empire.UpdateTurn(map, this->cities);
+    }
 
+    this->ResetMovementPoints();
+}
 void GameManager::ResetMovementPoints()
 {
     for (auto& unit : this->units)
@@ -143,15 +151,58 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     int32_t empireID = settler.ownerEmpireID;
 
     City newCity;
-    newCity.nameID = 0; 
+    newCity.nameID = nameID;
     newCity.centerTileID = tileID;
     newCity.ownerEmpireID = empireID;
 
     newCity.jurisdictionTiles.push_back(tileID);
-    //może to zostawie idk
+    
     for (std::size_t nIdx : map[tileID].neighbors)
     {
         newCity.jurisdictionTiles.push_back(static_cast<int32_t>(nIdx));
+    }
+    Empire& empire = const_cast<Empire&>(this->empires[empireID]);
+    PopManager& popSys = empire.GetPopManager();
+    uint16_t culture = static_cast<uint16_t>(empireID);
+
+    for (int i = 0; i < 7; ++i)
+    {
+        Pop farmer;
+        farmer.locationTileID = tileID;
+        farmer.firstNameID = static_cast<uint16_t>(std::rand() % 1000);
+        farmer.lastNameID = static_cast<uint16_t>(std::rand() % 1000);
+        farmer.cultureID = culture;
+        farmer.age = 20 + (std::rand() % 15);
+        farmer.group = PopGroup::FreeFarmer;
+        farmer.wealth = WealthLevel::Poor;
+        farmer.religion = ReligionGroup::None;
+        farmer.satisfaction = 180;
+        farmer.demographicsFlags = 0;
+        
+        if (std::rand() % 2 == 0) farmer.SetFemale();
+        farmer.SetAssimilated(true);
+
+        popSys.AddPop(farmer);
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+        Pop worker;
+        worker.locationTileID = tileID;
+        worker.firstNameID = static_cast<uint16_t>(std::rand() % 1000);
+        worker.lastNameID = static_cast<uint16_t>(std::rand() % 1000);
+        worker.cultureID = culture;
+        worker.age = 20 + (std::rand() % 15);
+        worker.group = PopGroup::Worker;
+        worker.wealth = WealthLevel::Poor;
+        worker.religion = ReligionGroup::None;
+        worker.satisfaction = 180;
+        worker.demographicsFlags = 0;
+        
+        if (std::rand() % 2 == 0) worker.SetFemale();
+        worker.SetAssimilated(true);
+
+        popSys.AddPop(worker);
     }
 
     this->cities.push_back(newCity);

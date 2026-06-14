@@ -75,14 +75,6 @@ void InputController::Update(float dt)
 
 void InputController::HandleEvent(const sf::Event &event)
 {
-    /*
-     * BLOK WPROWADZANIA TEKSTU (NATIVE SFML)
-     * Kiedy gracz wybierze kafel pod miasto, silnik wchodzi w tryb isTypingCityName.
-     * Przechwytujemy tutaj zdarzenia TextEntered do budowania stringa oraz KeyPressed
-     * dla akcji specjalnych (Enter zatwierdza, Escape anuluje). Na końcu znajduje się
-     * return, który fizycznie blokuje graczowi możliwość klikania w mapę lub ruszania
-     * jednostkami do czasu zamknięcia okna dialogowego.
-     */
     if (this->isTypingCityName)
     {
         if (const auto *textEvent = event.getIf<sf::Event::TextEntered>())
@@ -226,7 +218,12 @@ void InputController::HandleEvent(const sf::Event &event)
                 }
             }
             this->gui->UpdateCitySelection(clickedCity, ownerName);
-
+            if (clickedCity && this->gui && this->gui->GetCityPanel())
+            {
+                const Empire &owner = this->gm.GetEmpire(clickedCity->ownerEmpireID);
+                const PopManager& popMgr = const_cast<Empire&>(owner).GetPopManager();
+                this->gui->GetCityPanel()->UpdateCityData(*clickedCity, popMgr);
+            }
             if (this->gui)
             {
                 const Tile *clickedTile = (this->selectedTileID != -1) ? &this->map[this->selectedTileID] : nullptr;

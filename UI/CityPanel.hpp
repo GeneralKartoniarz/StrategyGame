@@ -13,11 +13,16 @@ public:
     void Draw(sf::RenderWindow *window);
     bool Contains(sf::Vector2f point) const;
     void SetPosition(sf::Vector2f position);
+    void UpdateCityData(const City &city, const PopManager &popMgr);
+    bool isVisible;
 
 private:
     sf::RectangleShape background;
     std::unique_ptr<Label> cityNameLabel;
     std::unique_ptr<Label> ownerLabel;
     std::unique_ptr<Label> tilesCountLabel;
-    bool isVisible;
+
+    std::unique_ptr<Label> totalPopLabel;
+    std::unique_ptr<Label> satisfactionLabel;
+    std::unique_ptr<Label> ClassDistributionLabel;
 };

@@ -39,11 +39,32 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     this->gui = std::make_unique<GameInterface>(windowPtr, this->gm);
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
 
-    this->gui->onNextTurnAction = [this]()
+
+
+  this->gui->onNextTurnAction = [this]()
+{
+    this->gm.NextTurn(this->map); 
+
+    int32_t selectedTile = this->inputCtrl->GetSelectedTileID();
+    if (selectedTile != -1 && this->gui->GetCityPanel() && this->gui->GetCityPanel()->isVisible)
     {
-        this->gm.ResetMovementPoints();
-        this->inputCtrl->RefreshSelectedUnitUI();
-    };
+        for (const auto& city : this->gm.GetAllCities())
+        {
+            if (city.centerTileID == selectedTile)
+            {
+                const Empire& owner = this->gm.GetEmpire(city.ownerEmpireID);
+                const PopManager& popMgr = const_cast<Empire&>(owner).GetPopManager();
+                
+                this->gui->GetCityPanel()->UpdateCityData(city, popMgr);
+                break;
+            }
+        }
+    }
+
+    this->inputCtrl->RefreshSelectedUnitUI(); 
+};
+
+
     this->inputCtrl->onMapChanged = [this]()
     {
         this->mapRenderer->RebuildPoliticalMesh(this->map, this->gm);
