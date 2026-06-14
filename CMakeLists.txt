@@ -57,4 +57,10 @@ target_include_directories(strategia PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/States
     ${CMAKE_CURRENT_SOURCE_DIR}/UI
     ${CMAKE_CURRENT_SOURCE_DIR}/Empires
+    ${CMAKE_CURRENT_SOURCE_DIR}/resurces
+)
+add_custom_command(TARGET strategia POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_SOURCE_DIR}/resurces"
+    "$<TARGET_FILE_DIR:strategia>/resurces"
 )

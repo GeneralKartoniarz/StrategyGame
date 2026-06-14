@@ -134,7 +134,7 @@ void TestState::Render(sf::RenderWindow *windowPtr)
     }
 
     this->mapRenderer->DrawBordersAndRivers(windowPtr);
-
+    this->mapRenderer->DrawResources(windowPtr);
     this->mapRenderer->DrawPolitical(windowPtr);
 
     int32_t activeUnitID = this->inputCtrl->GetSelectedUnitID();
