@@ -1,10 +1,19 @@
 #include "Empire.hpp"
+#include "City.hpp"
+#include "../Map/Tile.hpp"
 #include <algorithm>
-
+#include <iostream>
 
 Empire::Empire(int32_t id, const std::string& name, sf::Color color)
     : empireID(id), name(name), mapColor(color)
 {
+    marketPrices[ResourceType::Grain] = 2.0f;
+    marketPrices[ResourceType::Fish] = 3.0f;
+    marketPrices[ResourceType::Wood] = 1.5f;
+    marketPrices[ResourceType::Coal] = 4.0f;
+    marketPrices[ResourceType::LuxuryAlcohol] = 12.0f;
+    marketPrices[ResourceType::Paper] = 15.0f;
+    marketPrices[ResourceType::Gold] = 50.0f;
 }
 
 void Empire::AddCity(int32_t cityID)
@@ -20,36 +29,26 @@ void Empire::RemoveCity(int32_t cityID)
         this->controlledCitiesIDs.erase(it, this->controlledCitiesIDs.end());
     }
 }
-void Empire::UpdateTurn(std::vector<Tile>& map, const std::vector<City>& allCities)
-{
-    float totalFoodProduced = 0.0f;
 
+void Empire::UpdateTurn(std::vector<Tile>& map, std::vector<City>& allCities)
+{
     for (int32_t cityID : this->controlledCitiesIDs)
     {
-        const City& city = allCities[cityID]; 
+        City& city = allCities[cityID];
 
-        for (int32_t tileID : city.jurisdictionTiles)
-        {
-            const Tile& tile = map[tileID];
-            
+        city.ProcessConstructionQueue(map);
 
-            //TODO  MAKE IT MORE NATURAL???? SMTH LIKE THIS
-            if (tile.terrain.biome == BiomeType::Plains) totalFoodProduced += 2.0f;
-            else if (tile.terrain.biome == BiomeType::Ocean) totalFoodProduced += 1.0f;
-            
-            if (tile.terrain.resourceName == "Żyzna Gleba") totalFoodProduced += 3.0f;
-            if (tile.terrain.resourceName == "Ławica Ryb") totalFoodProduced += 2.0f;
-        }
+        city.CollectWorkplacesFromTerritory(map);
+        city.PerformEmploymentRegistry(this->popManager.GetAllPops());
+        city.SimulateProduction(map);
+
+        int32_t capitalTileID = city.centerTileID;
+        this->popManager.UpdateTurn(
+            city.warehouse,
+            this->marketPrices,
+            static_cast<uint16_t>(this->empireID),
+            0,
+            capitalTileID
+        );
     }
-
-    float remainingFood = 0.0f;
-    int32_t capitalTileID = !this->controlledCitiesIDs.empty() ? allCities[this->controlledCitiesIDs[0]].centerTileID : 0;
-
-    this->popManager.UpdateTurn(
-        totalFoodProduced,
-        remainingFood,
-        static_cast<uint16_t>(this->empireID),
-        0,
-        capitalTileID
-    );
 }

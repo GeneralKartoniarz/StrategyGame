@@ -1,6 +1,6 @@
 #include "GameInterface.hpp"
 #include <iostream>
-
+#include "BuildPanel.hpp"
 GameInterface *GameInterface::instance = nullptr;
 
 GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm), turnCount(1)
@@ -12,7 +12,7 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
         this->font.openFromFile("C:/Windows/Fonts/Arial.ttf");
     }
 
-    std::vector<std::string> statNames = {"Nauka: 0", "Kultura: 0", "Wiara: 0", "Złoto: 0", "Turystyka: 0"};
+    std::vector<std::string> statNames = {"Nauka: 0", "Kultura: 0", "Wiara: 0", "Zloto: 0", "Turystyka: 0"};
     float startX = 20.0f;
     float startY = 20.0f;
     float labelWidth = 140.0f;
@@ -30,8 +30,10 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
 
     this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
     this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 170.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
-    // TODO stale wartosci nie mam sily juz freezuje na amen wystarczy dodac zmienne w klasie
     this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1450.0f, 320.0f}), sf::Vector2f({400.0f, 180.0f}), this->font);
+    this->buildPanel = std::make_unique<BuildPanel>(sf::Vector2f({20.0f, 850.0f}), sf::Vector2f({300.0f, 120.0f}), this->font);
+
+    BuildPanel::gameManagerContext = &this->gm;
 }
 
 bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
@@ -46,6 +48,8 @@ bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
     if (this->turnCounterLabel && this->turnCounterLabel->Contains(fMousePos))
         return true;
     if (this->cityPanel && this->cityPanel->Contains(fMousePos))
+        return true;
+    if (this->buildPanel && this->buildPanel->Contains(fMousePos))
         return true;
     for (const auto &label : this->statLabels)
     {
@@ -66,6 +70,7 @@ void GameInterface::OnNextTurnClick()
     if (instance)
         instance->NextTurn();
 }
+
 void GameInterface::NextTurn()
 {
     this->turnCount++;
@@ -76,9 +81,15 @@ void GameInterface::NextTurn()
         this->onNextTurnAction();
     }
 }
-void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked)
+
+void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked, std::vector<Tile> &map)
 {
     this->nextTurnButton->Update(mousePos, mouseClicked);
+    
+    if (this->buildPanel)
+    {
+        this->buildPanel->Update(mousePos, mouseClicked, this->selectedCityPtr);
+    }
 }
 
 void GameInterface::Draw(sf::RenderWindow *window)
@@ -90,6 +101,8 @@ void GameInterface::Draw(sf::RenderWindow *window)
     this->nextTurnButton->Draw(window);
     this->unitPanel->Draw(window);
     this->cityPanel->Draw(window);
+    if (this->buildPanel)
+        this->buildPanel->Draw(window);
 }
 
 void GameInterface::UpdateSelection(const Tile *tile)
@@ -97,11 +110,31 @@ void GameInterface::UpdateSelection(const Tile *tile)
     if (this->sidePanel)
         this->sidePanel->UpdateSelection(tile);
 }
+
 void GameInterface::UpdateCitySelection(const City *city, const std::string &empireName)
 {
+    this->selectedCityPtr = city;
+
     if (this->cityPanel)
         this->cityPanel->UpdateSelection(city, empireName, this->gm);
+
+    if (this->buildPanel)
+    {
+        if (city != nullptr)
+        {
+            this->buildPanel->SetVisible(true);
+            BuildPanel::currentCityContext = city;
+        }
+        else
+        {
+            this->buildPanel->SetVisible(false);
+            BuildPanel::currentCityContext = nullptr;
+
+            this->currentInterfaceState = InterfaceState::Default;
+        }
+    }
 }
+
 void GameInterface::UpdateUnitSelection(const Unit *unit)
 {
     this->isUnitSelected = (unit != nullptr);
@@ -118,6 +151,4 @@ void GameInterface::UpdateCityPanelPosition()
     {
         float targetY = this->isUnitSelected ? 320.0f : 170.0f;
     }
-
-    
 }

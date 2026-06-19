@@ -3,6 +3,14 @@
 #include "Map/Tile.hpp"
 #include <iostream>
 #include <algorithm>
+#include <limits>
+#include "UI/BuildPanel.hpp"
+#include "UI/GameInterface.hpp"
+
+GameManager::GameManager(sf::RenderWindow *window)
+    : window(window)
+{
+}
 
 void GameManager::AddCity(const City &city)
 {
@@ -14,9 +22,88 @@ void GameManager::AddEmpire(const Empire &empire)
     this->empires.push_back(empire);
 }
 
-City &GameManager::GetCity(int32_t id)
+City &GameManager::GetCity(int32_t centerTileID)
 {
-    return this->cities[id];
+    for (auto &city : this->cities)
+    {
+        if (city.centerTileID == centerTileID)
+        {
+            return city;
+        }
+    }
+    return this->cities[0];
+}
+
+bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType type, std::vector<Tile> &map)
+{
+    if (!BuildPanel::currentCityContext)
+        return false;
+
+    sf::Vector2f worldPos = this->window->mapPixelToCoords(mousePos, this->window->getView());
+    for (auto &tile : map)
+    {
+        bool mouseInsideTile = false;
+
+        for (const auto &poly : tile.subPolygons)
+        {
+            size_t ptCount = poly.size();
+            if (ptCount < 3)
+                continue;
+
+            for (size_t i = 0, j = ptCount - 1; i < ptCount; j = i++)
+            {
+                if (((poly[i].y > worldPos.y) != (poly[j].y > worldPos.y)) &&
+                    (worldPos.x < (poly[j].x - poly[i].x) * (worldPos.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x))
+                {
+                    mouseInsideTile = !mouseInsideTile;
+                }
+            }
+            if (mouseInsideTile)
+                break;
+        }
+
+        if (!mouseInsideTile)
+            continue;
+
+        City &city = this->GetCity(BuildPanel::currentCityContext->centerTileID);
+        int32_t currentTileID = static_cast<int32_t>(tile.ID);
+
+        auto it = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), currentTileID);
+        if (it == city.jurisdictionTiles.end())
+        {
+            std::cout << "[PLAC BUDOWY] Nie mozesz tu budowac! Ten kafelek lezy poza granicami osady." << std::endl;
+            return false;
+        }
+
+        if (!tile.CanAddManufacture(type))
+        {
+            std::cout << "[PLAC BUDOWY] Blad! Przekroczono limit struktur (max 3) lub poziom ulepszenia budynku osiagnal maksimum (lvl 5)!" << std::endl;
+            return false;
+        }
+
+        float cost = (type == BuildingType::Farm) ? 10.0f : 20.0f;
+        if (city.warehouse[ResourceType::Wood] < cost)
+        {
+            std::cout << "[PLAC BUDOWY] Brak surowcow! Wymagane: " << cost << " j. drewna." << std::endl;
+            return false;
+        }
+
+        city.warehouse[ResourceType::Wood] -= cost;
+
+        ConstructionTask task;
+        task.type = type;
+        task.targetTileID = currentTileID;
+        task.turnsLeft = 3;
+
+        city.buildQueue.push_back(task);
+
+        std::cout << "[PLAC BUDOWY] Sukces! Rozpoczeto wznoszenie struktury na kafelku: "
+                  << currentTileID << ". Budowa potrwa jeszcze 3 tury." << std::endl;
+
+        return true;
+    }
+
+    return false;
 }
 
 const Empire &GameManager::GetEmpire(int32_t id) const
@@ -91,7 +178,6 @@ void GameManager::NextTurn(std::vector<Tile> &map)
     {
         empire.UpdateTurn(map, this->cities);
     }
-
     this->ResetMovementPoints();
 }
 
@@ -159,6 +245,9 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     newCity.ownerEmpireID = empireID;
 
     newCity.jurisdictionTiles.push_back(tileID);
+    newCity.warehouse[ResourceType::Grain] = 300.0f;
+    newCity.warehouse[ResourceType::Fish] = 200.0f;
+    newCity.warehouse[ResourceType::Wood] = 150.0f;
 
     for (std::size_t nIdx : map[tileID].neighbors)
     {
@@ -169,7 +258,6 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     PopManager &popSys = empire.GetPopManager();
     uint8_t culture = static_cast<uint8_t>(empireID);
 
-
     for (int i = 0; i < 7; ++i)
     {
         Pop boundPop;
@@ -178,17 +266,14 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
         boundPop.cultureID = culture;
         boundPop.religionID = 0;
         boundPop.age = 20 + (std::rand() % 15);
-        boundPop.socialClass = SocialClass::Bound; 
+        boundPop.socialClass = SocialClass::Bound;
         boundPop.wealth = WealthLevel::Poor;
-        boundPop.literacy = 2; 
+        boundPop.literacy = 2;
         boundPop.satisfaction = 180;
         boundPop.reserved = 0;
-
         boundPop.demographicsFlags = 0x02;
         if (std::rand() % 2 == 0)
-        {
-            boundPop.demographicsFlags |= 0x01; 
-        }
+            boundPop.demographicsFlags |= 0x01;
 
         popSys.AddPop(boundPop);
     }
@@ -201,17 +286,14 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
         laborerPop.cultureID = culture;
         laborerPop.religionID = 0;
         laborerPop.age = 20 + (std::rand() % 15);
-        laborerPop.socialClass = SocialClass::Laborer; 
+        laborerPop.socialClass = SocialClass::Laborer;
         laborerPop.wealth = WealthLevel::Poor;
         laborerPop.literacy = 5;
         laborerPop.satisfaction = 180;
         laborerPop.reserved = 0;
-
         laborerPop.demographicsFlags = 0x02;
         if (std::rand() % 2 == 0)
-        {
             laborerPop.demographicsFlags |= 0x01;
-        }
 
         popSys.AddPop(laborerPop);
     }

@@ -8,8 +8,16 @@
 #include "UnitPanel.hpp"
 #include "CityPanel.hpp"
 #include <functional>
+#include "Industry.hpp"
 
 class GameManager;
+struct Tile;
+class BuildPanel;
+enum class InterfaceState
+{
+    Default,
+    PlacingBuilding
+};
 
 class GameInterface
 {
@@ -17,7 +25,7 @@ public:
     GameInterface(sf::RenderWindow *window, GameManager &gm);
     ~GameInterface();
 
-    void Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked);
+    void Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked, std::vector<Tile> &map);
     void Draw(sf::RenderWindow *window);
     bool IsMouseOverUI(const sf::Vector2i &mousePos) const;
     int GetTurnCount() const { return this->turnCount; }
@@ -26,6 +34,11 @@ public:
     std::function<void()> onNextTurnAction;
     void UpdateCitySelection(const City *city, const std::string &empireName);
     CityPanel *GetCityPanel() const { return this->cityPanel.get(); }
+
+    static GameInterface *GetInstance() { return instance; }
+
+    InterfaceState currentInterfaceState = InterfaceState::Default;
+    BuildingType buildingUnderCursor = BuildingType::Farm;
 
 private:
     void NextTurn();
@@ -41,7 +54,8 @@ private:
     std::unique_ptr<UnitPanel> unitPanel;
     std::unique_ptr<CityPanel> cityPanel;
     int turnCount;
-
+    std::unique_ptr<BuildPanel> buildPanel;
+    const City *selectedCityPtr = nullptr;
     bool isUnitSelected = false;
     void UpdateCityPanelPosition();
 };

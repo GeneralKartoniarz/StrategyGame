@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <SFML/Graphics.hpp>
 #include "City.hpp"
 #include "Empires/Empire.hpp"
 #include "Map/NavigationGraph.hpp"
@@ -13,15 +14,15 @@ struct Tile;
 class GameManager
 {
 public:
-    GameManager() = default;
+    GameManager(sf::RenderWindow* window);
     ~GameManager() = default;
 
     void AddCity(const City &city);
     void AddEmpire(const Empire &empire);
 
-    City &GetCity(int32_t id);
+    City &GetCity(int32_t centerTileID);
     const Empire &GetEmpire(int32_t id) const;
-    
+
     const std::vector<City> &GetAllCities() const { return cities; }
     const std::vector<Empire> &GetAllEmpires() const { return empires; }
 
@@ -43,8 +44,12 @@ public:
 
     bool CanFoundCity(int32_t tileID, const std::vector<Tile> &map) const;
     void TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile> &map);
-    void NextTurn(std::vector<Tile>& map);
+    void NextTurn(std::vector<Tile> &map);
+
+    bool TryPlaceBuildingAt(const sf::Vector2i& mousePos, BuildingType type, std::vector<Tile> &map);
+
 private:
+    sf::RenderWindow* window; 
     NavigationGraph navGraph;
     std::vector<City> cities;
     std::vector<Empire> empires;

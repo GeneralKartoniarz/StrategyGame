@@ -1,11 +1,13 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <map>
 #include <SFML/Graphics.hpp>
 #include "PopManager.hpp"
-#include "../Unit.hpp"
-#include "../Map/Tile.hpp"
-#include "City.hpp"
+
+struct City;
+struct Tile;
+
 class Empire
 {
 public:
@@ -21,7 +23,8 @@ public:
     void AddCity(int32_t cityID);
     void RemoveCity(int32_t cityID);
     const std::vector<int32_t> &GetCities() const { return controlledCitiesIDs; }
-    void UpdateTurn(std::vector<Tile> &map, const std::vector<City> &allCities);
+    
+    void UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities);
     void AddUnit(int32_t unitID) { controlledUnitsIDs.push_back(unitID); }
 
 private:
@@ -31,6 +34,7 @@ private:
 
     PopManager popManager;
     std::vector<int32_t> controlledCitiesIDs;
-
     std::vector<int32_t> controlledUnitsIDs;
+    
+    std::map<ResourceType, float> marketPrices;
 };

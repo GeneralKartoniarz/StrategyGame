@@ -1,24 +1,6 @@
 #pragma once
 #include <cstdint>
-
-enum class WealthLevel : uint8_t
-{
-    Broke,
-    Poor,
-    Middle,
-    Rich,
-    FilthyRich
-};
-
-enum class SocialClass : uint8_t
-{
-    Bound,       // Uwiązani do ziemi
-    Laborer,     // Niewykwalifikowani najemni
-    Specialist,  // Fachowcy i inżynierowie
-    Capitalist,  // Posiadacze środków produkcji
-    Elite        // Twórcy idei i technologii
-};
-
+#include "../Demographics.hpp"
 enum class ReligionGroup : uint8_t
 {
     None

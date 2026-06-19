@@ -4,8 +4,8 @@
 #include <ctime>
 #include <algorithm>
 #include <SFML/Graphics.hpp>
-
-TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
+#include <iostream>
+TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr), gm(windowPtr)
 {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
 
@@ -39,31 +39,28 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr)
     this->gui = std::make_unique<GameInterface>(windowPtr, this->gm);
     this->inputCtrl = std::make_unique<InputController>(windowPtr, this->map, this->gm, this->gui.get());
 
-
-
-  this->gui->onNextTurnAction = [this]()
-{
-    this->gm.NextTurn(this->map); 
-
-    int32_t selectedTile = this->inputCtrl->GetSelectedTileID();
-    if (selectedTile != -1 && this->gui->GetCityPanel() && this->gui->GetCityPanel()->isVisible)
+    this->gui->onNextTurnAction = [this]()
     {
-        for (const auto& city : this->gm.GetAllCities())
+        this->gm.NextTurn(this->map);
+
+        int32_t selectedTile = this->inputCtrl->GetSelectedTileID();
+        if (selectedTile != -1 && this->gui->GetCityPanel() && this->gui->GetCityPanel()->isVisible)
         {
-            if (city.centerTileID == selectedTile)
+            for (const auto &city : this->gm.GetAllCities())
             {
-                const Empire& owner = this->gm.GetEmpire(city.ownerEmpireID);
-                const PopManager& popMgr = const_cast<Empire&>(owner).GetPopManager();
-                
-                this->gui->GetCityPanel()->UpdateCityData(city, popMgr);
-                break;
+                if (city.centerTileID == selectedTile)
+                {
+                    const Empire &owner = this->gm.GetEmpire(city.ownerEmpireID);
+                    const PopManager &popMgr = const_cast<Empire &>(owner).GetPopManager();
+
+                    this->gui->GetCityPanel()->UpdateCityData(city, popMgr);
+                    break;
+                }
             }
         }
-    }
 
-    this->inputCtrl->RefreshSelectedUnitUI(); 
-};
-
+        this->inputCtrl->RefreshSelectedUnitUI();
+    };
 
     this->inputCtrl->onMapChanged = [this]()
     {
@@ -76,9 +73,9 @@ void TestState::Update(float dt)
     sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
     bool mouseClicked = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
 
-    this->gui->Update(dt, mousePos, mouseClicked);
+    this->gui->Update(dt, mousePos, mouseClicked, this->map);
 
-    if (!this->gui->IsMouseOverUI(mousePos))
+    if (!this->gui->IsMouseOverUI(mousePos) && this->gui->currentInterfaceState != InterfaceState::PlacingBuilding)
     {
         this->inputCtrl->Update(dt);
     }
@@ -88,6 +85,31 @@ void TestState::Update(float dt)
 
 void TestState::HandleEvent(const sf::Event &event)
 {
+    if (this->gui->currentInterfaceState == InterfaceState::PlacingBuilding)
+    {
+        if (const auto *mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
+        {
+            if (mouseBtnDown->button == sf::Mouse::Button::Left)
+            {
+                sf::Vector2i pixelPos = mouseBtnDown->position;
+
+                bool success = this->gm.TryPlaceBuildingAt(pixelPos, this->gui->buildingUnderCursor, this->map);
+                
+                if (success)
+                {
+                    this->gui->currentInterfaceState = InterfaceState::Default;
+                }
+                return; 
+            }
+            else if (mouseBtnDown->button == sf::Mouse::Button::Right)
+            {
+                this->gui->currentInterfaceState = InterfaceState::Default;
+                std::cout << "[INTERFEJS] Anulowano tryb budowy (PPM)." << std::endl;
+                return;
+            }
+        }
+    }
+
     if (const auto *mouseBtnDown = event.getIf<sf::Event::MouseButtonPressed>())
     {
         if (this->gui->IsMouseOverUI(mouseBtnDown->position))

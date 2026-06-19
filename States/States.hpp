@@ -11,7 +11,7 @@ protected:
 public:
     std::unique_ptr<States> nextState;
 
-    States(sf::RenderWindow *windowPtr); // Tutaj ucinamy sprawę średnikiem
+    States(sf::RenderWindow *windowPtr); 
     virtual ~States() = default;
 
     virtual void Update(float dt) = 0;

@@ -2,29 +2,34 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics.hpp>
+#include "../Industry.hpp"
 #include <string>
 using namespace std;
 
-enum class Elevation {
+enum class Elevation
+{
     Water,
     Plains,
     Hills,
     Mountains
 };
 
-enum class Temperature {
+enum class Temperature
+{
     Cold,
     Temperate,
     Hot
 };
 
-enum class Moisture {
+enum class Moisture
+{
     Dry,
     Normal,
     Wet
 };
 
-enum class BiomeType {
+enum class BiomeType
+{
     Ocean,
     IceSheet,
     Tundra,
@@ -36,7 +41,8 @@ enum class BiomeType {
     MountainPeak
 };
 
-struct Terrain {
+struct Terrain
+{
     float elevationNoise = 0.0f;
     float temperatureNoise = 0.0f;
     float moistureNoise = 0.0f;
@@ -58,9 +64,10 @@ struct CellEdge
 
 struct Tile
 {
+    std::vector<Manufacture> manufactures;
     sf::Vector2f position;
     std::vector<sf::Vector2f> vertices;
-    std::vector<std::vector<sf::Vector2f>> subPolygons; 
+    std::vector<std::vector<sf::Vector2f>> subPolygons;
     std::size_t ID;
     float size;
     int ownerID;
@@ -69,4 +76,13 @@ struct Tile
     std::vector<sf::Vertex> provinceBorders;
     Terrain terrain;
     std::vector<std::size_t> neighbors;
+    bool CanAddManufacture(BuildingType newType) const
+    {
+        for (const auto &m : manufactures)
+        {
+            if (m.type == newType)
+                return m.level < 5;
+        }
+        return manufactures.size() < 3;
+    }
 };
