@@ -10,11 +10,11 @@ public:
     ~PopManager() = default;
 
     void AddPop(const Pop& newPop); 
-    //void TransferPopsByTile(int32_t tileID, PopManager& winnerManager);
+    void ProgressAgeAndMortality();
     const std::vector<Pop>& GetAllPops() const { return population; }
 
     size_t GetTotalPopulation() const { return population.size(); }
-    int32_t GetGroupCount(PopGroup targetGroup) const;
+    int32_t GetGroupCount(SocialClass targetClass) const;
 
     void UpdateSatisfaction(float townFoodSurplus);
     float GetAverageSatisfaction(const std::vector<const Pop*>& subGroup) const;

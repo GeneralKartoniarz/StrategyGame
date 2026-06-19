@@ -19,6 +19,28 @@ public:
 
 private:
     sf::VertexArray terrainMesh;
+
+    sf::VertexArray biomeMesh;
+    sf::VertexArray desertTerrainMesh;
+    sf::VertexArray plainsTerrainMesh;
+    sf::VertexArray taigaTerrainMesh;
+    sf::VertexArray tundraTerrainMesh;
+    sf::VertexArray oceanTerrainMesh;
+    sf::VertexArray mountainTerrainMesh;
+    sf::VertexArray iceTerrainMesh;
+    sf::VertexArray rainForestTerrainMesh;
+    sf::VertexArray forestTerrainMesh;
+
+    sf::Texture desertTexture;
+    sf::Texture plainsTexture;
+    sf::Texture taigaTexture;
+    sf::Texture tundraTexture;
+    sf::Texture oceanTexture;
+    sf::Texture mountainTexture;
+    sf::Texture iceTexture;
+    sf::Texture rainForestTexture;
+    sf::Texture forestTexture;
+
     sf::VertexArray borderMesh;
     sf::VertexArray riverMesh;
     sf::VertexArray politicalMesh;

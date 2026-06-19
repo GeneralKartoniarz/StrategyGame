@@ -19,7 +19,7 @@ City &GameManager::GetCity(int32_t id)
     return this->cities[id];
 }
 
-const Empire& GameManager::GetEmpire(int32_t id) const
+const Empire &GameManager::GetEmpire(int32_t id) const
 {
     return this->empires[id];
 }
@@ -56,7 +56,7 @@ void GameManager::UpdateUnits(float dt)
 {
     float speed = 60.0f;
 
-    for (auto& unit : this->units)
+    for (auto &unit : this->units)
     {
         if (unit.nextNodeID != -1)
         {
@@ -67,7 +67,7 @@ void GameManager::UpdateUnits(float dt)
             if (dist <= speed * dt)
             {
                 unit.position = targetPos;
-                unit.currentNodeID = unit.nextNodeID; 
+                unit.currentNodeID = unit.nextNodeID;
                 unit.nextNodeID = -1;
                 unit.currentMovementPoints -= 1;
             }
@@ -84,30 +84,33 @@ void GameManager::UpdateUnits(float dt)
         }
     }
 }
-void GameManager::NextTurn(std::vector<Tile>& map)
+
+void GameManager::NextTurn(std::vector<Tile> &map)
 {
-    for (auto& empire : this->empires)
+    for (auto &empire : this->empires)
     {
         empire.UpdateTurn(map, this->cities);
     }
 
     this->ResetMovementPoints();
 }
+
 void GameManager::ResetMovementPoints()
 {
-    for (auto& unit : this->units)
+    for (auto &unit : this->units)
     {
         unit.currentMovementPoints = unit.maxMovementPoints;
     }
 }
 
-bool GameManager::CanFoundCity(int32_t tileID, const std::vector<Tile>& map) const
+bool GameManager::CanFoundCity(int32_t tileID, const std::vector<Tile> &map) const
 {
-    if (map[tileID].terrain.biome == BiomeType::Ocean) return false;
+    if (map[tileID].terrain.biome == BiomeType::Ocean)
+        return false;
 
     std::vector<int32_t> visited;
     std::vector<int32_t> queue;
-    
+
     queue.push_back(tileID);
     visited.push_back(tileID);
 
@@ -129,25 +132,25 @@ bool GameManager::CanFoundCity(int32_t tileID, const std::vector<Tile>& map) con
         queue = nextWave;
     }
 
-    for (const auto& city : this->cities)
+    for (const auto &city : this->cities)
     {
         if (std::find(visited.begin(), visited.end(), city.centerTileID) != visited.end())
         {
-            return false; 
+            return false;
         }
     }
 
     return true;
 }
 
-void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile>& map)
+void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile> &map)
 {
     if (!this->CanFoundCity(tileID, map))
     {
         return;
     }
 
-    Unit& settler = this->units[unitID];
+    Unit &settler = this->units[unitID];
     int32_t empireID = settler.ownerEmpireID;
 
     City newCity;
@@ -156,59 +159,67 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     newCity.ownerEmpireID = empireID;
 
     newCity.jurisdictionTiles.push_back(tileID);
-    
+
     for (std::size_t nIdx : map[tileID].neighbors)
     {
         newCity.jurisdictionTiles.push_back(static_cast<int32_t>(nIdx));
     }
-    Empire& empire = const_cast<Empire&>(this->empires[empireID]);
-    PopManager& popSys = empire.GetPopManager();
-    uint16_t culture = static_cast<uint16_t>(empireID);
+
+    Empire &empire = const_cast<Empire &>(this->empires[empireID]);
+    PopManager &popSys = empire.GetPopManager();
+    uint8_t culture = static_cast<uint8_t>(empireID);
+
 
     for (int i = 0; i < 7; ++i)
     {
-        Pop farmer;
-        farmer.locationTileID = tileID;
-        farmer.firstNameID = static_cast<uint16_t>(std::rand() % 1000);
-        farmer.lastNameID = static_cast<uint16_t>(std::rand() % 1000);
-        farmer.cultureID = culture;
-        farmer.age = 20 + (std::rand() % 15);
-        farmer.group = PopGroup::FreeFarmer;
-        farmer.wealth = WealthLevel::Poor;
-        farmer.religion = ReligionGroup::None;
-        farmer.satisfaction = 180;
-        farmer.demographicsFlags = 0;
-        
-        if (std::rand() % 2 == 0) farmer.SetFemale();
-        farmer.SetAssimilated(true);
+        Pop boundPop;
+        boundPop.locationTileID = tileID;
+        boundPop.nameSeed = static_cast<uint16_t>(std::rand() % 65535);
+        boundPop.cultureID = culture;
+        boundPop.religionID = 0;
+        boundPop.age = 20 + (std::rand() % 15);
+        boundPop.socialClass = SocialClass::Bound; 
+        boundPop.wealth = WealthLevel::Poor;
+        boundPop.literacy = 2; 
+        boundPop.satisfaction = 180;
+        boundPop.reserved = 0;
 
-        popSys.AddPop(farmer);
+        boundPop.demographicsFlags = 0x02;
+        if (std::rand() % 2 == 0)
+        {
+            boundPop.demographicsFlags |= 0x01; 
+        }
+
+        popSys.AddPop(boundPop);
     }
 
     for (int i = 0; i < 3; ++i)
     {
-        Pop worker;
-        worker.locationTileID = tileID;
-        worker.firstNameID = static_cast<uint16_t>(std::rand() % 1000);
-        worker.lastNameID = static_cast<uint16_t>(std::rand() % 1000);
-        worker.cultureID = culture;
-        worker.age = 20 + (std::rand() % 15);
-        worker.group = PopGroup::Worker;
-        worker.wealth = WealthLevel::Poor;
-        worker.religion = ReligionGroup::None;
-        worker.satisfaction = 180;
-        worker.demographicsFlags = 0;
-        
-        if (std::rand() % 2 == 0) worker.SetFemale();
-        worker.SetAssimilated(true);
+        Pop laborerPop;
+        laborerPop.locationTileID = tileID;
+        laborerPop.nameSeed = static_cast<uint16_t>(std::rand() % 65535);
+        laborerPop.cultureID = culture;
+        laborerPop.religionID = 0;
+        laborerPop.age = 20 + (std::rand() % 15);
+        laborerPop.socialClass = SocialClass::Laborer; 
+        laborerPop.wealth = WealthLevel::Poor;
+        laborerPop.literacy = 5;
+        laborerPop.satisfaction = 180;
+        laborerPop.reserved = 0;
 
-        popSys.AddPop(worker);
+        laborerPop.demographicsFlags = 0x02;
+        if (std::rand() % 2 == 0)
+        {
+            laborerPop.demographicsFlags |= 0x01;
+        }
+
+        popSys.AddPop(laborerPop);
     }
 
     this->cities.push_back(newCity);
-    
+
     int32_t newCityID = static_cast<int32_t>(this->cities.size() - 1);
-    this->empires[empireID].AddCity(newCityID); 
+    this->empires[empireID].AddCity(newCityID);
 
     this->units.erase(this->units.begin() + unitID);
     for (size_t i = 0; i < this->units.size(); ++i)
@@ -216,12 +227,14 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
         this->units[i].ID = static_cast<int32_t>(i);
     }
 }
-uint32_t GameManager::RegisterCityName(const std::string& name)
+
+uint32_t GameManager::RegisterCityName(const std::string &name)
 {
     uint32_t assignedID = this->nextCityNameID++;
     this->cityNamesRegistry[assignedID] = name;
     return assignedID;
 }
+
 std::string GameManager::GetCityName(uint32_t nameID) const
 {
     auto it = this->cityNamesRegistry.find(nameID);

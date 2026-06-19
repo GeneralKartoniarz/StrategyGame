@@ -1,17 +1,49 @@
 #include "MapRenderer.hpp"
 #include <algorithm>
 #include <iostream>
+
 MapRenderer::MapRenderer()
 {
     this->terrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
     this->borderMesh.setPrimitiveType(sf::PrimitiveType::Lines);
     this->riverMesh.setPrimitiveType(sf::PrimitiveType::Lines);
+
+    this->desertTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->plainsTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->oceanTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->forestTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->rainForestTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->tundraTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->iceTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->taigaTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+    this->mountainTerrainMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+
     this->politicalMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
     this->resourceMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
+
     if (!this->resourceAtlas.loadFromFile("resurces/textures/resource_atlas.png"))
     {
         std::cout << "[BŁĄD] Nie udalo sie znalezc pliku resources/textures/resource_atlas.png!" << std::endl;
     }
+
+    auto loadTex = [](sf::Texture &tex, const std::string &path)
+    {
+        if (!tex.loadFromFile(path))
+        {
+            std::cout << "[BŁĄD] Brak pliku: " << path << std::endl;
+        }
+        tex.setRepeated(true);
+    };
+
+    loadTex(this->desertTexture, "resurces/textures/DesertBackground.png");
+    loadTex(this->plainsTexture, "resurces/textures/PlainsBackground.png");
+    loadTex(this->oceanTexture, "resurces/textures/OceanBackground.png");
+    loadTex(this->forestTexture, "resurces/textures/ForestBackground.png");
+    loadTex(this->rainForestTexture, "resurces/textures/RainForestBackground.png");
+    loadTex(this->tundraTexture, "resurces/textures/TundraBackground.png");
+    loadTex(this->iceTexture, "resurces/textures/IceBackground.png");
+    loadTex(this->taigaTexture, "resurces/textures/TaigaBackground.png");
+    loadTex(this->mountainTexture, "resurces/textures/MountainBackground.png");
 }
 
 sf::Color MapRenderer::GetBiomeColor(BiomeType biome) const
@@ -40,6 +72,7 @@ sf::Color MapRenderer::GetBiomeColor(BiomeType biome) const
         return sf::Color(100, 100, 100);
     }
 }
+
 sf::IntRect MapRenderer::GetResourceTextureRect(const std::string &resourceName) const
 {
     if (resourceName == "Brak")
@@ -71,11 +104,21 @@ sf::IntRect MapRenderer::GetResourceTextureRect(const std::string &resourceName)
 
     return sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(0, 0));
 }
+
 void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph &topoGraph, const GameManager &gm)
 {
     this->terrainMesh.clear();
     this->borderMesh.clear();
     this->riverMesh.clear();
+    this->desertTerrainMesh.clear();
+    this->plainsTerrainMesh.clear();
+    this->oceanTerrainMesh.clear();
+    this->forestTerrainMesh.clear();
+    this->rainForestTerrainMesh.clear();
+    this->tundraTerrainMesh.clear();
+    this->iceTerrainMesh.clear();
+    this->taigaTerrainMesh.clear();
+    this->mountainTerrainMesh.clear();
 
     for (size_t i = 0; i < topoGraph.nodes.size(); ++i)
     {
@@ -99,25 +142,37 @@ void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph 
     {
         for (const auto &borderVertex : region.provinceBorders)
         {
-            this->borderMesh.append(borderVertex);
+            sf::Vertex v = borderVertex;
+            v.color = sf::Color(30, 30, 30, 220); 
+            this->borderMesh.append(v);
         }
 
-        sf::Color baseColor = GetBiomeColor(region.terrain.biome);
+        sf::VertexArray* targetMesh = &this->terrainMesh;
+        switch (region.terrain.biome)
+        {
+            case BiomeType::Desert:       targetMesh = &this->desertTerrainMesh; break;
+            case BiomeType::Plains:       targetMesh = &this->plainsTerrainMesh; break;
+            case BiomeType::Ocean:        targetMesh = &this->oceanTerrainMesh; break;
+            case BiomeType::Forest:       targetMesh = &this->forestTerrainMesh; break;
+            case BiomeType::Rainforest:   targetMesh = &this->rainForestTerrainMesh; break;
+            case BiomeType::Tundra:       targetMesh = &this->tundraTerrainMesh; break;
+            case BiomeType::IceSheet:     targetMesh = &this->iceTerrainMesh; break;
+            case BiomeType::Taiga:        targetMesh = &this->taigaTerrainMesh; break;
+            case BiomeType::MountainPeak: targetMesh = &this->mountainTerrainMesh; break;
+            default:                      targetMesh = &this->terrainMesh; break;
+        }
+
         float heightFactor = region.terrain.elevationNoise;
         int brightnessAdjustment = static_cast<int>(heightFactor * 30.0f);
-        sf::Color finalColor;
+        
+        int tintVal = std::max(0, std::min(255, 255 + brightnessAdjustment));
+        sf::Color finalColor(tintVal, tintVal, tintVal, 255);
 
         if (region.terrain.biome == BiomeType::Ocean)
         {
-            finalColor.r = std::max(0, std::min(255, baseColor.r + brightnessAdjustment / 2));
-            finalColor.g = std::max(0, std::min(255, baseColor.g + brightnessAdjustment / 2));
-            finalColor.b = std::max(0, std::min(255, baseColor.b + brightnessAdjustment));
-        }
-        else
-        {
-            finalColor.r = std::max(0, std::min(255, baseColor.r + brightnessAdjustment));
-            finalColor.g = std::max(0, std::min(255, baseColor.g + brightnessAdjustment));
-            finalColor.b = std::max(0, std::min(255, baseColor.b + brightnessAdjustment));
+            finalColor.r = std::max(0, std::min(255, tintVal / 2));
+            finalColor.g = std::max(0, std::min(255, tintVal / 2));
+            finalColor.b = std::max(0, std::min(255, tintVal));
         }
 
         for (const auto &poly : region.subPolygons)
@@ -129,9 +184,9 @@ void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph 
             sf::Vector2f p0 = poly[0];
             for (size_t i = 1; i < pointCount - 1; ++i)
             {
-                this->terrainMesh.append(sf::Vertex{p0, finalColor});
-                this->terrainMesh.append(sf::Vertex{poly[i], finalColor});
-                this->terrainMesh.append(sf::Vertex{poly[i + 1], finalColor});
+                targetMesh->append(sf::Vertex{p0, finalColor, p0});
+                targetMesh->append(sf::Vertex{poly[i], finalColor, poly[i]});
+                targetMesh->append(sf::Vertex{poly[i + 1], finalColor, poly[i + 1]});
             }
         }
     }
@@ -149,7 +204,6 @@ void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph 
             continue;
 
         sf::Vector2f center = region.position;
-
         float halfSize = 1.0f;
 
         sf::Vector2f tl(center.x - halfSize, center.y - halfSize);
@@ -171,6 +225,7 @@ void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph 
         this->resourceMesh.append(sf::Vertex{bl, sf::Color::White, uvBl});
     }
 }
+
 void MapRenderer::RebuildPoliticalMesh(const std::vector<Tile> &map, const GameManager &gm)
 {
     this->politicalMesh.clear();
@@ -212,12 +267,25 @@ void MapRenderer::RebuildPoliticalMesh(const std::vector<Tile> &map, const GameM
     }
 }
 
-void MapRenderer::DrawTerrain(sf::RenderWindow *window) const { window->draw(this->terrainMesh); }
+void MapRenderer::DrawTerrain(sf::RenderWindow *window) const 
+{ 
+    window->draw(this->terrainMesh); 
+    window->draw(this->desertTerrainMesh, &this->desertTexture);
+    window->draw(this->plainsTerrainMesh, &this->plainsTexture);
+    window->draw(this->oceanTerrainMesh, &this->oceanTexture);
+    window->draw(this->forestTerrainMesh, &this->forestTexture);
+    window->draw(this->rainForestTerrainMesh, &this->rainForestTexture);
+    window->draw(this->tundraTerrainMesh, &this->tundraTexture);
+    window->draw(this->iceTerrainMesh, &this->iceTexture);
+    window->draw(this->taigaTerrainMesh, &this->taigaTexture);
+    window->draw(this->mountainTerrainMesh, &this->mountainTexture);
+}
 void MapRenderer::DrawBordersAndRivers(sf::RenderWindow *window) const
 {
     window->draw(this->borderMesh);
     window->draw(this->riverMesh);
 }
+
 void MapRenderer::DrawPolitical(sf::RenderWindow *window) const { window->draw(this->politicalMesh); }
 void MapRenderer::DrawResources(sf::RenderWindow *window) const
 {

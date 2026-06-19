@@ -1,7 +1,6 @@
 #include "CityPanel.hpp"
 #include <algorithm>
 
-
 CityPanel::CityPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font &font)
     : isVisible(false)
 {
@@ -70,24 +69,23 @@ void CityPanel::UpdateCityData(const City &city, const PopManager &popMgr)
     int satisfactionPercent = static_cast<int>((avgSat / 255.0f) * 100.0f);
     this->satisfactionLabel->SetText("Zadow.: " + std::to_string(satisfactionPercent) + "%");
 
-    int32_t slaves = 0, serfs = 0, farmers = 0, workers = 0, intellectuals = 0, nobles = 0;
+    int32_t bound = 0, laborers = 0, specialists = 0, capitalists = 0, elite = 0;
 
     for (const auto *popPtr : cityPops)
     {
-        switch (popPtr->group)
+        switch (popPtr->socialClass)
         {
-        case PopGroup::Slave: slaves++; break;
-        case PopGroup::Serf: serfs++; break;
-        case PopGroup::FreeFarmer: farmers++; break;
-        case PopGroup::Worker: workers++; break;
-        case PopGroup::Intellectual: intellectuals++; break;
-        case PopGroup::Noble: nobles++; break;
-        default: break;
+            case SocialClass::Bound:      bound++; break;
+            case SocialClass::Laborer:    laborers++; break;
+            case SocialClass::Specialist: specialists++; break;
+            case SocialClass::Capitalist: capitalists++; break;
+            case SocialClass::Elite:      elite++; break;
+            default: break;
         }
     }
 
-    std::string distStr = "Niewolnicy: " + std::to_string(slaves) + " | Chłopi: " + std::to_string(serfs) + " | Rolnicy: " + std::to_string(farmers) + "\n" +
-                          "Robotnicy: " + std::to_string(workers) + " | Inteligencja: " + std::to_string(intellectuals) + " | Szlachta: " + std::to_string(nobles);
+    std::string distStr = "Zwiazani: " + std::to_string(bound) + " | Robotnicy: " + std::to_string(laborers) + " | Specjaliści: " + std::to_string(specialists) + "\n" +
+                          "Posiadacze: " + std::to_string(capitalists) + " | Elita: " + std::to_string(elite);
     this->ClassDistributionLabel->SetText(distStr);
 }
 
