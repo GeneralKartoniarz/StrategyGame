@@ -123,6 +123,90 @@ void InputController::HandleEvent(const sf::Event &event)
         {
             if (this->gui && this->gui->IsMouseOverUI(mousePos))
                 return;
+            if (GameInterface::GetInstance() && GameInterface::GetInstance()->currentInterfaceState == InterfaceState::PlacingBuilding)
+            {
+                int32_t clickedTileIndex = -1;
+                for (size_t i = 0; i < this->map.size(); ++i)
+                {
+                    const auto &region = this->map[i];
+                    bool insideRegion = false;
+                    for (const auto &poly : region.subPolygons)
+                    {
+                        size_t pointCount = poly.size();
+                        if (pointCount < 3)
+                            continue;
+                        sf::Vector2f p0 = poly[0];
+                        for (size_t j = 1; j < pointCount - 1; ++j)
+                        {
+                            if (IsPointInTriangle(worldPos, p0, poly[j], poly[j + 1]))
+                            {
+                                insideRegion = true;
+                                break;
+                            }
+                        }
+                        if (insideRegion)
+                            break;
+                    }
+                    if (insideRegion)
+                    {
+                        clickedTileIndex = static_cast<int32_t>(i);
+                        break;
+                    }
+                }
+
+                if (clickedTileIndex != -1)
+                {
+                    int32_t owningCityCenterID = -1;
+                    for (const auto &c : this->gm.GetAllCities())
+                    {
+                        auto jurIt = std::find(c.jurisdictionTiles.begin(), c.jurisdictionTiles.end(), clickedTileIndex);
+                        if (jurIt != c.jurisdictionTiles.end())
+                        {
+                            owningCityCenterID = c.centerTileID;
+                            break;
+                        }
+                    }
+
+                    if (owningCityCenterID != -1)
+                    {
+                        City &city = this->gm.GetCity(owningCityCenterID);
+                        Tile &targetTile = this->map[clickedTileIndex];
+                        BuildingType plannedType = GameInterface::GetInstance()->buildingUnderCursor;
+
+                        if (targetTile.CanAddManufacture(plannedType))
+                        {
+                            city.warehouse[ResourceType::Wood] -= 10.0f;
+
+                            bool upgraded = false;
+                            for (auto &m : targetTile.manufactures)
+                            {
+                                if (m.type == plannedType)
+                                {
+                                    m.level++;
+                                    upgraded = true;
+                                    std::cout << "[BUDOWNICTWO] Ulepszono budynek do poziomu " << m.level << " na kafelku " << clickedTileIndex << std::endl;
+                                    break;
+                                }
+                            }
+
+                            if (!upgraded)
+                            {
+                                targetTile.manufactures.push_back(Manufacture{plannedType, 1});
+                                std::cout << "[BUDOWNICTWO] Zbudowano nowa manufakture na kafelku " << clickedTileIndex << std::endl;
+                            }
+
+                            city.CollectWorkplacesFromTerritory(this->map);
+                        }
+                        else
+                        {
+                            std::cout << "[BLOKADA] Przekroczono limit budynków na tym kafelku!" << std::endl;
+                        }
+                    }
+                }
+
+                GameInterface::GetInstance()->currentInterfaceState = static_cast<InterfaceState>(0);
+                return;
+            }
 
             if (this->isPlanningCity)
             {
@@ -376,7 +460,6 @@ void InputController::HandleEvent(const sf::Event &event)
         }
     }
 }
-
 void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
 {
     if (this->isPlanningCity && !this->validCityTiles.empty())
