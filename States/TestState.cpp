@@ -93,7 +93,8 @@ void TestState::HandleEvent(const sf::Event &event)
             {
                 sf::Vector2i pixelPos = mouseBtnDown->position;
 
-                bool success = this->gm.TryPlaceBuildingAt(pixelPos, this->gui->buildingUnderCursor, this->map);
+                sf::View worldCamera = this->inputCtrl->GetCamera();
+                bool success = this->gm.TryPlaceBuildingAt(pixelPos, this->gui->buildingUnderCursor, this->map, worldCamera);
                 
                 if (success)
                 {

@@ -46,7 +46,7 @@ public:
     void TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile> &map);
     void NextTurn(std::vector<Tile> &map);
 
-    bool TryPlaceBuildingAt(const sf::Vector2i& mousePos, BuildingType type, std::vector<Tile> &map);
+    bool TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType type, std::vector<Tile> &map, const sf::View &worldView);
 
 private:
     sf::RenderWindow* window; 

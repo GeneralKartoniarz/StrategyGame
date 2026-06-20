@@ -8,34 +8,36 @@
 
 uint8_t Manufacture::GetRequiredClassAsUint8() const
 {
-    if (type == BuildingType::Farm) return static_cast<uint8_t>(SocialClass::Bound);
-    if (type == BuildingType::PaperMill) return static_cast<uint8_t>(SocialClass::Specialist);
+    if (type == BuildingType::Farm)
+        return static_cast<uint8_t>(SocialClass::Bound);
+    if (type == BuildingType::PaperMill)
+        return static_cast<uint8_t>(SocialClass::Specialist);
     return static_cast<uint8_t>(SocialClass::Laborer);
 }
 
-void City::ProcessConstructionQueue(std::vector<Tile>& map)
+void City::ProcessConstructionQueue(std::vector<Tile> &map)
 {
-    for (auto it = this->buildQueue.begin(); it != this->buildQueue.end(); )
+    for (auto it = this->buildQueue.begin(); it != this->buildQueue.end();)
     {
         it->turnsLeft--;
-        std::cout << "[KOLEJKA] Budynek na kafelku " << it->targetTileID 
+        std::cout << "[KOLEJKA] Budynek na kafelku " << it->targetTileID
                   << " | Pozostalo tur: " << it->turnsLeft << std::endl;
 
         if (it->turnsLeft <= 0)
         {
-            Tile& targetTile = map[it->targetTileID];
+            Tile &targetTile = map[it->targetTileID];
             bool upgraded = false;
-            
-            for (auto& m : targetTile.manufactures)
+
+            for (auto &m : targetTile.manufactures)
             {
-                if (m.type == it->type) 
-                { 
-                    m.level++; 
-                    upgraded = true; 
-                    break; 
+                if (m.type == it->type)
+                {
+                    m.level++;
+                    upgraded = true;
+                    break;
                 }
             }
-            
+
             if (!upgraded)
             {
                 Manufacture newBuilding;
@@ -43,10 +45,10 @@ void City::ProcessConstructionQueue(std::vector<Tile>& map)
                 newBuilding.level = 1;
                 targetTile.manufactures.push_back(newBuilding);
             }
-            
-            std::cout << "[BUDOWNICTWO] Ukonczono wznoszenie manufaktury na kafelku: " 
+
+            std::cout << "[BUDOWNICTWO] Ukonczono wznoszenie manufaktury na kafelku: "
                       << it->targetTileID << "!" << std::endl;
-                      
+
             it = this->buildQueue.erase(it);
         }
         else
@@ -56,13 +58,13 @@ void City::ProcessConstructionQueue(std::vector<Tile>& map)
     }
 }
 
-void City::CollectWorkplacesFromTerritory(const std::vector<Tile>& map)
+void City::CollectWorkplacesFromTerritory(const std::vector<Tile> &map)
 {
     this->workplaces.clear();
     for (int32_t tileID : this->jurisdictionTiles)
     {
-        const Tile& tile = map[tileID];
-        for (const auto& manufacture : tile.manufactures)
+        const Tile &tile = map[tileID];
+        for (const auto &manufacture : tile.manufactures)
         {
             Workplace wp;
             wp.producedResource = manufacture.GetOutputResource();
@@ -74,10 +76,10 @@ void City::CollectWorkplacesFromTerritory(const std::vector<Tile>& map)
     }
 }
 
-void City::PerformEmploymentRegistry(const std::vector<Pop>& empirePops)
+void City::PerformEmploymentRegistry(const std::vector<Pop> &empirePops)
 {
     std::map<uint8_t, int32_t> availableWorkers;
-    for (const auto& pop : empirePops)
+    for (const auto &pop : empirePops)
     {
         auto it = std::find(this->jurisdictionTiles.begin(), this->jurisdictionTiles.end(), pop.locationTileID);
         if (it != this->jurisdictionTiles.end() && pop.age >= 15)
@@ -86,11 +88,12 @@ void City::PerformEmploymentRegistry(const std::vector<Pop>& empirePops)
         }
     }
 
-    for (auto& job : this->workplaces)
+    for (auto &job : this->workplaces)
     {
         job.currentEmployees = 0;
         int32_t pool = availableWorkers[job.requiredClassRaw];
-        if (pool <= 0) continue;
+        if (pool <= 0)
+            continue;
 
         int32_t recruits = std::min(job.maxEmployees, pool);
         job.currentEmployees = recruits;
@@ -98,20 +101,22 @@ void City::PerformEmploymentRegistry(const std::vector<Pop>& empirePops)
     }
 }
 
-void City::SimulateProduction(const std::vector<Tile>& map)
+void City::SimulateProduction(const std::vector<Tile> &map)
 {
     std::cout << "--- BILANS PRODUKCJI MIASTA ---" << std::endl;
     size_t wpIndex = 0;
 
     for (int32_t tileID : this->jurisdictionTiles)
     {
-        const Tile& tile = map[tileID];
-        for (const auto& manufacture : tile.manufactures)
+        const Tile &tile = map[tileID];
+        for (const auto &manufacture : tile.manufactures)
         {
-            if (wpIndex >= this->workplaces.size()) break;
-            Workplace& job = this->workplaces[wpIndex++];
+            if (wpIndex >= this->workplaces.size())
+                break;
+            Workplace &job = this->workplaces[wpIndex++];
 
-            if (job.currentEmployees <= 0) continue;
+            if (job.currentEmployees <= 0)
+                continue;
 
             ResourceType inputType;
             float inputAmountPerWorker;
@@ -119,16 +124,15 @@ void City::SimulateProduction(const std::vector<Tile>& map)
 
             if (inputAmountPerWorker == 0.0f)
             {
-                float baseOutput = static_cast<float>(job.currentEmployees) * 0.1f;
-                
-                // MECHANIKA ŻYZNEJ GLEBY
+                float baseOutput = static_cast<float>(job.currentEmployees) * 2.0f;
+
                 if (manufacture.type == BuildingType::Farm && tile.terrain.resourceName == "Żyzna Gleba")
                 {
-                    baseOutput *= 2.0f; 
+                    baseOutput *= 2.0f;
                 }
 
                 this->warehouse[job.producedResource] += baseOutput;
-                std::cout << " -> [" << tile.terrain.resourceName << "] Wyprodukowano: " << baseOutput 
+                std::cout << " -> [" << tile.terrain.resourceName << "] Wyprodukowano: " << baseOutput
                           << " szt. " << MarketRegistry::GetResourceName(job.producedResource) << std::endl;
             }
             else
@@ -147,8 +151,8 @@ void City::SimulateProduction(const std::vector<Tile>& map)
                 float totalGenerated = static_cast<float>(job.currentEmployees) * 0.5f * efficiency;
                 this->warehouse[job.producedResource] += totalGenerated;
 
-                std::cout << " -> Przetworzono " << requiredInput << " szt. " 
-                          << MarketRegistry::GetResourceName(inputType) << " na " << totalGenerated 
+                std::cout << " -> Przetworzono " << requiredInput << " szt. "
+                          << MarketRegistry::GetResourceName(inputType) << " na " << totalGenerated
                           << " szt. " << MarketRegistry::GetResourceName(job.producedResource) << std::endl;
             }
         }

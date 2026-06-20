@@ -34,12 +34,13 @@ City &GameManager::GetCity(int32_t centerTileID)
     return this->cities[0];
 }
 
-bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType type, std::vector<Tile> &map)
+bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType type, std::vector<Tile> &map, const sf::View &worldView)
 {
     if (!BuildPanel::currentCityContext)
         return false;
 
-    sf::Vector2f worldPos = this->window->mapPixelToCoords(mousePos, this->window->getView());
+    sf::Vector2f worldPos = this->window->mapPixelToCoords(mousePos, worldView);
+
     for (auto &tile : map)
     {
         bool mouseInsideTile = false;
@@ -67,7 +68,9 @@ bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType 
 
         City &city = this->GetCity(BuildPanel::currentCityContext->centerTileID);
         int32_t currentTileID = static_cast<int32_t>(tile.ID);
-
+        
+        std::cout << "[MYSZ] Kliknieto w kafelek o ID: " << currentTileID << std::endl;
+        
         auto it = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), currentTileID);
         if (it == city.jurisdictionTiles.end())
         {
