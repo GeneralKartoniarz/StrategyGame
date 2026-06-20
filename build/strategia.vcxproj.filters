@@ -7,13 +7,46 @@
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PathFinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\States.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\TestState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NameGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PopManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\City.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\Empire.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PoliticalSetup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\InputController.cpp">
@@ -28,46 +61,13 @@
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\GameInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NameGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\SidePanel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PopManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\Empire.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PoliticalSetup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PathFinder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\UnitPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\CityPanel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\City.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\BuildPanel.cpp">
@@ -75,10 +75,37 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp">
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Unit.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PathFinder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Economy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Industry.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Demographics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\States\MenuState.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NavigationGraph.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\Pop.hpp">
@@ -93,43 +120,19 @@
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\Empire.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\GameManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Empires\PoliticalSetup.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\VoronoiBuilder.hpp">
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\Button.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\ClimateEngine.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\NavigationGraph.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Unit.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\PathFinder.hpp">
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\GameInterface.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\UnitPanel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Map\MapRenderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\CityPanel.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Economy.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Industry.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\Demographics.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\BuildPanel.hpp">

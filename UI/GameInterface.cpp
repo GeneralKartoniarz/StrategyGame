@@ -7,7 +7,7 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
 {
     instance = this;
 
-    if (!this->font.openFromFile("resurces/fonts/ARIAL.TTF"))
+    if (!this->font.openFromFile("resources/fonts/ARIAL.TTF"))
     {
         this->font.openFromFile("C:/Windows/Fonts/Arial.ttf");
     }

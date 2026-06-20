@@ -8,7 +8,7 @@ MenuState::MenuState(sf::RenderWindow* windowPtr) : States(windowPtr)
 {
     instance = this;
 
-    if (!this->font.openFromFile("resurces/fonts/ARIAL.TTF"))
+    if (!this->font.openFromFile("resources/fonts/ARIAL.TTF"))
     {
         this->font.openFromFile("C:/Windows/Fonts/Arial.ttf");
     }

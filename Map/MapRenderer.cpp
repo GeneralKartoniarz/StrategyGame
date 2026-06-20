@@ -21,7 +21,7 @@ MapRenderer::MapRenderer()
     this->politicalMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
     this->resourceMesh.setPrimitiveType(sf::PrimitiveType::Triangles);
 
-    if (!this->resourceAtlas.loadFromFile("resurces/textures/resource_atlas.png"))
+    if (!this->resourceAtlas.loadFromFile("resources/textures/resource_atlas.png"))
     {
         std::cout << "[BŁĄD] Nie udalo sie znalezc pliku resources/textures/resource_atlas.png!" << std::endl;
     }
@@ -35,15 +35,15 @@ MapRenderer::MapRenderer()
         tex.setRepeated(true);
     };
 
-    loadTex(this->desertTexture, "resurces/textures/DesertBackground.png");
-    loadTex(this->plainsTexture, "resurces/textures/PlainsBackground.png");
-    loadTex(this->oceanTexture, "resurces/textures/OceanBackground.png");
-    loadTex(this->forestTexture, "resurces/textures/ForestBackground.png");
-    loadTex(this->rainForestTexture, "resurces/textures/RainForestBackground.png");
-    loadTex(this->tundraTexture, "resurces/textures/TundraBackground.png");
-    loadTex(this->iceTexture, "resurces/textures/IceBackground.png");
-    loadTex(this->taigaTexture, "resurces/textures/TaigaBackground.png");
-    loadTex(this->mountainTexture, "resurces/textures/MountainBackground.png");
+    loadTex(this->desertTexture, "resources/textures/DesertBackground.png");
+    loadTex(this->plainsTexture, "resources/textures/PlainsBackground.png");
+    loadTex(this->oceanTexture, "resources/textures/OceanBackground.png");
+    loadTex(this->forestTexture, "resources/textures/ForestBackground.png");
+    loadTex(this->rainForestTexture, "resources/textures/RainForestBackground.png");
+    loadTex(this->tundraTexture, "resources/textures/TundraBackground.png");
+    loadTex(this->iceTexture, "resources/textures/IceBackground.png");
+    loadTex(this->taigaTexture, "resources/textures/TaigaBackground.png");
+    loadTex(this->mountainTexture, "resources/textures/MountainBackground.png");
 }
 
 sf::Color MapRenderer::GetBiomeColor(BiomeType biome) const

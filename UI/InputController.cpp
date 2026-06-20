@@ -405,73 +405,75 @@ void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
         }
         window->setView(oldView);
     }
-
-    if (GameInterface::GetInstance() && GameInterface::GetInstance()->currentInterfaceState == InterfaceState::PlacingBuilding && BuildPanel::currentCityContext)
+    if (this->gui && this->gui->currentInterfaceState == InterfaceState::PlacingBuilding)
     {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
-        sf::Vector2f worldPos = this->windowPtr->mapPixelToCoords(mousePos, this->camera);
-
-        sf::View oldView = window->getView();
-        window->setView(this->camera);
-
-        City &city = this->gm.GetCity(BuildPanel::currentCityContext->centerTileID);
-
-        for (const auto &region : this->map)
+        if (this->gui->GetCityPanel() && this->selectedTileID != -1)
         {
-            bool mouseInsideTile = false;
+            sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+            sf::Vector2f worldPos = this->windowPtr->mapPixelToCoords(mousePos, this->camera);
 
-            for (const auto &poly : region.subPolygons)
+            sf::View oldView = window->getView();
+            window->setView(this->camera);
+
+            City &city = this->gm.GetCity(this->selectedTileID);
+
+            for (const auto &region : this->map)
             {
-                size_t ptCount = poly.size();
-                if (ptCount < 3)
+                bool mouseInsideTile = false;
+
+                for (const auto &poly : region.subPolygons)
+                {
+                    size_t ptCount = poly.size();
+                    if (ptCount < 3)
+                        continue;
+
+                    for (size_t i = 0, j = ptCount - 1; i < ptCount; j = i++)
+                    {
+                        if (((poly[i].y > worldPos.y) != (poly[j].y > worldPos.y)) &&
+                            (worldPos.x < (poly[j].x - poly[i].x) * (worldPos.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x))
+                        {
+                            mouseInsideTile = !mouseInsideTile;
+                        }
+                    }
+                    if (mouseInsideTile)
+                        break;
+                }
+
+                if (!mouseInsideTile)
                     continue;
 
-                for (size_t i = 0, j = ptCount - 1; i < ptCount; j = i++)
+                int32_t currentTileID = static_cast<int32_t>(region.ID);
+                auto jurisdictionIt = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), currentTileID);
+                if (jurisdictionIt == city.jurisdictionTiles.end())
                 {
-                    if (((poly[i].y > worldPos.y) != (poly[j].y > worldPos.y)) &&
-                        (worldPos.x < (poly[j].x - poly[i].x) * (worldPos.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x))
+                    break;
+                }
+
+                BuildingType plannedType = this->gui->buildingUnderCursor;
+                bool meetsLimits = region.CanAddManufacture(plannedType);
+
+                sf::Color buildHighlightColor = meetsLimits ? sf::Color(0, 255, 0, 120) : sf::Color(255, 0, 0, 120);
+
+                sf::VertexArray buildTrigs(sf::PrimitiveType::Triangles);
+                for (const auto &poly : region.subPolygons)
+                {
+                    size_t pointCount = poly.size();
+                    if (pointCount < 3)
+                        continue;
+
+                    sf::Vector2f p0 = poly[0];
+                    for (size_t i = 1; i < pointCount - 1; ++i)
                     {
-                        mouseInsideTile = !mouseInsideTile;
+                        buildTrigs.append(sf::Vertex{p0, buildHighlightColor});
+                        buildTrigs.append(sf::Vertex{poly[i], buildHighlightColor});
+                        buildTrigs.append(sf::Vertex{poly[i + 1], buildHighlightColor});
                     }
                 }
-                if (mouseInsideTile)
-                    break;
-            }
-
-            if (!mouseInsideTile)
-                continue;
-
-            int32_t currentTileID = static_cast<int32_t>(region.ID);
-            auto jurisdictionIt = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), currentTileID);
-            if (jurisdictionIt == city.jurisdictionTiles.end())
-            {
+                window->draw(buildTrigs);
                 break;
             }
-
-            BuildingType plannedType = GameInterface::GetInstance()->buildingUnderCursor;
-            bool meetsLimits = region.CanAddManufacture(plannedType);
-
-            sf::Color buildHighlightColor = meetsLimits ? sf::Color(0, 255, 0, 120) : sf::Color(255, 0, 0, 120);
-
-            sf::VertexArray buildTrigs(sf::PrimitiveType::Triangles);
-            for (const auto &poly : region.subPolygons)
-            {
-                size_t pointCount = poly.size();
-                if (pointCount < 3)
-                    continue;
-
-                sf::Vector2f p0 = poly[0];
-                for (size_t i = 1; i < pointCount - 1; ++i)
-                {
-                    buildTrigs.append(sf::Vertex{p0, buildHighlightColor});
-                    buildTrigs.append(sf::Vertex{poly[i], buildHighlightColor});
-                    buildTrigs.append(sf::Vertex{poly[i + 1], buildHighlightColor});
-                }
-            }
-            window->draw(buildTrigs);
-            break;
+            window->setView(oldView);
         }
-        window->setView(oldView);
     }
 
     if (this->isTypingCityName)

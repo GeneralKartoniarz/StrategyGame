@@ -83,26 +83,12 @@ bool BuildPanel::Contains(const sf::Vector2f &point) const
 
 void BuildPanel::OnBuildFarmClick()
 {
-    if (currentCityContext && gameManagerContext)
+    if (GameInterface::GetInstance())
     {
-        int32_t cityID = currentCityContext->centerTileID; 
-        City& city = gameManagerContext->GetCity(cityID);
-
-        if (city.warehouse[ResourceType::Wood] >= 10.0f)
-        {
-            if (GameInterface::GetInstance())
-            {
-                GameInterface::GetInstance()->currentInterfaceState = InterfaceState::PlacingBuilding;
-                GameInterface::GetInstance()->buildingUnderCursor = BuildingType::Farm;
-                
-                std::cout << "[INTERFEJS] Wybierz kafelek jurysdykcji dla Farmy..." << std::endl;
-            }
-        }
-        else
-        {
-            std::cout << "[PRODUKCJA] Za malo drewna w magazynie (" 
-                      << city.warehouse[ResourceType::Wood] << "/10)!" << std::endl;
-        }
+        GameInterface::GetInstance()->currentInterfaceState = InterfaceState::PlacingBuilding;
+        GameInterface::GetInstance()->buildingUnderCursor = BuildingType::Farm;
+        
+        std::cout << "[INTERFEJS] Wybierz kafelek jurysdykcji dla Farmy..." << std::endl;
     }
 }
 

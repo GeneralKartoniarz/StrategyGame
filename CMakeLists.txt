@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.28)
 project(strategia LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# ==============================================================================
+# ZALEŻNOŚCI (SFML 3.1.0)
+# ==============================================================================
 include(FetchContent)
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
@@ -10,63 +16,98 @@ FetchContent_Declare(SFML
 )
 FetchContent_MakeAvailable(SFML)
 
+# ==============================================================================
+# PLIKI ŹRÓDŁOWE I NAGŁÓWKI
+# ==============================================================================
 add_executable(strategia 
+    # Rdzeń gry
     main.cpp 
     Game.cpp 
-    States/States.cpp 
-    States/TestState.cpp 
-    Map/MapGenerator.cpp 
-    UI/InputController.cpp
-    UI/Label.cpp
-    UI/Button.hpp
-    UI/Button.cpp
-    UI/GameInterface.cpp
-    Map/NameGenerator.cpp
-    UI/SidePanel.cpp
-    States/MenuState.hpp
-    States/MenuState.cpp
-    Empires/Pop.hpp
-    Empires/PopManager.hpp
-    Empires/PopManager.cpp
-    Empires/City.hpp
-    Empires/Empire.hpp
-    Empires/Empire.cpp
     GameManager.hpp
     GameManager.cpp
-    Empires/PoliticalSetup.hpp
-    Empires/PoliticalSetup.cpp
+    Unit.hpp
+    PathFinder.hpp
+    PathFinder.cpp
+    Economy.hpp
+    Industry.hpp
+    Demographics.hpp
+
+    # Moduł: Stany Gry
+    States/States.cpp 
+    States/MenuState.hpp
+    States/MenuState.cpp
+    States/TestState.cpp 
+
+    # Moduł: Świat i Mapa (Map)
+    Map/MapGenerator.cpp 
+    Map/NameGenerator.cpp
     Map/VoronoiBuilder.hpp
     Map/VoronoiBuilder.cpp
     Map/ClimateEngine.hpp
     Map/ClimateEngine.cpp
     Map/NavigationGraph.hpp
-    Unit.hpp
-    PathFinder.hpp
-    PathFinder.cpp
-    UI/UnitPanel.hpp
-    UI/UnitPanel.cpp
     Map/MapRenderer.hpp
     Map/MapRenderer.cpp
+
+    # Moduł: Ekonomia i Demografia (Empires)
+    Empires/Pop.hpp
+    Empires/PopManager.hpp
+    Empires/PopManager.cpp
+    Empires/City.hpp
+    Empires/City.cpp
+    Empires/Empire.hpp
+    Empires/Empire.cpp
+    Empires/PoliticalSetup.hpp
+    Empires/PoliticalSetup.cpp
+
+    # Moduł: Interfejs Użytkownika (UI)
+    UI/InputController.cpp
+    UI/Label.cpp
+    UI/Button.hpp
+    UI/Button.cpp
+    UI/GameInterface.hpp
+    UI/GameInterface.cpp
+    UI/SidePanel.cpp
+    UI/UnitPanel.hpp
+    UI/UnitPanel.cpp
     UI/CityPanel.hpp
     UI/CityPanel.cpp
-    Economy.hpp
-    Industry.hpp
-    Empires/City.cpp
-    Demographics.hpp
     UI/BuildPanel.hpp
-    UI/BuildPanel.cpp)
+    UI/BuildPanel.cpp
+)
+
+# ==============================================================================
+# KONFIGURACJA INTEGRACJI
+# ==============================================================================
 target_compile_features(strategia PRIVATE cxx_std_17)
-target_link_libraries(strategia PRIVATE SFML::Graphics SFML::Window SFML::System)
+
+# Włączenie ostrzeżeń kompilatora, żeby ułatwić wyłapywanie błędów logicznych
+if(MSVC)
+    target_compile_options(strategia PRIVATE /W4)
+else()
+    target_compile_options(strategia PRIVATE -Wall -Wextra)
+endif()
+
+target_link_libraries(strategia PRIVATE 
+    SFML::Graphics 
+    SFML::Window 
+    SFML::System
+)
+
 target_include_directories(strategia PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/Map
     ${CMAKE_CURRENT_SOURCE_DIR}/States
     ${CMAKE_CURRENT_SOURCE_DIR}/UI
     ${CMAKE_CURRENT_SOURCE_DIR}/Empires
-    ${CMAKE_CURRENT_SOURCE_DIR}/resurces
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources
 )
+
+# ==============================================================================
+# ZASOBY (Kopiowanie po kompilacji)
+# ==============================================================================
 add_custom_command(TARGET strategia POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/resurces"
-    "$<TARGET_FILE_DIR:strategia>/resurces"
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+    "$<TARGET_FILE_DIR:strategia>/resources"
 )
