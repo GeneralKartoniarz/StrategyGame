@@ -1,14 +1,8 @@
 ================================================================================
 Linker Errors
-Generated: 2026-06-19T22:38:28.005Z
-Total Errors: 3
+Generated: 2026-06-20T09:36:47.796Z
+Total Errors: 1
 ================================================================================
 
-[LNK2019] (MSVC)
-nierozpoznany symbol zewnętrzny "public: void __cdecl BuildPanel::Update(class sf::Vector2<int> const &,bool,struct City const *)" (?Update@BuildPanel@@QEAAXAEBV?$Vector2@H@sf@@_NPEBUCity@@@Z) przywołany w funkcji "public: void __cdecl GameInterface::Update(float,class sf::Vector2<int> const &,bool)" (?Update@GameInterface@@QEAAXMAEBV?$Vector2@H@sf@@_N@Z) [C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.vcxproj]
-
-[LNK2001] (MSVC)
-nierozpoznany symbol zewnętrzny "private: static struct City const * const BuildPanel::currentCityContext" (?currentCityContext@BuildPanel@@0PEBUCity@@EB) [C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.vcxproj]
-
-[LNK1120] (MSVC)
-liczba nierozpoznanych elementów zewnętrznych: 2 [C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.vcxproj]
+[LNK1168] (MSVC)
+nie można otworzyć pliku C:\Users\janpa\Documents\GitHub\StrategyGame\build\Debug\strategia.exe do zapisu [C:\Users\janpa\Documents\GitHub\StrategyGame\build\strategia.vcxproj]

@@ -35,13 +35,14 @@ public:
         std::map<NeedCategory, MarketNeed> needs;
         switch(cl)
         {
+            //TODO POPY MAJĄ WYMAGANIA INACZEJ SO WKURWIONE
             case SocialClass::Bound:
                 needs[NeedCategory::Calories]   = { 1.0f, true };
-                needs[NeedCategory::Protection] = { 0.5f, true };
+                needs[NeedCategory::Protection] = { 0.5f, false };
                 break;
             case SocialClass::Laborer:
                 needs[NeedCategory::Calories]    = { 1.0f, true };
-                needs[NeedCategory::Protection]  = { 0.6f, true };
+                needs[NeedCategory::Protection]  = { 0.6f, false };
                 needs[NeedCategory::DietVariety] = { 0.4f, false };
                 needs[NeedCategory::Stimulants]  = { 0.3f, false };
                 break;

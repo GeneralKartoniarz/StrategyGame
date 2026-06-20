@@ -91,21 +91,74 @@ void City::PerformEmploymentRegistry(const std::vector<Pop> &empirePops)
     for (auto &job : this->workplaces)
     {
         job.currentEmployees = 0;
-        int32_t pool = availableWorkers[job.requiredClassRaw];
-        if (pool <= 0)
-            continue;
+        int32_t remainingJobs = job.maxEmployees;
 
-        int32_t recruits = std::min(job.maxEmployees, pool);
-        job.currentEmployees = recruits;
-        availableWorkers[job.requiredClassRaw] -= recruits;
+        int32_t primaryPool = availableWorkers[job.requiredClassRaw];
+        if (primaryPool > 0)
+        {
+            int32_t recruits = std::min(remainingJobs, primaryPool);
+            job.currentEmployees += recruits;
+            remainingJobs -= recruits;
+            availableWorkers[job.requiredClassRaw] -= recruits;
+        }
+        if (remainingJobs > 0)
+        {
+            std::vector<uint8_t> backupClasses;
+
+            if (job.requiredClassRaw == static_cast<uint8_t>(SocialClass::Bound))
+            {
+                backupClasses = { static_cast<uint8_t>(SocialClass::Laborer), static_cast<uint8_t>(SocialClass::Specialist) };
+            }
+            else if (job.requiredClassRaw == static_cast<uint8_t>(SocialClass::Laborer))
+            {
+                backupClasses = { static_cast<uint8_t>(SocialClass::Bound), static_cast<uint8_t>(SocialClass::Specialist) };
+            }
+
+            for (uint8_t backupClassRaw : backupClasses)
+            {
+                if (remainingJobs <= 0) break;
+
+                int32_t backupPool = availableWorkers[backupClassRaw];
+                if (backupPool > 0)
+                {
+                    int32_t recruits = std::min(remainingJobs, backupPool);
+                    job.currentEmployees += recruits;
+                    remainingJobs -= recruits;
+                    availableWorkers[backupClassRaw] -= recruits;
+
+                    std::cout << "[URZĄD PRACY] Przekwalifikowano " << recruits 
+                              << " popów z klasy " << static_cast<int>(backupClassRaw) 
+                              << " do pracy typu " << MarketRegistry::GetResourceName(job.producedResource) << std::endl;
+                }
+            }
+        }
     }
 }
 
 void City::SimulateProduction(const std::vector<Tile> &map)
 {
     std::cout << "--- BILANS PRODUKCJI MIASTA ---" << std::endl;
-    size_t wpIndex = 0;
 
+    float requiredGrainForPops = 0.0f;
+    int32_t totalLocalWorkers = 0;
+    for (const auto& job : this->workplaces)
+    {
+        if (job.producedResource == ResourceType::Grain || job.producedResource == ResourceType::Fish)
+        {
+            totalLocalWorkers += job.currentEmployees;
+        }
+    }
+    float grainSafetyBuffer = static_cast<float>(totalLocalWorkers) * 1.5f;
+    if (grainSafetyBuffer <= 0.0f) grainSafetyBuffer = 20.0f;
+
+    float availableGrainForIndustry = std::max(0.0f, this->warehouse[ResourceType::Grain] - grainSafetyBuffer);
+    
+    std::cout << "[BEZPIECZNIK] Łącznie zboża w magazynie: " << this->warehouse[ResourceType::Grain] << " j." << std::endl;
+    std::cout << "[BEZPIECZNIK] Zablokowano do spichlerza (rezerwa głodowa): " << grainSafetyBuffer << " j." << std::endl;
+    std::cout << "[BEZPIECZNIK] Wolne zboże przekazane dla przemysłu: " << availableGrainForIndustry << " j." << std::endl;
+
+
+    size_t wpIndex = 0;
     for (int32_t tileID : this->jurisdictionTiles)
     {
         const Tile &tile = map[tileID];
@@ -138,22 +191,33 @@ void City::SimulateProduction(const std::vector<Tile> &map)
             else
             {
                 float requiredInput = static_cast<float>(job.currentEmployees) * inputAmountPerWorker;
-                float availableInput = this->warehouse[inputType];
-                float efficiency = 1.0f;
+                float usableInputPool = this->warehouse[inputType];
 
-                if (availableInput < requiredInput)
+                if (inputType == ResourceType::Grain)
                 {
-                    efficiency = (requiredInput > 0.0f) ? (availableInput / requiredInput) : 0.0f;
-                    requiredInput = availableInput;
+                    usableInputPool = availableGrainForIndustry;
+                }
+
+                float efficiency = 1.0f;
+                if (usableInputPool < requiredInput)
+                {
+                    efficiency = (requiredInput > 0.0f) ? (usableInputPool / requiredInput) : 0.0f;
+                    requiredInput = usableInputPool;
                 }
 
                 this->warehouse[inputType] -= requiredInput;
+                if (inputType == ResourceType::Grain)
+                {
+                    availableGrainForIndustry -= requiredInput;
+                }
+
                 float totalGenerated = static_cast<float>(job.currentEmployees) * 0.5f * efficiency;
                 this->warehouse[job.producedResource] += totalGenerated;
 
                 std::cout << " -> Przetworzono " << requiredInput << " szt. "
                           << MarketRegistry::GetResourceName(inputType) << " na " << totalGenerated
-                          << " szt. " << MarketRegistry::GetResourceName(job.producedResource) << std::endl;
+                          << " szt. " << MarketRegistry::GetResourceName(job.producedResource) 
+                          << " (Wydajność: " << static_cast<int>(efficiency * 100.0f) << "%)" << std::endl;
             }
         }
     }

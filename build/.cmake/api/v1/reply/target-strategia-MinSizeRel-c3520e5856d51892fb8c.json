@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Debug/strategia.exe"
+			"path" : "MinSizeRel/strategia.exe"
 		},
 		{
-			"path" : "Debug/strategia.pdb"
+			"path" : "MinSizeRel/strategia.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -105,7 +105,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++17 -MDd -Zi"
+					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O1 /Ob1 /DNDEBUG -std:c++17 -MD"
 				}
 			],
 			"defines" : 
@@ -196,15 +196,15 @@
 		},
 		{
 			"backtrace" : 2,
-			"id" : "sfml-graphics::@98af38147d5fa7e70f61"
-		},
-		{
-			"backtrace" : 2,
 			"id" : "freetype::@d06f9f5ffc3cc0b4bd77"
 		},
 		{
 			"backtrace" : 2,
 			"id" : "harfbuzz::@0205adea4b0616362521"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "sfml-graphics::@98af38147d5fa7e70f61"
 		},
 		{
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
@@ -216,11 +216,11 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -Zi",
+				"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O1 /Ob1 /DNDEBUG -MD",
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/machine:x64 /debug /INCREMENTAL",
+				"fragment" : "/machine:x64 /INCREMENTAL:NO",
 				"role" : "flags"
 			},
 			{
@@ -229,17 +229,17 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "_deps\\sfml-build\\lib\\Debug\\sfml-graphics-s-d.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\MinSizeRel\\sfml-graphics-s.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "_deps\\sfml-build\\lib\\Debug\\sfml-window-s-d.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\MinSizeRel\\sfml-window-s.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "_deps\\sfml-build\\lib\\Debug\\sfml-system-s-d.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\MinSizeRel\\sfml-system-s.lib",
 				"role" : "libraries"
 			},
 			{
@@ -259,12 +259,12 @@
 			},
 			{
 				"backtrace" : 7,
-				"fragment" : "_deps\\sfml-build\\lib\\Debug\\harfbuzzd.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\MinSizeRel\\harfbuzz.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 7,
-				"fragment" : "_deps\\sfml-build\\lib\\Debug\\freetyped.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\MinSizeRel\\freetype.lib",
 				"role" : "libraries"
 			},
 			{

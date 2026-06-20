@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "_deps/sfml-build/lib/Debug/sfml-graphics-s-d.lib"
+			"path" : "_deps/sfml-build/lib/RelWithDebInfo/sfml-graphics-s.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -184,7 +184,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++17 -MDd -Zi"
+					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG -std:c++17 -MD -Zi"
 				},
 				{
 					"backtrace" : 8,
@@ -408,15 +408,15 @@
 			"id" : "sfml-window::@5730451e331e3690ae65"
 		},
 		{
+			"id" : "SheenBidi::@abdbacd89c8133eee2b6"
+		},
+		{
 			"backtrace" : 5,
 			"id" : "freetype::@d06f9f5ffc3cc0b4bd77"
 		},
 		{
 			"backtrace" : 5,
 			"id" : "harfbuzz::@0205adea4b0616362521"
-		},
-		{
-			"id" : "SheenBidi::@abdbacd89c8133eee2b6"
 		},
 		{
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
@@ -479,7 +479,7 @@
 		}
 	],
 	"name" : "sfml-graphics",
-	"nameOnDisk" : "sfml-graphics-s-d.lib",
+	"nameOnDisk" : "sfml-graphics-s.lib",
 	"objectDependencies" : 
 	[
 		{

@@ -39,16 +39,26 @@ int32_t PopManager::CalculateGrowthPotential() const
     if (this->population.empty())
         return 0;
 
-    int32_t femaleCount = 0;
+    int32_t totalNewborns = 0;
+
     for (const auto &pop : this->population)
     {
         if (pop.IsFemale() && pop.age >= 16 && pop.age <= 45)
-            femaleCount++;
+        {
+
+            float satisfactionRatio = static_cast<float>(pop.satisfaction) / 255.0f;
+            float currentBirthChance = 0.40f + (satisfactionRatio * 0.08f);
+
+            float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
+            if (roll < currentBirthChance)
+            {
+                totalNewborns++;
+            }
+        }
     }
 
-    return femaleCount / 4;
+    return totalNewborns;
 }
-
 void PopManager::ProgressAgeAndMortality()
 {
     this->population.erase(
@@ -80,13 +90,21 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float>& mar
         for (auto const& [category, marketNeed] : personalNeeds)
         {
             float targetDemand = marketNeed.baseDemandPerCapita;
+            
+            if (category == NeedCategory::Calories && pop.age < 15)
+            {
+                targetDemand = 0.1f + (static_cast<float>(pop.age) * 0.06f);
+            }
+
             float satisfiedDemand = 0.0f;
             activeNeedsCount++;
 
             auto substitutes = MarketRegistry::GetSubstitutes(category);
 
             std::sort(substitutes.begin(), substitutes.end(), [&marketPrices](const auto& a, const auto& b) {
-                return (marketPrices[a.first] / a.second) < (marketPrices[b.first] / b.second);
+                float priceA = marketPrices.count(a.first) ? marketPrices[a.first] : 999.0f;
+                float priceB = marketPrices.count(b.first) ? marketPrices[b.first] : 999.0f;
+                return (priceA / a.second) < (priceB / b.second);
             });
 
             for (auto const& [resource, efficiency] : substitutes)
@@ -94,19 +112,27 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float>& mar
                 if (satisfiedDemand >= targetDemand) break;
 
                 float neededAmount = (targetDemand - satisfiedDemand) / efficiency;
-                float boughtAmount = std::min(neededAmount, marketSupplies[resource]);
+                
+                float availableInWarehouse = (marketSupplies.count(resource)) ? marketSupplies[resource] : 0.0f;
+                float boughtAmount = std::min(neededAmount, availableInWarehouse);
 
                 marketSupplies[resource] -= boughtAmount;
                 satisfiedDemand += boughtAmount * efficiency;
             }
-
             if (satisfiedDemand >= targetDemand)
             {
-                totalSatisfactionImpact += 4.0f;
+                totalSatisfactionImpact += 6.0f; 
             }
             else
             {
-                totalSatisfactionImpact -= marketNeed.isCritical ? 25.0f : 8.0f;
+                if (category == NeedCategory::Calories)
+                {
+                    totalSatisfactionImpact -= 30.0f;
+                }
+                else
+                {
+                    totalSatisfactionImpact -= marketNeed.isCritical ? 4.0f : 1.0f;
+                }
             }
         }
 
@@ -130,19 +156,18 @@ void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_
         baby.age = 0;
         baby.demographicsFlags = 0;
         baby.satisfaction = 150;
-        baby.literacy = 0; 
+        baby.literacy = 0;
         baby.reserved = 0;
 
-        if (std::rand() % 2 == 0) baby.SetFemale();
+        if (std::rand() % 2 == 0)
+            baby.SetFemale();
         baby.SetAssimilated(true);
 
         if (!this->population.empty())
         {
-            const Pop& randomParent = this->population[std::rand() % this->population.size()];
+            const Pop &randomParent = this->population[std::rand() % this->population.size()];
             baby.socialClass = randomParent.socialClass;
-                     
-            if (randomParent.wealth == WealthLevel::Broke) baby.wealth = WealthLevel::Broke;
-            else baby.wealth = static_cast<WealthLevel>(static_cast<uint8_t>(randomParent.wealth) - 1);
+            baby.wealth = randomParent.wealth;
         }
         else
         {
@@ -156,12 +181,13 @@ void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_
 
 void PopManager::StarvePopulation(int32_t deathAmount)
 {
-    if (this->population.empty() || deathAmount <= 0) return;
-    std::sort(this->population.begin(), this->population.end(), [](const Pop& a, const Pop& b) {
+    if (this->population.empty() || deathAmount <= 0)
+        return;
+    std::sort(this->population.begin(), this->population.end(), [](const Pop &a, const Pop &b)
+              {
         if (a.wealth != b.wealth)
             return static_cast<uint8_t>(a.wealth) > static_cast<uint8_t>(b.wealth);
-        return a.satisfaction > b.satisfaction;
-    });
+        return a.satisfaction > b.satisfaction; });
 
     size_t safeToKill = std::min(static_cast<size_t>(deathAmount), this->population.size());
     for (size_t i = 0; i < safeToKill; ++i)
@@ -170,11 +196,11 @@ void PopManager::StarvePopulation(int32_t deathAmount)
     }
 }
 
-void PopManager::UpdateTurn(std::map<ResourceType, float>& marketSupplies, std::map<ResourceType, float>& marketPrices, uint16_t cultureID, uint8_t religionID, int32_t tileID)
+void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, float> &marketPrices, uint16_t cultureID, uint8_t religionID, int32_t tileID)
 {
     std::cout << "\n=================== RAPORT GOSPODARCZY (Kafel: " << tileID << ") ===================" << std::endl;
 
-    std::cout << "[MAGAZYN START] Zboze: " << marketSupplies[ResourceType::Grain] 
+    std::cout << "[MAGAZYN START] Zboze: " << marketSupplies[ResourceType::Grain]
               << " j. | Ryby: " << marketSupplies[ResourceType::Fish] << " j." << std::endl;
 
     size_t popBeforeLines = this->population.size();
@@ -186,7 +212,7 @@ void PopManager::UpdateTurn(std::map<ResourceType, float>& marketSupplies, std::
     }
 
     size_t popCountBeforeMarket = this->population.size();
-    
+
     float grainBefore = marketSupplies[ResourceType::Grain];
     float fishBefore = marketSupplies[ResourceType::Fish];
 
@@ -194,30 +220,31 @@ void PopManager::UpdateTurn(std::map<ResourceType, float>& marketSupplies, std::
 
     float grainConsumed = grainBefore - marketSupplies[ResourceType::Grain];
     float fishConsumed = fishBefore - marketSupplies[ResourceType::Fish];
-    
+
     std::cout << "[KONSUMPCJA] Popy zjadly z magazynu: " << grainConsumed << " Zboza i " << fishConsumed << " Ryb." << std::endl;
-    std::cout << "[MAGAZYN KONIEC] Pozostalo -> Zboze: " << marketSupplies[ResourceType::Grain] 
+    std::cout << "[MAGAZYN KONIEC] Pozostalo -> Zboze: " << marketSupplies[ResourceType::Grain]
               << " j. | Ryby: " << marketSupplies[ResourceType::Fish] << " j." << std::endl;
 
     float avgSat = 0.0f;
     int32_t starvingPopsCount = 0;
-    
-    for(const auto& p : this->population) 
+
+    for (const auto &p : this->population)
     {
         avgSat += p.satisfaction;
-        if (p.satisfaction < 50) starvingPopsCount++;
+        if (p.satisfaction < 50)
+            starvingPopsCount++;
     }
     avgSat = this->population.empty() ? 0.0f : (avgSat / this->population.size());
 
-    std::cout << "[RYNEK] Srednie zadowolenie: " << static_cast<int>((avgSat / 255.0f) * 100.0f) 
+    std::cout << "[RYNEK] Srednie zadowolenie: " << static_cast<int>((avgSat / 255.0f) * 100.0f)
               << "% | Popy na skraju glodu: " << starvingPopsCount << "/" << this->population.size() << std::endl;
     if (marketSupplies[ResourceType::Grain] <= 0.0f && marketSupplies[ResourceType::Fish] <= 0.0f && !this->population.empty())
     {
-        int32_t starveDeaths = std::max(1, static_cast<int32_t>(this->population.size() * 0.10f)); 
+        int32_t starveDeaths = std::max(1, static_cast<int32_t>(this->population.size() * 0.10f));
         size_t sizeBeforeStarve = this->population.size();
-        
+
         this->StarvePopulation(starveDeaths);
-        
+
         size_t actualStarveDeaths = sizeBeforeStarve - this->population.size();
         std::cout << "[ALARM - GLOD] Magazyny sa PUSTE! Z glodu umiera: " << actualStarveDeaths << " popow!" << std::endl;
     }
@@ -232,18 +259,31 @@ void PopManager::UpdateTurn(std::map<ResourceType, float>& marketSupplies, std::
     }
 
     std::map<SocialClass, int32_t> groupCounts;
-    for (const auto& pop : this->population) groupCounts[pop.socialClass]++;
+    for (const auto &pop : this->population)
+        groupCounts[pop.socialClass]++;
 
     std::cout << "\n[SPIS LUDNOSCI - POZOSTALI PRZY ZYCIU]" << std::endl;
-    for (auto const& [group, count] : groupCounts)
+    for (auto const &[group, count] : groupCounts)
     {
-        switch(group) {
-            case SocialClass::Bound:      std::cout << " -> Bound: " << count << std::endl; break;
-            case SocialClass::Laborer:    std::cout << " -> Laborer: " << count << std::endl; break;
-            case SocialClass::Specialist: std::cout << " -> Specialist: " << count << std::endl; break;
-            case SocialClass::Capitalist: std::cout << " -> Capitalist: " << count << std::endl; break;
-            case SocialClass::Elite:      std::cout << " -> Elite: " << count << std::endl; break;
+        switch (group)
+        {
+        case SocialClass::Bound:
+            std::cout << " -> Bound: " << count << std::endl;
+            break;
+        case SocialClass::Laborer:
+            std::cout << " -> Laborer: " << count << std::endl;
+            break;
+        case SocialClass::Specialist:
+            std::cout << " -> Specialist: " << count << std::endl;
+            break;
+        case SocialClass::Capitalist:
+            std::cout << " -> Capitalist: " << count << std::endl;
+            break;
+        case SocialClass::Elite:
+            std::cout << " -> Elite: " << count << std::endl;
+            break;
         }
     }
-    std::cout << "===================================================================\n" << std::endl;
+    std::cout << "===================================================================\n"
+              << std::endl;
 }

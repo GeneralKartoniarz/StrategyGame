@@ -12,7 +12,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "_deps/sfml-build/lib/MinSizeRel/sfml-network-s.lib"
+			"path" : "_deps/sfml-build/lib/RelWithDebInfo/sfml-network-s.lib"
 		}
 	],
 	"backtrace" : 2,
@@ -167,7 +167,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O1 /Ob1 /DNDEBUG -std:c++17 -MD"
+					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG -std:c++17 -MD -Zi"
 				},
 				{
 					"backtrace" : 8,
@@ -357,11 +357,11 @@
 		},
 		{
 			"backtrace" : 5,
-			"id" : "libssh2_static::@e6fd7acc6339b6a0e9ab"
+			"id" : "mbedcrypto::@085c30ee5801d290d8db"
 		},
 		{
 			"backtrace" : 5,
-			"id" : "mbedcrypto::@085c30ee5801d290d8db"
+			"id" : "libssh2_static::@e6fd7acc6339b6a0e9ab"
 		},
 		{
 			"backtrace" : 5,

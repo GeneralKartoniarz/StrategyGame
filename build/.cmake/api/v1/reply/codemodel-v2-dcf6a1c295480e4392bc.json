@@ -781,14 +781,14 @@
 				{
 					"directoryIndex" : 23,
 					"id" : "ALL_BUILD::@5df98b4ecdae321c3ae2",
-					"jsonFile" : "target-ALL_BUILD-Debug-82a65abf73db1df0face.json",
+					"jsonFile" : "target-ALL_BUILD-Debug-24183aab2bab3b2f0fde.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 9
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "ALL_BUILD::@120c268ab73394db0a9a",
-					"jsonFile" : "target-ALL_BUILD-Debug-e83b14bd998b9ed59067.json",
+					"jsonFile" : "target-ALL_BUILD-Debug-2db4734f7b3c40abc04c.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 1
 				},
@@ -914,14 +914,14 @@
 				{
 					"directoryIndex" : 18,
 					"id" : "sfml-audio::@a153e5727587c53fce98",
-					"jsonFile" : "target-sfml-audio-Debug-98160e9affb18c243125.json",
+					"jsonFile" : "target-sfml-audio-Debug-7f93548896ff42e2a402.json",
 					"name" : "sfml-audio",
 					"projectIndex" : 1
 				},
 				{
 					"directoryIndex" : 14,
 					"id" : "sfml-graphics::@98af38147d5fa7e70f61",
-					"jsonFile" : "target-sfml-graphics-Debug-92f0e577b56b9f875423.json",
+					"jsonFile" : "target-sfml-graphics-Debug-a4068c5c2ff34fa9e5d6.json",
 					"name" : "sfml-graphics",
 					"projectIndex" : 1
 				},
@@ -935,7 +935,7 @@
 				{
 					"directoryIndex" : 6,
 					"id" : "sfml-network::@d7f79968b2699e7782cb",
-					"jsonFile" : "target-sfml-network-Debug-3ca7e85efd47cc88208d.json",
+					"jsonFile" : "target-sfml-network-Debug-f16f73a8d92846c865ab.json",
 					"name" : "sfml-network",
 					"projectIndex" : 1
 				},
@@ -956,7 +956,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "strategia::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-strategia-Debug-cd4ac2aebf31f7cfd162.json",
+					"jsonFile" : "target-strategia-Debug-d7ed071738ca22dfd4c2.json",
 					"name" : "strategia",
 					"projectIndex" : 0
 				},
@@ -1763,14 +1763,14 @@
 				{
 					"directoryIndex" : 23,
 					"id" : "ALL_BUILD::@5df98b4ecdae321c3ae2",
-					"jsonFile" : "target-ALL_BUILD-Release-82a65abf73db1df0face.json",
+					"jsonFile" : "target-ALL_BUILD-Release-24183aab2bab3b2f0fde.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 9
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "ALL_BUILD::@120c268ab73394db0a9a",
-					"jsonFile" : "target-ALL_BUILD-Release-e83b14bd998b9ed59067.json",
+					"jsonFile" : "target-ALL_BUILD-Release-2db4734f7b3c40abc04c.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 1
 				},
@@ -1896,14 +1896,14 @@
 				{
 					"directoryIndex" : 18,
 					"id" : "sfml-audio::@a153e5727587c53fce98",
-					"jsonFile" : "target-sfml-audio-Release-514196711066d2489e89.json",
+					"jsonFile" : "target-sfml-audio-Release-0b3ba3a309c929950542.json",
 					"name" : "sfml-audio",
 					"projectIndex" : 1
 				},
 				{
 					"directoryIndex" : 14,
 					"id" : "sfml-graphics::@98af38147d5fa7e70f61",
-					"jsonFile" : "target-sfml-graphics-Release-dd0c069f4429a7187476.json",
+					"jsonFile" : "target-sfml-graphics-Release-399aa19636f37c3d090d.json",
 					"name" : "sfml-graphics",
 					"projectIndex" : 1
 				},
@@ -1917,7 +1917,7 @@
 				{
 					"directoryIndex" : 6,
 					"id" : "sfml-network::@d7f79968b2699e7782cb",
-					"jsonFile" : "target-sfml-network-Release-f81ca0b2dcf006c2de9b.json",
+					"jsonFile" : "target-sfml-network-Release-33035c9205187b13ead1.json",
 					"name" : "sfml-network",
 					"projectIndex" : 1
 				},
@@ -1938,7 +1938,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "strategia::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-strategia-Release-1578c850b2e21c7f96bb.json",
+					"jsonFile" : "target-strategia-Release-ec56a4a911fe49f9a124.json",
 					"name" : "strategia",
 					"projectIndex" : 0
 				},
@@ -2745,14 +2745,14 @@
 				{
 					"directoryIndex" : 23,
 					"id" : "ALL_BUILD::@5df98b4ecdae321c3ae2",
-					"jsonFile" : "target-ALL_BUILD-MinSizeRel-82a65abf73db1df0face.json",
+					"jsonFile" : "target-ALL_BUILD-MinSizeRel-24183aab2bab3b2f0fde.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 9
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "ALL_BUILD::@120c268ab73394db0a9a",
-					"jsonFile" : "target-ALL_BUILD-MinSizeRel-e83b14bd998b9ed59067.json",
+					"jsonFile" : "target-ALL_BUILD-MinSizeRel-2db4734f7b3c40abc04c.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 1
 				},
@@ -2878,14 +2878,14 @@
 				{
 					"directoryIndex" : 18,
 					"id" : "sfml-audio::@a153e5727587c53fce98",
-					"jsonFile" : "target-sfml-audio-MinSizeRel-9513620f8ec19fea96d6.json",
+					"jsonFile" : "target-sfml-audio-MinSizeRel-64ef8471015ed7ef8d3e.json",
 					"name" : "sfml-audio",
 					"projectIndex" : 1
 				},
 				{
 					"directoryIndex" : 14,
 					"id" : "sfml-graphics::@98af38147d5fa7e70f61",
-					"jsonFile" : "target-sfml-graphics-MinSizeRel-36c5045d494b631dd92d.json",
+					"jsonFile" : "target-sfml-graphics-MinSizeRel-857c266994d8878e405b.json",
 					"name" : "sfml-graphics",
 					"projectIndex" : 1
 				},
@@ -2899,7 +2899,7 @@
 				{
 					"directoryIndex" : 6,
 					"id" : "sfml-network::@d7f79968b2699e7782cb",
-					"jsonFile" : "target-sfml-network-MinSizeRel-669b8cc52c32e767f5a4.json",
+					"jsonFile" : "target-sfml-network-MinSizeRel-4a9391ad012b9b5d548b.json",
 					"name" : "sfml-network",
 					"projectIndex" : 1
 				},
@@ -2920,7 +2920,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "strategia::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-strategia-MinSizeRel-b4a6364c0cae294b49cf.json",
+					"jsonFile" : "target-strategia-MinSizeRel-c3520e5856d51892fb8c.json",
 					"name" : "strategia",
 					"projectIndex" : 0
 				},
@@ -3727,14 +3727,14 @@
 				{
 					"directoryIndex" : 23,
 					"id" : "ALL_BUILD::@5df98b4ecdae321c3ae2",
-					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-82a65abf73db1df0face.json",
+					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-24183aab2bab3b2f0fde.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 9
 				},
 				{
 					"directoryIndex" : 1,
 					"id" : "ALL_BUILD::@120c268ab73394db0a9a",
-					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-e83b14bd998b9ed59067.json",
+					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-2db4734f7b3c40abc04c.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 1
 				},
@@ -3860,14 +3860,14 @@
 				{
 					"directoryIndex" : 18,
 					"id" : "sfml-audio::@a153e5727587c53fce98",
-					"jsonFile" : "target-sfml-audio-RelWithDebInfo-1e53f9cd30dc61fe19bf.json",
+					"jsonFile" : "target-sfml-audio-RelWithDebInfo-586f1da8cd320ca680c9.json",
 					"name" : "sfml-audio",
 					"projectIndex" : 1
 				},
 				{
 					"directoryIndex" : 14,
 					"id" : "sfml-graphics::@98af38147d5fa7e70f61",
-					"jsonFile" : "target-sfml-graphics-RelWithDebInfo-000b1b1624d0a8b1160c.json",
+					"jsonFile" : "target-sfml-graphics-RelWithDebInfo-510ebf853b0cacab1267.json",
 					"name" : "sfml-graphics",
 					"projectIndex" : 1
 				},
@@ -3881,7 +3881,7 @@
 				{
 					"directoryIndex" : 6,
 					"id" : "sfml-network::@d7f79968b2699e7782cb",
-					"jsonFile" : "target-sfml-network-RelWithDebInfo-6c1291ba6c0a5d74614e.json",
+					"jsonFile" : "target-sfml-network-RelWithDebInfo-ec9043807034eb0cb2a8.json",
 					"name" : "sfml-network",
 					"projectIndex" : 1
 				},
@@ -3902,7 +3902,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "strategia::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-strategia-RelWithDebInfo-89e0b697deaa3c318b7f.json",
+					"jsonFile" : "target-strategia-RelWithDebInfo-f7825c617ebe258359f2.json",
 					"name" : "strategia",
 					"projectIndex" : 0
 				},

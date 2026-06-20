@@ -221,7 +221,7 @@ void InputController::HandleEvent(const sf::Event &event)
             if (clickedCity && this->gui && this->gui->GetCityPanel())
             {
                 const Empire &owner = this->gm.GetEmpire(clickedCity->ownerEmpireID);
-                const PopManager& popMgr = const_cast<Empire&>(owner).GetPopManager();
+                const PopManager &popMgr = const_cast<Empire &>(owner).GetPopManager();
                 this->gui->GetCityPanel()->UpdateCityData(*clickedCity, popMgr);
             }
             if (this->gui)
@@ -383,9 +383,7 @@ void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
     {
         sf::View oldView = window->getView();
         window->setView(this->camera);
-
         sf::Color highlightColor(0, 255, 0, 100);
-
         for (int32_t tileID : this->validCityTiles)
         {
             const auto &region = this->map[tileID];
@@ -394,10 +392,8 @@ void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
                 size_t pointCount = poly.size();
                 if (pointCount < 3)
                     continue;
-
                 sf::VertexArray trigs(sf::PrimitiveType::Triangles);
                 sf::Vector2f p0 = poly[0];
-
                 for (size_t i = 1; i < pointCount - 1; ++i)
                 {
                     trigs.append(sf::Vertex{p0, highlightColor});
@@ -406,6 +402,74 @@ void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
                 }
                 window->draw(trigs);
             }
+        }
+        window->setView(oldView);
+    }
+
+    if (GameInterface::GetInstance() && GameInterface::GetInstance()->currentInterfaceState == InterfaceState::PlacingBuilding && BuildPanel::currentCityContext)
+    {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+        sf::Vector2f worldPos = this->windowPtr->mapPixelToCoords(mousePos, this->camera);
+
+        sf::View oldView = window->getView();
+        window->setView(this->camera);
+
+        City &city = this->gm.GetCity(BuildPanel::currentCityContext->centerTileID);
+
+        for (const auto &region : this->map)
+        {
+            bool mouseInsideTile = false;
+
+            for (const auto &poly : region.subPolygons)
+            {
+                size_t ptCount = poly.size();
+                if (ptCount < 3)
+                    continue;
+
+                for (size_t i = 0, j = ptCount - 1; i < ptCount; j = i++)
+                {
+                    if (((poly[i].y > worldPos.y) != (poly[j].y > worldPos.y)) &&
+                        (worldPos.x < (poly[j].x - poly[i].x) * (worldPos.y - poly[i].y) / (poly[j].y - poly[i].y) + poly[i].x))
+                    {
+                        mouseInsideTile = !mouseInsideTile;
+                    }
+                }
+                if (mouseInsideTile)
+                    break;
+            }
+
+            if (!mouseInsideTile)
+                continue;
+
+            int32_t currentTileID = static_cast<int32_t>(region.ID);
+            auto jurisdictionIt = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), currentTileID);
+            if (jurisdictionIt == city.jurisdictionTiles.end())
+            {
+                break;
+            }
+
+            BuildingType plannedType = GameInterface::GetInstance()->buildingUnderCursor;
+            bool meetsLimits = region.CanAddManufacture(plannedType);
+
+            sf::Color buildHighlightColor = meetsLimits ? sf::Color(0, 255, 0, 120) : sf::Color(255, 0, 0, 120);
+
+            sf::VertexArray buildTrigs(sf::PrimitiveType::Triangles);
+            for (const auto &poly : region.subPolygons)
+            {
+                size_t pointCount = poly.size();
+                if (pointCount < 3)
+                    continue;
+
+                sf::Vector2f p0 = poly[0];
+                for (size_t i = 1; i < pointCount - 1; ++i)
+                {
+                    buildTrigs.append(sf::Vertex{p0, buildHighlightColor});
+                    buildTrigs.append(sf::Vertex{poly[i], buildHighlightColor});
+                    buildTrigs.append(sf::Vertex{poly[i + 1], buildHighlightColor});
+                }
+            }
+            window->draw(buildTrigs);
+            break;
         }
         window->setView(oldView);
     }
@@ -448,7 +512,6 @@ void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
         window->setView(oldView);
     }
 }
-
 void InputController::RefreshSelectedUnitUI()
 {
     if (this->gui && this->selectedUnitID != -1)

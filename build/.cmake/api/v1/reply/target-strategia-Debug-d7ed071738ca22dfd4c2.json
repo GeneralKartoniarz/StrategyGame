@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "RelWithDebInfo/strategia.exe"
+			"path" : "Debug/strategia.exe"
 		},
 		{
-			"path" : "RelWithDebInfo/strategia.pdb"
+			"path" : "Debug/strategia.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -105,7 +105,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG -std:c++17 -MD -Zi"
+					"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++17 -MDd -Zi"
 				}
 			],
 			"defines" : 
@@ -196,15 +196,15 @@
 		},
 		{
 			"backtrace" : 2,
-			"id" : "sfml-graphics::@98af38147d5fa7e70f61"
-		},
-		{
-			"backtrace" : 2,
 			"id" : "freetype::@d06f9f5ffc3cc0b4bd77"
 		},
 		{
 			"backtrace" : 2,
 			"id" : "harfbuzz::@0205adea4b0616362521"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "sfml-graphics::@98af38147d5fa7e70f61"
 		},
 		{
 			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
@@ -216,7 +216,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /EHsc /O2 /Ob1 /DNDEBUG -MD -Zi",
+				"fragment" : "/DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -Zi",
 				"role" : "flags"
 			},
 			{
@@ -229,17 +229,17 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "_deps\\sfml-build\\lib\\RelWithDebInfo\\sfml-graphics-s.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\Debug\\sfml-graphics-s-d.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "_deps\\sfml-build\\lib\\RelWithDebInfo\\sfml-window-s.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\Debug\\sfml-window-s-d.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "_deps\\sfml-build\\lib\\RelWithDebInfo\\sfml-system-s.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\Debug\\sfml-system-s-d.lib",
 				"role" : "libraries"
 			},
 			{
@@ -259,12 +259,12 @@
 			},
 			{
 				"backtrace" : 7,
-				"fragment" : "_deps\\sfml-build\\lib\\RelWithDebInfo\\harfbuzz.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\Debug\\harfbuzzd.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 7,
-				"fragment" : "_deps\\sfml-build\\lib\\RelWithDebInfo\\freetype.lib",
+				"fragment" : "_deps\\sfml-build\\lib\\Debug\\freetyped.lib",
 				"role" : "libraries"
 			},
 			{
