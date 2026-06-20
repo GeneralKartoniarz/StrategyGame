@@ -76,13 +76,38 @@ struct Tile
     std::vector<sf::Vertex> provinceBorders;
     Terrain terrain;
     std::vector<std::size_t> neighbors;
-    bool CanAddManufacture(BuildingType newType) const
+    bool CanAddManufacture(BuildingType newType, const std::vector<ConstructionTask> &cityQueue = {}) const
     {
+        if (!BuildingRegistry::IsBiomeAllowed(newType, this->terrain.biome))
+        {
+            return false;
+        }
+        int projectedLevel = 0;
+        std::vector<BuildingType> projectedTypes;
+
         for (const auto &m : manufactures)
         {
+            projectedTypes.push_back(m.type);
             if (m.type == newType)
-                return m.level < 5;
+                projectedLevel = m.level;
         }
-        return manufactures.size() < 3;
+        for (const auto &task : cityQueue)
+        {
+            if (task.targetTileID == static_cast<int32_t>(this->ID))
+            {
+                if (task.type == newType)
+                    projectedLevel++;
+                if (std::find(projectedTypes.begin(), projectedTypes.end(), task.type) == projectedTypes.end())
+                {
+                    projectedTypes.push_back(task.type);
+                }
+            }
+        }
+        if (projectedLevel > 0)
+        {
+            return projectedLevel < 5;
+        }
+
+        return projectedTypes.size() < 3;
     }
 };

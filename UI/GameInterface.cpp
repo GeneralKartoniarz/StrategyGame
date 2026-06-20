@@ -27,10 +27,10 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
 
     this->turnCounterLabel = std::make_unique<Label>(sf::Vector2f({1730.0f, 900.0f}), sf::Vector2f({150.0f, 30.0f}), this->font, "TURA 1", 14);
     this->nextTurnButton = std::make_unique<Button>(sf::Vector2f({1780.0f, 940.0f}), 50.0f, this->font, "NEXT", &GameInterface::OnNextTurnClick);
-
-    this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
-    this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 170.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
-    this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1450.0f, 320.0f}), sf::Vector2f({400.0f, 180.0f}), this->font);
+    this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 260.0f}), this->font);
+    this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 300.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
+    this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1450.0f, 450.0f}), sf::Vector2f({400.0f, 180.0f}), this->font);
+    
     this->buildPanel = std::make_unique<BuildPanel>(sf::Vector2f({20.0f, 850.0f}), sf::Vector2f({300.0f, 120.0f}), this->font);
 
     BuildPanel::gameManagerContext = &this->gm;
@@ -149,6 +149,6 @@ void GameInterface::UpdateCityPanelPosition()
 {
     if (this->cityPanel)
     {
-        float targetY = this->isUnitSelected ? 320.0f : 170.0f;
+        float targetY = this->isUnitSelected ? 450.0f : 300.0f;
     }
 }

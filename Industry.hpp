@@ -11,6 +11,12 @@ enum class BuildingType : uint8_t
     Distillery,
     PaperMill
 };
+struct ConstructionTask
+{
+    BuildingType type;
+    int32_t targetTileID;
+    int32_t turnsLeft;
+};
 
 enum class SocialClass : uint8_t;
 
@@ -59,4 +65,13 @@ struct Manufacture
                 outType = ResourceType::Grain; outAmountPerWorker = 0.0f; break;
         }
     }
+};
+enum class BiomeType; 
+
+class BuildingRegistry
+{
+public:
+    static bool IsBiomeAllowed(BuildingType bType, BiomeType biome);
+
+    static std::string GetBuildingName(BuildingType bType);
 };

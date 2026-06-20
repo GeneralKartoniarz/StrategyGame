@@ -8,12 +8,6 @@
 struct Tile;
 struct Pop;
 
-struct ConstructionTask
-{
-    BuildingType type;
-    int32_t targetTileID;
-    int32_t turnsLeft;
-};
 
 struct Workplace
 {

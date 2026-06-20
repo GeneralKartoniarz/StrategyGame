@@ -533,8 +533,7 @@ void InputController::DrawCityPlanningHighlights(sf::RenderWindow *window)
                 }
 
                 BuildingType plannedType = this->gui->buildingUnderCursor;
-                bool meetsLimits = region.CanAddManufacture(plannedType);
-
+                bool meetsLimits = region.CanAddManufacture(plannedType, city.buildQueue);
                 sf::Color buildHighlightColor = meetsLimits ? sf::Color(0, 255, 0, 120) : sf::Color(255, 0, 0, 120);
 
                 sf::VertexArray buildTrigs(sf::PrimitiveType::Triangles);

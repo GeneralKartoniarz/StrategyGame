@@ -68,9 +68,9 @@ bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType 
 
         City &city = this->GetCity(BuildPanel::currentCityContext->centerTileID);
         int32_t currentTileID = static_cast<int32_t>(tile.ID);
-        
+
         std::cout << "[MYSZ] Kliknieto w kafelek o ID: " << currentTileID << std::endl;
-        
+
         auto it = std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), currentTileID);
         if (it == city.jurisdictionTiles.end())
         {
@@ -78,9 +78,9 @@ bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType 
             return false;
         }
 
-        if (!tile.CanAddManufacture(type))
+        if (!tile.CanAddManufacture(type, city.buildQueue))
         {
-            std::cout << "[PLAC BUDOWY] Blad! Przekroczono limit struktur (max 3) lub poziom ulepszenia budynku osiagnal maksimum (lvl 5)!" << std::endl;
+            std::cout << "[PLAC BUDOWY] Blad! Przekroczono limit struktur lub poziom!" << std::endl;
             return false;
         }
 
@@ -118,7 +118,30 @@ Unit &GameManager::GetUnit(int32_t id)
 {
     return this->units[id];
 }
+bool BuildingRegistry::IsBiomeAllowed(BuildingType bType, BiomeType biome)
+{
+    if (bType == BuildingType::Farm)
+    {
+        return biome != BiomeType::Ocean && 
+               biome != BiomeType::IceSheet && 
+               biome != BiomeType::MountainPeak;
+    }
+    
+    // Przykład na przyszłość:
+    // if (bType == BuildingType::Fishery) return biome == BiomeType::Ocean;
 
+    return true;
+}
+
+std::string BuildingRegistry::GetBuildingName(BuildingType bType)
+{
+    switch (bType)
+    {
+        case BuildingType::Farm: return "Farma";
+        // case BuildingType::Fishery: return "Przystan Rybacka";
+        default: return "Nieznany Obiekt";
+    }
+}
 int32_t GameManager::GetNearestNodeID(sf::Vector2f worldPos) const
 {
     if (this->navGraph.nodes.empty())

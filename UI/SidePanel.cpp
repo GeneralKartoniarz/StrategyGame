@@ -1,5 +1,5 @@
-    #include "SidePanel.hpp"
-
+#include "SidePanel.hpp"
+#include "../Industry.hpp"
 SidePanel::SidePanel(const sf::Vector2f& position, const sf::Vector2f& size, const sf::Font& font)
     : nameText(font), idText(font), biomeText(font) 
 {
@@ -49,6 +49,20 @@ void SidePanel::UpdateSelection(const Tile* tile)
         this->idText.setString("ID: " + std::to_string(tile->ID));
         
         std::string biomeStr = "Teren: " + BiomeToString(tile->terrain.biome) + "\nSurowiec: "+ tile->terrain.resourceName;
+        
+        biomeStr += "\n\n--- Infrastruktura ---\n";
+        if (tile->manufactures.empty())
+        {
+            biomeStr += "Brak zabudowan";
+        }
+        else
+        {
+            for (const auto& m : tile->manufactures)
+            {
+                biomeStr += "- " + BuildingRegistry::GetBuildingName(m.type) + " (Poz. " + std::to_string(m.level) + ")\n";
+            }
+        }
+        
         this->biomeText.setString(sf::String::fromUtf8(biomeStr.begin(), biomeStr.end()));
     }
     else
