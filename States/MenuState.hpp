@@ -21,6 +21,9 @@ private:
     static void OnPlayClick();
     static MenuState* instance;
 
+    std::unique_ptr<sf::Texture> bgTexture;
+    std::unique_ptr<sf::Sprite> bgSprite;
+
     sf::Font font;
     std::unique_ptr<Label> titleLabel;
     std::unique_ptr<Button> playButton;

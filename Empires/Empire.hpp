@@ -23,10 +23,10 @@ public:
     void AddCity(int32_t cityID);
     void RemoveCity(int32_t cityID);
     const std::vector<int32_t> &GetCities() const { return controlledCitiesIDs; }
-    
+
     void UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities);
     void AddUnit(int32_t unitID) { controlledUnitsIDs.push_back(unitID); }
-
+    void UpdatePrices();
 private:
     int32_t empireID;
     std::string name;
@@ -35,6 +35,6 @@ private:
     PopManager popManager;
     std::vector<int32_t> controlledCitiesIDs;
     std::vector<int32_t> controlledUnitsIDs;
-    
-    std::map<ResourceType, float> marketPrices;
+
+    std::map<ResourceType, MarketCommodity> market;
 };

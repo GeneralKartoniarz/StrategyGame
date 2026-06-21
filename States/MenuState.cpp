@@ -8,6 +8,18 @@ MenuState::MenuState(sf::RenderWindow* windowPtr) : States(windowPtr)
 {
     instance = this;
 
+    this->bgTexture = std::make_unique<sf::Texture>();
+    if (this->bgTexture->loadFromFile("resources/textures/background.png"))
+    {
+        this->bgSprite = std::make_unique<sf::Sprite>(*this->bgTexture);
+        
+        sf::Vector2f targetSize = static_cast<sf::Vector2f>(this->windowPtr->getSize());
+        this->bgSprite->setScale({
+            targetSize.x / this->bgSprite->getLocalBounds().size.x,
+            targetSize.y / this->bgSprite->getLocalBounds().size.y
+        });
+    }
+
     if (!this->font.openFromFile("resources/fonts/ARIAL.TTF"))
     {
         this->font.openFromFile("C:/Windows/Fonts/Arial.ttf");
@@ -32,7 +44,6 @@ void MenuState::OnPlayClick()
 
 void MenuState::HandleEvent(const sf::Event& event)
 {
-
 }
 
 void MenuState::Update(float dt)
@@ -51,6 +62,11 @@ void MenuState::Update(float dt)
 
 void MenuState::Render(sf::RenderWindow* windowPtr)
 {
+    if (this->bgSprite)
+    {
+        windowPtr->draw(*this->bgSprite);
+    }
+    
     this->titleLabel->Draw(windowPtr);
     this->playButton->Draw(windowPtr);
 }

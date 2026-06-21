@@ -29,7 +29,18 @@ enum class NeedCategory : uint8_t
     Education,      // Edukacja
     StatusGoods     // Dobra luksusowe
 };
+struct MarketCommodity
+{
+    float currentPrice = 1.0f;
+    
+    float demandLastTurn = 0.0f;
+    float supplyLastTurn = 0.0f;
+    
 
+    //TODO IMPORT PO NAJNIŻSZEJ CENIE OD BYLE KTÓREGO MIASTA
+    float targetImportPrice = 0.0f;
+    float targetExportPrice = 0.0f;
+};
 struct MarketRegistry
 {
     static std::vector<std::pair<ResourceType, float>> GetSubstitutes(NeedCategory category)
