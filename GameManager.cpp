@@ -304,7 +304,7 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     newCity.warehouse[ResourceType::Grain] = 300.0f;
     newCity.warehouse[ResourceType::Fish] = 200.0f;
     newCity.warehouse[ResourceType::Wood] = 150.0f;
-
+    newCity.warehouse[ResourceType::Gold] = 800.0f;
     for (std::size_t nIdx : map[tileID].neighbors)
     {
         newCity.jurisdictionTiles.push_back(static_cast<int32_t>(nIdx));

@@ -6,6 +6,7 @@
 #include "Economy.hpp"
 #include "namegen.hpp"
 class GameManager;
+struct City;
 class PopManager
 {
 public:
@@ -20,8 +21,8 @@ public:
     size_t GetTotalPopulation() const { return population.size(); }
     int32_t GetGroupCount(SocialClass targetClass) const;
 
-    void ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market);
-    void UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw);
+    void ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, City &city);
+    void UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city);
     void GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw);
     float GetAverageSatisfaction(const std::vector<const Pop *> &subGroup) const;
 

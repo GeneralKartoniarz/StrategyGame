@@ -70,8 +70,7 @@ void Empire::UpdatePrices()
             commodity.currentPrice *= 1.10f;
         }
 
-        commodity.currentPrice = std::clamp(commodity.currentPrice, 0.5f, 500.0f);
-
+        commodity.currentPrice = std::clamp(commodity.currentPrice, 0.05f, 500.0f);
         if (std::abs(commodity.currentPrice - oldPrice) > 0.01f)
         {
             std::cout << " -> " << MarketRegistry::GetResourceName(resource)
@@ -94,7 +93,7 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
 
         city.ProcessConstructionQueue(map);
         city.CollectWorkplacesFromTerritory(map);
-        city.PerformEmploymentRegistry(this->popManager.GetAllPops());
+        city.PerformEmploymentRegistry(this->popManager);
         city.SimulateProduction(map);
 
         for (const auto &[res, amount] : city.warehouse)
@@ -110,7 +109,7 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
             0,
             capitalTileID,
             gm,
-            this->cultureRaw);
+            this->cultureRaw, city);
     }
 
     this->UpdatePrices();
