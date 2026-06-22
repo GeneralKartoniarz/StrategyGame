@@ -11,7 +11,7 @@ TestState::TestState(sf::RenderWindow *windowPtr) : States(windowPtr), gm(window
 
     MapGenerator mg;
     TopologyGraph graph;
-
+    this->gm.InitializeNameGenerator();
     bool isValidMap = false;
     while (!isValidMap)
     {

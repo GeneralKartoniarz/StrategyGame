@@ -9,12 +9,33 @@ Empire::Empire(int32_t id, const std::string &name, sf::Color color)
 {
     // CENY DOMYSLNE SUROWCOW
     market[ResourceType::Grain].currentPrice = 0.8f;
-    market[ResourceType::Fish].currentPrice = 1.2f;  
+    market[ResourceType::Fish].currentPrice = 1.2f;
     market[ResourceType::Wood].currentPrice = 1.5f;
     market[ResourceType::Coal].currentPrice = 4.0f;
     market[ResourceType::LuxuryAlcohol].currentPrice = 12.0f;
     market[ResourceType::Paper].currentPrice = 15.0f;
     market[ResourceType::Gold].currentPrice = 50.0f;
+
+    std::vector<dasmig::culture> allowedCultures = {
+        dasmig::culture::albanian, dasmig::culture::american, dasmig::culture::austrian,
+        dasmig::culture::belgian, dasmig::culture::bolivian, dasmig::culture::botswanan,
+        dasmig::culture::brazilian, dasmig::culture::british, dasmig::culture::bulgarian,
+        dasmig::culture::canadian, dasmig::culture::chilean, dasmig::culture::chinese,
+        dasmig::culture::croatian, dasmig::culture::czech, dasmig::culture::danish,
+        dasmig::culture::dutch, dasmig::culture::egyptian, dasmig::culture::estonian,
+        dasmig::culture::filipino, dasmig::culture::finnish, dasmig::culture::french,
+        dasmig::culture::georgian, dasmig::culture::german, dasmig::culture::greek,
+        dasmig::culture::haitian, dasmig::culture::hungarian, dasmig::culture::indian,
+        dasmig::culture::italian, dasmig::culture::japanese, dasmig::culture::kazakh,
+        dasmig::culture::korean, dasmig::culture::lithuanian, dasmig::culture::luxembourgish,
+        dasmig::culture::malaysian, dasmig::culture::mexican, dasmig::culture::moldovan,
+        dasmig::culture::norwegian, dasmig::culture::polish, dasmig::culture::portuguese,
+        dasmig::culture::russian, dasmig::culture::saudi, dasmig::culture::serbian,
+        dasmig::culture::slovenian, dasmig::culture::southafrican, dasmig::culture::spanish,
+        dasmig::culture::swedish, dasmig::culture::swiss, dasmig::culture::turkish};
+
+    dasmig::culture wylosowana = allowedCultures[std::rand() % allowedCultures.size()];
+    this->cultureRaw = static_cast<uint8_t>(wylosowana);
 }
 
 void Empire::AddCity(int32_t cityID)
@@ -62,7 +83,7 @@ void Empire::UpdatePrices()
         commodity.supplyLastTurn = 0.0f;
     }
 }
-void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities)
+void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, GameManager &gm)
 {
     for (auto &[res, comm] : this->market)
         comm.supplyLastTurn = 0.0f;
@@ -87,7 +108,9 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities)
             this->market,
             static_cast<uint16_t>(this->empireID),
             0,
-            capitalTileID);
+            capitalTileID,
+            gm,
+            this->cultureRaw);
     }
 
     this->UpdatePrices();

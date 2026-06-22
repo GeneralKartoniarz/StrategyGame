@@ -138,6 +138,9 @@
     <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\UI\BuildPanel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Users\janpa\Documents\GitHub\StrategyGame\random.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\janpa\Documents\GitHub\StrategyGame\CMakeLists.txt" />

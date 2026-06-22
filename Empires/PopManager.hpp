@@ -4,7 +4,8 @@
 #include <map>
 #include "Pop.hpp"
 #include "Economy.hpp"
-
+#include "namegen.hpp"
+class GameManager;
 class PopManager
 {
 public:
@@ -20,12 +21,13 @@ public:
     int32_t GetGroupCount(SocialClass targetClass) const;
 
     void ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market);
-    void UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID);
+    void UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw);
+    void GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw);
     float GetAverageSatisfaction(const std::vector<const Pop *> &subGroup) const;
 
     int32_t CalculateGrowthPotential() const;
-    void GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID);
     void StarvePopulation(int32_t deathAmount);
+
 private:
     std::vector<Pop> population;
 };

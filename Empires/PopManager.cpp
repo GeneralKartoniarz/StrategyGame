@@ -5,6 +5,9 @@
 #include <string>
 #include <iostream>
 #include "../Demographics.hpp"
+#include "../GameManager.hpp"
+
+#include <string>
 int32_t PopManager::GetGroupCount(SocialClass targetClass) const
 {
     int32_t count = 0;
@@ -201,13 +204,12 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
     std::cout << "[EKONOMIA] Zloto w miejskim skarbcu z zakupow detalicznych: +" << totalSalesValue << " j." << std::endl;
 }
 
-void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID)
+void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw)
 {
     for (int32_t i = 0; i < growthAmount; ++i)
     {
         Pop baby;
         baby.locationTileID = tileID;
-        baby.nameSeed = static_cast<uint16_t>(std::rand() % 65535);
         baby.cultureID = static_cast<uint8_t>(cultureID);
         baby.religionID = religionID;
         baby.age = 0;
@@ -217,8 +219,27 @@ void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_
         baby.reserved = 0;
 
         if (std::rand() % 2 == 0)
+        {
             baby.SetFemale();
+        }
+
         baby.SetAssimilated(true);
+
+        dasmig::gender popGender = baby.IsFemale() ? dasmig::gender::f : dasmig::gender::m;
+        dasmig::culture popCulture = static_cast<dasmig::culture>(empireCultureRaw);
+
+        std::wstring fullName = L"Anonim";
+        try
+        {
+            fullName = gm.GetNameGenerator().get_name(popGender, popCulture).append_surname(popCulture);
+        }
+        catch (const std::exception &e)
+        {
+            std::cout << "[OSTRZEZENIE] Blad generatora: " << e.what() << " -> Nadano imie domyslne.\n";
+        }
+
+        uint32_t assignedNameID = gm.RegisterPopName(fullName);
+        baby.nameSeed = static_cast<uint16_t>(assignedNameID > 65535 ? 65535 : assignedNameID);
 
         if (!this->population.empty())
         {
@@ -253,7 +274,7 @@ void PopManager::StarvePopulation(int32_t deathAmount)
     }
 }
 
-void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID)
+void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw)
 {
     std::cout << "\n=================== RAPORT GOSPODARCZY (Kafel: " << tileID << ") ===================" << std::endl;
 
@@ -309,8 +330,16 @@ void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::
         int32_t potentialGrowth = this->CalculateGrowthPotential();
         if (potentialGrowth > 0)
         {
-            this->GrowPopulation(potentialGrowth, cultureID, religionID, tileID);
+            size_t popBeforeGrowth = this->population.size();
+            this->GrowPopulation(potentialGrowth, cultureID, religionID, tileID, gm, empireCultureRaw);
             std::cout << "[NARODZINY] Spoleczenstwo kwitnie! Urodzilo sie: " << potentialGrowth << " nowych popow." << std::endl;
+            for (size_t i = popBeforeGrowth; i < this->population.size(); ++i)
+            {
+                const Pop &baby = this->population[i];
+                std::cout << "  [+] Witamy na swiecie: ";
+                std::wcout << gm.GetPopName(baby.nameSeed);
+                std::cout << "\n";
+            }
         }
     }
 
@@ -321,36 +350,34 @@ void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::
     }
 
     std::vector<std::pair<SocialClass, std::string>> classNames = {
-        {SocialClass::Bound, "Bound"}, 
+        {SocialClass::Bound, "Bound"},
         {SocialClass::Laborer, "Laborer"},
-        {SocialClass::Specialist, "Specialist"}, 
+        {SocialClass::Specialist, "Specialist"},
         {SocialClass::Capitalist, "Capitalist"},
-        {SocialClass::Elite, "Elite"}
-    };
+        {SocialClass::Elite, "Elite"}};
 
     std::vector<std::pair<WealthLevel, std::string>> wealthNames = {
-        {WealthLevel::Broke, "Broke"}, 
+        {WealthLevel::Broke, "Broke"},
         {WealthLevel::Poor, "Poor"},
-        {WealthLevel::Middle, "Middle"}, 
+        {WealthLevel::Middle, "Middle"},
         {WealthLevel::Rich, "Rich"},
-        {WealthLevel::FilthyRich, "FilthyRich"}
-    };
+        {WealthLevel::FilthyRich, "FilthyRich"}};
 
     std::cout << "\n[SPIS LUDNOSCI - STRATYFIKACJA MAJATKOWA]" << std::endl;
-    for (const auto& [sc, cName] : classNames) 
+    for (const auto &[sc, cName] : classNames)
     {
         int totalInClass = 0;
-        for (const auto& [wl, wName] : wealthNames) 
+        for (const auto &[wl, wName] : wealthNames)
         {
             totalInClass += stratification[sc][wl];
         }
-        
-        if (totalInClass > 0) 
+
+        if (totalInClass > 0)
         {
             std::cout << " -> " << cName << " (" << totalInClass << "): ";
-            for (const auto& [wl, wName] : wealthNames) 
+            for (const auto &[wl, wName] : wealthNames)
             {
-                if (stratification[sc][wl] > 0) 
+                if (stratification[sc][wl] > 0)
                 {
                     std::cout << "[" << wName << ": " << stratification[sc][wl] << "] ";
                 }
@@ -358,5 +385,6 @@ void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::
             std::cout << std::endl;
         }
     }
-    std::cout << "===================================================================\n" << std::endl;
+    std::cout << "===================================================================\n"
+              << std::endl;
 }

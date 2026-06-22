@@ -8,13 +8,13 @@
 #include "Empires/Empire.hpp"
 #include "Map/NavigationGraph.hpp"
 #include "Unit.hpp"
-
+#include "namegen.hpp"
 struct Tile;
 
 class GameManager
 {
 public:
-    GameManager(sf::RenderWindow* window);
+    GameManager(sf::RenderWindow *window);
     ~GameManager() = default;
 
     void AddCity(const City &city);
@@ -47,14 +47,20 @@ public:
     void NextTurn(std::vector<Tile> &map);
 
     bool TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType type, std::vector<Tile> &map, const sf::View &worldView);
+    dasmig::ng &GetNameGenerator() { return nameGenerator; }
+    void InitializeNameGenerator();
+    uint32_t RegisterPopName(const std::wstring &name);
+    std::wstring GetPopName(uint32_t id) const;
 
 private:
-    sf::RenderWindow* window; 
+    sf::RenderWindow *window;
     NavigationGraph navGraph;
     std::vector<City> cities;
     std::vector<Empire> empires;
     std::vector<Unit> units;
-
+    dasmig::ng nameGenerator;
+    std::vector<std::wstring> registeredPopNames;
     std::unordered_map<uint32_t, std::string> cityNamesRegistry;
+
     uint32_t nextCityNameID = 0;
 };

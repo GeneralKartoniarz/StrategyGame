@@ -1,6 +1,7 @@
 #include "GameManager.hpp"
 #include <cmath>
 #include "Map/Tile.hpp"
+#include <filesystem>
 #include <iostream>
 #include <algorithm>
 #include <limits>
@@ -21,7 +22,37 @@ void GameManager::AddEmpire(const Empire &empire)
 {
     this->empires.push_back(empire);
 }
+void GameManager::InitializeNameGenerator()
+{
+ std::filesystem::path resPath = std::filesystem::current_path() / "resources" / "full";
+    
+    std::cout << "[DEBUG] Szukam bazy w: " << resPath.string() << std::endl;
 
+    if (std::filesystem::exists(resPath))
+    {
+        this->nameGenerator.load(resPath);
+        
+        if (this->nameGenerator.has_resources())
+            std::cout << "[INFO] Sukces! Baza załadowana." << std::endl;
+        else
+            std::cout << "[ERROR] Ścieżka istnieje, ale biblioteka nie wczytała żadnych plików .names!" << std::endl;
+    }
+    else
+    {
+        std::cout << "[ERROR] Folder nie istnieje w: " << resPath.string() << std::endl;
+    }
+}
+uint32_t GameManager::RegisterPopName(const std::wstring& name)
+{
+    this->registeredPopNames.push_back(name);
+    return static_cast<uint32_t>(this->registeredPopNames.size() - 1);
+}
+
+std::wstring GameManager::GetPopName(uint32_t id) const
+{
+    if (id < this->registeredPopNames.size()) return this->registeredPopNames[id];
+    return L"Anonim";
+}
 City &GameManager::GetCity(int32_t centerTileID)
 {
     for (auto &city : this->cities)
@@ -127,7 +158,6 @@ bool BuildingRegistry::IsBiomeAllowed(BuildingType bType, BiomeType biome)
                biome != BiomeType::MountainPeak;
     }
     
-    // Przykład na przyszłość:
     // if (bType == BuildingType::Fishery) return biome == BiomeType::Ocean;
 
     return true;
@@ -202,7 +232,7 @@ void GameManager::NextTurn(std::vector<Tile> &map)
 {
     for (auto &empire : this->empires)
     {
-        empire.UpdateTurn(map, this->cities);
+        empire.UpdateTurn(map, this->cities, *this);
     }
     this->ResetMovementPoints();
 }
