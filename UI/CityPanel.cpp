@@ -62,7 +62,7 @@ void CityPanel::UpdateCityData(const City &city, const PopManager &popMgr)
         }
     }
 
-    size_t totalPeopleCount = cityPops.size() * 100;
+    size_t totalPeopleCount = cityPops.size() * 10;
     this->totalPopLabel->SetText("Ludn.: " + std::to_string(totalPeopleCount));
 
     float avgSat = popMgr.GetAverageSatisfaction(cityPops);

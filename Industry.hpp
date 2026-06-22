@@ -29,11 +29,11 @@ struct Manufacture
     {
         switch (type)
         {
-            case BuildingType::Farm:       return level * 100;
-            case BuildingType::Fishery:    return level * 60;
-            case BuildingType::Mine:       return level * 80;
-            case BuildingType::Distillery: return level * 25;
-            case BuildingType::PaperMill:  return level * 15;
+            case BuildingType::Farm:       return level * 3;
+            case BuildingType::Fishery:    return level * 3;
+            case BuildingType::Mine:       return level * 5;
+            case BuildingType::Distillery: return level * 1;
+            case BuildingType::PaperMill:  return level * 1;
             default: return 0;
         }
     }
