@@ -2,6 +2,19 @@
 #include <cstdint>
 #include "Economy.hpp"
 
+/*
+ * [PL] STRUKTURA: BuildingType / Manufacture
+ * LOGIKA: Definiuje typy budynków, poziomy, łańcuchy produkcyjne i obostrzenia biomów.
+ * [DO ZMIANY]: Wprowadzimy tu pulę kapitału (dywidendę), z którego fabryka 
+ * będzie samodzielnie wypłacać rynkowe pensje.
+ * POWIĄZANIA: City (SimulateProduction).
+ * * [EN] STRUCTURE: BuildingType / Manufacture
+ * LOGIC: Defines building types, levels, production chains, and biome restrictions.
+ * [TO CHANGE]: Will soon introduce a capital pool (dividend) from which 
+ * the factory will independently pay market wages.
+ * DEPENDENCIES: City (SimulateProduction).
+ */
+
 enum class BuildingType : uint8_t
 {
     None,

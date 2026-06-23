@@ -8,6 +8,17 @@
 #include "UI/BuildPanel.hpp"
 #include "UI/GameInterface.hpp"
 
+/*
+ * [PL] KLASA: GameManager
+ * LOGIKA: Główny reżyser rozgrywki. Przechowuje globalne wektory Imperiów, Miast i Jednostek. 
+ * Obsługuje tury, przenoszenie jednostek (Pathfinding) i transformację osadników w miasta.
+ * POWIĄZANIA: Spina wszystko. Zależny od MapGenerator, PathFinder i PopManager.
+ * * [EN] CLASS: GameManager
+ * LOGIC: The main gameplay director. Stores global vectors of Empires, Cities, and Units. 
+ * Handles turns, unit movement (Pathfinding), and transforming settlers into cities.
+ * DEPENDENCIES: Ties everything together. Relies on MapGenerator, PathFinder, and PopManager.
+ */
+
 GameManager::GameManager(sf::RenderWindow *window)
     : window(window)
 {

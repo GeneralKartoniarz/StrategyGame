@@ -5,7 +5,16 @@
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
-
+/*
+ * [PL] METODA: BuildNavigationGraph
+ * LOGIKA: Przekształca krawędzie mapy w graf skierowany (NavNode), po którym będą
+ * poruszać się jednostki wojskowe i cywilne. Haszuje koordynaty wierzchołków dla optymalizacji.
+ * POWIĄZANIA: NavigationGraph.hpp.
+ * * [EN] METHOD: BuildNavigationGraph
+ * LOGIC: Converts map edges into a directed graph (NavNode) for military and civilian 
+ * unit pathfinding. Hashes vertex coordinates for optimization.
+ * DEPENDENCIES: NavigationGraph.hpp.
+ */
 NavigationGraph MapGenerator::BuildNavigationGraph(const std::vector<Tile>& map)
 {
     NavigationGraph navGraph;
@@ -62,7 +71,14 @@ NavigationGraph MapGenerator::BuildNavigationGraph(const std::vector<Tile>& map)
 
     return navGraph;
 }
-
+/*
+ * [PL] METODA: ExtractTopology
+ * LOGIKA: Wyciąga topologię terenu (wysokości i występowanie wody) w postaci siatki wierzchołków, 
+ * co jest absolutnie krytyczne dla prawidłowego generowania rzek spływających grawitacyjnie w dół.
+ * * [EN] METHOD: ExtractTopology
+ * LOGIC: Extracts terrain topology (elevation and water bodies) as a vertex grid, 
+ * which is absolutely critical for correctly generating gravity-fed, downstream-flowing rivers.
+ */
 TopologyGraph MapGenerator::ExtractTopology(const std::vector<Tile>& map, int mapWidth, int mapHeight, const ClimateEngine& climate)
 {
     TopologyGraph graph;
@@ -135,9 +151,14 @@ TopologyGraph MapGenerator::ExtractTopology(const std::vector<Tile>& map, int ma
 }
 
 /*
- * AGREGACJA GEOMETRII (KLASTERYZACJA ALGORYTMEM BFS)
- * Łączymy małe, surowe komórki Voronoia w większe regiony prowincjonalne.
- * Ta funkcja odpowiada wyłącznie za scalanie granic, wektorów wierzchołków i sąsiedztwa.
+ * [PL] METODA: MergeTiles
+ * LOGIKA: Agregacja geometrii. Wykorzystuje algorytm przeszukiwania wszerz (BFS) do łączenia 
+ * drobnych komórek Voronoia w większe, grywalne regiony (prowincje), wygładzając w ten sposób mapę.
+ * POWIĄZANIA: Tile.hpp.
+ * * [EN] METHOD: MergeTiles
+ * LOGIC: Geometry aggregation. Uses a Breadth-First Search (BFS) algorithm to cluster 
+ * tiny Voronoi cells into larger, playable regions (provinces), thereby smoothing the map.
+ * DEPENDENCIES: Tile.hpp.
  */
 std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, int targetClusterSize, int mapWidth, int mapHeight)
 {
@@ -243,6 +264,16 @@ std::vector<Tile> MapGenerator::MergeTiles(const std::vector<Tile> &smallTiles, 
 
     return largeTiles;
 }
+
+/*
+ * [PL] METODA: GenerateRivers
+ * LOGIKA: Symuluje fizyczny spływ rzek z najwyżej położonych terenów (wg Topologii) do oceanu.
+ * Wyposażona w zabezpieczenia (pętle awaryjne) przed utknięciem biegu rzeki w depresji terenu.
+ * * [EN] METHOD: GenerateRivers
+ * LOGIC: Simulates the physical flow of rivers from the highest elevations (based on Topology) 
+ * down to the ocean. Equipped with fail-safes to prevent the river from getting stuck in a basin.
+ */
+
 void MapGenerator::GenerateRivers(TopologyGraph& graph, int numRivers)
 {
     std::random_device rd;
@@ -292,6 +323,14 @@ void MapGenerator::GenerateRivers(TopologyGraph& graph, int numRivers)
         }
     }
 }
+/*
+ * [PL] METODA: GetMap
+ * LOGIKA: Główny reżyser i interfejs generacji świata. Łączy siatkę Voronoia, scalanie prowincji (Merge),
+ * system rzek i silnik klimatyczny, zwracając w efekcie w pełni gotowy do rozgrywki wektor Kafelków.
+ * * [EN] METHOD: GetMap
+ * LOGIC: The main director and interface for world generation. Combines the Voronoi grid, province 
+ * clustering (Merge), river systems, and the climate engine, returning a fully game-ready Tile vector.
+ */
 std::vector<Tile> MapGenerator::GetMap(int mapWidth, int mapHeight, int cellSize, int iterations, ClimateConfig config)
 {
     std::random_device rd;

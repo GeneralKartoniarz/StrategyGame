@@ -8,6 +8,18 @@
 #include "States/MenuState.hpp"
 #include <vector>
 using namespace std;
+
+/*
+ * [PL] KLASA: Game
+ * LOGIKA: Główna pętla aplikacji (Game Loop). Inicjalizuje okno SFML, zarządza 
+ * maszyną stanów (State Machine) i deleguje zdarzenia (Delta Time, Eventy).
+ * POWIĄZANIA: Moduł States (TestState, MenuState).
+ * * [EN] CLASS: Game
+ * LOGIC: The main application loop (Game Loop). Initializes the SFML window, manages 
+ * the State Machine, and delegates events (Delta Time, Events).
+ * DEPENDENCIES: States module (TestState, MenuState).
+ */
+
 Game::Game()
 {
     this->InitWindow();

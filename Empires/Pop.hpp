@@ -5,7 +5,20 @@ enum class ReligionGroup : uint8_t
 {
     None
 };
-
+/*
+ * [PL] STRUKTURA: Pop
+ * LOGIKA: Reprezentacja pojedynczej grupy ludności (popu) zoptymalizowana do rygorystycznego
+ * limitu 16 bajtów. Stanowi fundament systemu demograficznego.
+ * POWIĄZANIA: Wykorzystuje typy wyliczeniowe z Demographics.hpp (SocialClass, WealthLevel).
+ * Rozszerzona o flagi bitowe do obsługi płci, zatrudnienia i ostrzeżeń o głodzie.
+ * 
+ * * [EN] STRUCTURE: Pop
+ * LOGIC: Representation of a single population group (pop) optimized to a strict 
+ * 16-byte limit. Forms the foundation of the demographic system.
+ * DEPENDENCIES: Uses enums from Demographics.hpp (SocialClass, WealthLevel). 
+ * Extended with bit flags to handle gender (as previously requested, 
+ * no RNG needed for namegen), employment, and starvation warnings.
+ */
 #pragma pack(push, 1)
 struct Pop
 {

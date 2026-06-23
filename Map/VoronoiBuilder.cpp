@@ -4,6 +4,17 @@
 #include <random>
 #include <cstring>
 
+/*
+ * [PL] METODA: InitializeSeeds / ApplyLloydRelaxation
+ * LOGIKA: Rozrzuca losowe punkty, a następnie "relaksuje" je algorytmem Lloyda, 
+ * by uzyskać równomierne, estetyczne komórki, unikając ostrych i nieregularnych krawędzi.
+ * POWIĄZANIA: Biblioteka jc_voronoi.
+ * * [EN] METHOD: InitializeSeeds / ApplyLloydRelaxation
+ * LOGIC: Scatters random seed points and "relaxes" them using Lloyd's algorithm 
+ * to achieve evenly spaced, aesthetic cells, avoiding sharp and irregular edges.
+ * DEPENDENCIES: jc_voronoi library.
+ */
+
 std::vector<sf::Vector2f> VoronoiBuilder::InitializeSeeds(int mapWidth, int mapHeight, int cellSize)
 {
     std::vector<sf::Vector2f> points;
@@ -68,7 +79,14 @@ void VoronoiBuilder::ApplyLloydRelaxation(std::vector<sf::Vector2f>& points, int
         jcv_diagram_free(&diagram);
     }
 }
-
+/*
+ * [PL] METODA: CreateTiles
+ * LOGIKA: Transformuje surowe wyniki z biblioteki jc_voronoi na struktury Tile w naszej grze,
+ * wyciągając z nich wielokąty bazowe (subPolygons) oraz sąsiedztwo krawędzi (cellEdges).
+ * * [EN] METHOD: CreateTiles
+ * LOGIC: Transforms raw results from the jc_voronoi library into our game's Tile structures, 
+ * extracting polygons (subPolygons) and edge adjacencies (cellEdges).
+ */
 std::vector<Tile> VoronoiBuilder::CreateTiles(const std::vector<sf::Vector2f>& points, int mapWidth, int mapHeight)
 {
     jcv_rect rect = {{50.0, 50.0}, {static_cast<double>(mapWidth) - 50.0, static_cast<double>(mapHeight) - 50.0}};
@@ -114,7 +132,14 @@ std::vector<Tile> VoronoiBuilder::CreateTiles(const std::vector<sf::Vector2f>& p
     jcv_diagram_free(&diagram);
     return tiles;
 }
-
+/*
+ * [PL] METODA: GenerateRawGrid
+ * LOGIKA: Orkiestrator dla całego procesu budowy geometrycznej Voronoia (Seed -> Relax -> CreateTiles).
+ * Zwraca bardzo drobną siatkę komórek, która później zostanie zagregowana w duże prowincje.
+ * * [EN] METHOD: GenerateRawGrid
+ * LOGIC: Orchestrator for the entire geometric Voronoi generation process (Seed -> Relax -> CreateTiles).
+ * Returns a very fine cell grid that will later be aggregated into large provinces.
+ */
 std::vector<Tile> VoronoiBuilder::GenerateRawGrid(int mapWidth, int mapHeight, int cellSize, int iterations)
 {
     std::vector<sf::Vector2f> points = InitializeSeeds(mapWidth, mapHeight, cellSize);

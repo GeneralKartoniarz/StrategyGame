@@ -46,32 +46,6 @@ MapRenderer::MapRenderer()
     loadTex(this->mountainTexture, "resources/textures/MountainBackground.png");
 }
 
-sf::Color MapRenderer::GetBiomeColor(BiomeType biome) const
-{
-    switch (biome)
-    {
-    case BiomeType::Ocean:
-        return sf::Color(28, 81, 141);
-    case BiomeType::IceSheet:
-        return sf::Color(230, 245, 250);
-    case BiomeType::Tundra:
-        return sf::Color(145, 165, 140);
-    case BiomeType::Desert:
-        return sf::Color(225, 190, 110);
-    case BiomeType::Plains:
-        return sf::Color(120, 175, 90);
-    case BiomeType::Forest:
-        return sf::Color(55, 120, 65);
-    case BiomeType::Taiga:
-        return sf::Color(40, 95, 70);
-    case BiomeType::Rainforest:
-        return sf::Color(45, 80, 15);
-    case BiomeType::MountainPeak:
-        return sf::Color(110, 115, 120);
-    default:
-        return sf::Color(100, 100, 100);
-    }
-}
 
 sf::IntRect MapRenderer::GetResourceTextureRect(const std::string &resourceName) const
 {
@@ -104,7 +78,16 @@ sf::IntRect MapRenderer::GetResourceTextureRect(const std::string &resourceName)
 
     return sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(0, 0));
 }
-
+/*
+ * [PL] METODA: BuildMeshes
+ * LOGIKA: Wypieka surowe obiekty sf::VertexArray (Trójkąty dla terenów, Linie dla granic) 
+ * na podstawie twardych danych z mapy. Dzieli teren na osobne meshe na podstawie biomów dla wydajności.
+ * POWIĄZANIA: Ściśle zależne od sprzętowego API SFML (sf::VertexArray, sf::Texture).
+ * * [EN] METHOD: BuildMeshes
+ * LOGIC: Bakes raw sf::VertexArray objects (Triangles for terrain, Lines for borders) 
+ * based on hard map data. Splits terrain into separate meshes by biome for rendering performance.
+ * DEPENDENCIES: Strictly reliant on the hardware SFML API (sf::VertexArray, sf::Texture).
+ */
 void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph &topoGraph, const GameManager &gm)
 {
     this->terrainMesh.clear();
@@ -225,7 +208,16 @@ void MapRenderer::BuildMeshes(const std::vector<Tile> &map, const TopologyGraph 
         this->resourceMesh.append(sf::Vertex{bl, sf::Color::White, uvBl});
     }
 }
-
+/*
+ * [PL] METODA: RebuildPoliticalMesh
+ * LOGIKA: Przebudowuje i nakłada półprzezroczystą warstwę, oznaczającą jurysdykcję
+ * i własność polityczną poszczególnych terytoriów państw. Centrum miasta jest mocniej cieniowane.
+ * POWIĄZANIA: GameManager.hpp (zaciąga dane o granicach imperiów).
+ * * [EN] METHOD: RebuildPoliticalMesh
+ * LOGIC: Rebuilds and applies a semi-transparent layer indicating political jurisdiction 
+ * and territory ownership. The city center tile receives heavier shading.
+ * DEPENDENCIES: GameManager.hpp (pulls data on empire borders).
+ */
 void MapRenderer::RebuildPoliticalMesh(const std::vector<Tile> &map, const GameManager &gm)
 {
     this->politicalMesh.clear();

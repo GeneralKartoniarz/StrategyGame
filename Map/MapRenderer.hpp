@@ -47,5 +47,4 @@ private:
     sf::Texture resourceAtlas;
     sf::VertexArray resourceMesh;
     sf::IntRect GetResourceTextureRect(const std::string &resourceName) const;
-    sf::Color GetBiomeColor(BiomeType biome) const;
 };

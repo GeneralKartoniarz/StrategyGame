@@ -3,6 +3,18 @@
 #include <unordered_map>
 #include <cmath>
 #include <algorithm>
+
+/*
+ * [PL] METODA: FindPath
+ * LOGIKA: Algorytm szukania najkrótszej ścieżki na grafie nawigacyjnym (NavNode) 
+ * opartym o siatkę krawędzi komórek Voronoia.
+ * POWIĄZANIA: NavigationGraph, GameManager (ruch).
+ * * [EN] METHOD: FindPath
+ * LOGIC: Shortest-path algorithm operating on the navigation graph (NavNode) 
+ * built from Voronoi cell edges.
+ * DEPENDENCIES: NavigationGraph, GameManager (movement).
+ */
+
 float Pathfinder::Heuristic(sf::Vector2f a, sf::Vector2f b)
 {
     return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2));

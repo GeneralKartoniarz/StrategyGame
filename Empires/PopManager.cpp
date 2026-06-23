@@ -8,6 +8,12 @@
 #include "../GameManager.hpp"
 
 #include <string>
+/*
+ * [PL] METODA: GetGroupCount
+ * LOGIKA: Pomocnicza metoda zwracająca liczebność popów w danej klasie społecznej.
+ * [EN] METHOD: GetGroupCount
+ * LOGIC: Helper method returning the count of pops belonging to a specific social class.
+ */
 int32_t PopManager::GetGroupCount(SocialClass targetClass) const
 {
     int32_t count = 0;
@@ -18,12 +24,22 @@ int32_t PopManager::GetGroupCount(SocialClass targetClass) const
     }
     return count;
 }
-
+/*
+ * [PL] METODA: AddPop
+ * LOGIKA: Rejestruje nowego obywatela w strukturach państwa.
+ * [EN] METHOD: AddPop
+ * LOGIC: Registers a newly created citizen in the state structures.
+ */
 void PopManager::AddPop(const Pop &newPop)
 {
     this->population.push_back(newPop);
 }
-
+/*
+ * [PL] METODA: GetAverageSatisfaction
+ * LOGIKA: Zwraca średnią satysfakcję dla podzbioru populacji (wykorzystuje wskaźniki).
+ * [EN] METHOD: GetAverageSatisfaction
+ * LOGIC: Returns the average satisfaction for a population subset using pointers.
+ */
 float PopManager::GetAverageSatisfaction(const std::vector<const Pop *> &subGroup) const
 {
     if (subGroup.empty())
@@ -36,7 +52,12 @@ float PopManager::GetAverageSatisfaction(const std::vector<const Pop *> &subGrou
     }
     return totalSat / static_cast<float>(subGroup.size());
 }
-
+/*
+ * [PL] METODA: CalculateGrowthPotential
+ * LOGIKA: Szacuje przyrost naturalny na podstawie zadowolenia, płci i wieku (16-45).
+ * [EN] METHOD: CalculateGrowthPotential
+ * LOGIC: Estimates natural growth based on satisfaction, gender, and reproductive age (16-45).
+ */
 int32_t PopManager::CalculateGrowthPotential() const
 {
     if (this->population.empty())
@@ -48,7 +69,7 @@ int32_t PopManager::CalculateGrowthPotential() const
     {
         if (pop.IsFemale() && pop.age >= 16 && pop.age <= 45)
         {
-
+            // TODO SCALE THIS SHIT OUT
             float satisfactionRatio = static_cast<float>(pop.satisfaction) / 255.0f;
             float currentBirthChance = 0.40f + (satisfactionRatio * 0.08f);
 
@@ -62,6 +83,12 @@ int32_t PopManager::CalculateGrowthPotential() const
 
     return totalNewborns;
 }
+/*
+ * [PL] METODA: ProgressAgeAndMortality
+ * LOGIKA: Zwiększa wiek popów (bufor 12 miesięcy) i realizuje śmierć ze starości.
+ * [EN] METHOD: ProgressAgeAndMortality
+ * LOGIC: Increments pop age (using a 12-month buffer) and executes old-age death mechanics.
+ */
 void PopManager::ProgressAgeAndMortality()
 {
     this->population.erase(
@@ -85,7 +112,18 @@ void PopManager::ProgressAgeAndMortality()
             return false; }),
         this->population.end());
 }
-
+/*
+ * [PL] METODA: ProcessMarketAndSatisfaction
+ * LOGIKA: Symuluje wypłaty, opodatkowanie i zakupy.
+ * [DO ZMIANY]: Popy przestaną być opłacane z centralnego skarbca. Wypłaty zostaną powiązane 
+ * z rentownością miejsc pracy na wolnym rynku.
+ * POWIĄZANIA: DemographicsConfig, MarketRegistry, City.
+ * * [EN] METHOD: ProcessMarketAndSatisfaction
+ * LOGIC: Simulates payouts, taxation, and market purchases.
+ * [TO CHANGE]: Pops will no longer be paid from the central treasury. Payouts will be 
+ * tied to workplace profitability on the free market.
+ * DEPENDENCIES: DemographicsConfig, MarketRegistry, City.
+ */
 void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, City &city)
 {
     float totalSalesValue = 0.0f;
@@ -318,7 +356,14 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
     marketSupplies[ResourceType::Gold] += totalSalesValue;
     std::cout << "[EKONOMIA] Zloto zwrocone do skarbca (podatki + sprzedaz + oszczednosci): +" << totalSalesValue << " j." << std::endl;
 }
-
+/*
+ * [PL] METODA: GrowPopulation
+ * LOGIKA: Wprowadza na planszę nowe jednostki z puli urodzeń (imiona przez dasmig::ng).
+ * POWIĄZANIA: GameManager.
+ * [EN] METHOD: GrowPopulation
+ * LOGIC: Spawns new demographic units assigning cultural names via dasmig::ng.
+ * DEPENDENCIES: GameManager.
+ */
 void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw)
 {
     for (int32_t i = 0; i < growthAmount; ++i)
@@ -371,7 +416,12 @@ void PopManager::GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_
         this->AddPop(baby);
     }
 }
-
+/*
+ * [PL] METODA: StarvePopulation
+ * LOGIKA: Realizuje klęskę głodu – usuwa najbiedniejszych.
+ * [EN] METHOD: StarvePopulation
+ * LOGIC: Executes famine – removes the poorest from the population vector.
+ */
 void PopManager::StarvePopulation(int32_t deathAmount)
 {
     if (this->population.empty() || deathAmount <= 0)
@@ -388,7 +438,14 @@ void PopManager::StarvePopulation(int32_t deathAmount)
         this->population.pop_back();
     }
 }
-
+/*
+ * [PL] METODA: UpdateTurn
+ * LOGIKA: Orkiestracja cyklu demograficznego (starzenie, rynek, głód, przyrost).
+ * POWIĄZANIA: Spina działanie PopManager. Zależna od City.
+ * [EN] METHOD: UpdateTurn
+ * LOGIC: Orchestrates the demographic cycle (aging, market, famine, growth).
+ * DEPENDENCIES: Ties the PopManager together. Relies on City.
+ */
 void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city)
 {
     std::cout << "\n=================== RAPORT GOSPODARCZY (Kafel: " << tileID << ") ===================" << std::endl;

@@ -6,6 +6,15 @@
 #include <algorithm>
 #include <iostream>
 #include "PopManager.hpp"
+/*
+ * [PL] METODA: GetRequiredClassAsUint8
+ * LOGIKA: Mapuje typ budynku produkcyjnego na docelową klasę społeczną wymaganą do pracy.
+ * POWIĄZANIA: Industry.hpp (BuildingType), Demographics.hpp (SocialClass).
+ * 
+ * * [EN] METHOD: GetRequiredClassAsUint8
+ * LOGIC: Maps the production building type to the target social class required for employment.
+ * DEPENDENCIES: Industry.hpp (BuildingType), Demographics.hpp (SocialClass).
+ */
 uint8_t Manufacture::GetRequiredClassAsUint8() const
 {
     if (type == BuildingType::Farm)
@@ -14,7 +23,15 @@ uint8_t Manufacture::GetRequiredClassAsUint8() const
         return static_cast<uint8_t>(SocialClass::Specialist);
     return static_cast<uint8_t>(SocialClass::Laborer);
 }
-
+/*
+ * [PL] METODA: ProcessConstructionQueue
+ * LOGIKA: Dekrementuje liczniki tur dla budynków i fizycznie stawia je na planszy.
+ * POWIĄZANIA: Map/Tile.hpp (modyfikuje wektor manufactures docelowego kafelka).
+ * 
+ * * [EN] METHOD: ProcessConstructionQueue
+ * LOGIC: Decrements turn counters for queued buildings and physically spawns/upgrades them.
+ * DEPENDENCIES: Map/Tile.hpp (modifies the 'manufactures' vector of the target tile).
+ */
 void City::ProcessConstructionQueue(std::vector<Tile> &map)
 {
     for (auto it = this->buildQueue.begin(); it != this->buildQueue.end();)
@@ -57,7 +74,15 @@ void City::ProcessConstructionQueue(std::vector<Tile> &map)
         }
     }
 }
-
+/*
+ * [PL] METODA: CollectWorkplacesFromTerritory
+ * LOGIKA: Agreguje manufaktury z terytorium miasta i konwertuje je na listę miejsc pracy.
+ * POWIĄZANIA: Map/Tile.hpp (odczytuje manufactures z kafelków jurysdykcji).
+ * 
+ * * [EN] METHOD: CollectWorkplacesFromTerritory
+ * LOGIC: Aggregates manufactures from the city's territory into a list of available Workplaces.
+ * DEPENDENCIES: Map/Tile.hpp (reads 'manufactures' from jurisdiction tiles).
+ */
 void City::CollectWorkplacesFromTerritory(const std::vector<Tile> &map)
 {
     this->workplaces.clear();
@@ -75,7 +100,19 @@ void City::CollectWorkplacesFromTerritory(const std::vector<Tile> &map)
         }
     }
 }
-
+/*
+ * [PL] METODA: PerformEmploymentRegistry
+ * LOGIKA: Centralny urząd pracy. Przypisuje obywateli do miejsc pracy.
+ * [DO ZMIANY]: Kalkulacja państwowych płac (promisedWages) wyleci – fabryki będą 
+ * płacić z dywidend.
+ * POWIĄZANIA: PopManager (pobiera referencje do obywateli).
+ * 
+ * * [EN] METHOD: PerformEmploymentRegistry
+ * LOGIC: Central employment office. Assigns citizens to available jobs.
+ * [TO CHANGE]: State-funded wage calculation (promisedWages) will be removed. 
+ * Factories will pay from market dividends.
+ * DEPENDENCIES: PopManager (fetches and modifies citizen references).
+ */
 void City::PerformEmploymentRegistry(PopManager &popManager)
 {
     std::vector<Pop>& allPops = popManager.GetPopulationRef();
@@ -184,7 +221,17 @@ void City::PerformEmploymentRegistry(PopManager &popManager)
         }
     }
 }
-
+/*
+ * [PL] METODA: SimulateProduction
+ * LOGIKA: Przetwarza surowce w fabrykach na podstawie wydajności zatrudnionych popów.
+ * [DO ZMIANY]: Będzie obliczać zyski ze sprzedaży by zasilić pulę pensji konkretnego Workplace.
+ * POWIĄZANIA: Map/Tile.hpp, Industry.hpp.
+ * 
+ * * [EN] METHOD: SimulateProduction
+ * LOGIC: Transforms input resources into outputs based on the efficiency of employed pops.
+ * [TO CHANGE]: Will calculate market sales profits to feed the wage pool of a specific Workplace.
+ * DEPENDENCIES: Map/Tile.hpp, Industry.hpp.
+ */
 void City::SimulateProduction(const std::vector<Tile> &map)
 {
     std::cout << "--- BILANS PRODUKCJI MIASTA ---" << std::endl;

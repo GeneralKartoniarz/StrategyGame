@@ -4,6 +4,19 @@
 #include <vector>
 #include <utility>
 
+/*
+ * [PL] STRUKTURA: MarketCommodity / ResourceType / MarketRegistry
+ * LOGIKA: Definiuje typy surowców, ich substytuty na rynku oraz globalne parametry
+ * giełdowe (podaż, popyt, cena). 
+ * [DO ZMIANY]: Za chwilę dodamy tu mechanikę wyliczania zysków ze sprzedaży.
+ * POWIĄZANIA: PopManager (konsumpcja), Empire (aktualizacja cen).
+ * * [EN] STRUCTURE: MarketCommodity / ResourceType / MarketRegistry
+ * LOGIC: Defines resource types, their market substitutes, and global exchange 
+ * parameters (supply, demand, price).
+ * [TO CHANGE]: We will shortly add mechanics for calculating sales profits here.
+ * DEPENDENCIES: PopManager (consumption), Empire (price updates).
+ */
+
 enum class ResourceType : uint8_t
 {
     Grain,

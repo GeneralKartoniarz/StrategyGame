@@ -4,6 +4,17 @@
 #include <optional>
 #include <vector>
 
+/*
+ * [PL] STRUKTURA: Unit / ColonizationComponent / CombatComponent
+ * LOGIKA: Architektura komponentowa dla jednostek. Komponenty logiki osadnictwa 
+ * i walki doczepione do lekkiej struktury trzymanej w wektorze globalnym.
+ * POWIĄZANIA: GameManager, Tile (pozycja).
+ * * [EN] STRUCTURE: Unit / ColonizationComponent / CombatComponent
+ * LOGIC: Component architecture for units. Settlement and combat logic components 
+ * attached to a lightweight structure held in a global vector.
+ * DEPENDENCIES: GameManager, Tile (position).
+ */
+
 class GameManager;
 
 struct ColonizationComponent {

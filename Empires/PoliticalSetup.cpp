@@ -1,6 +1,11 @@
 #include "PoliticalSetup.hpp"
 /*
- * GENERACJA TESTOWEGO PAŃSTWA
+ * [PL] METODA: CreateTestEmpire
+ * LOGIKA: Wstrzykuje na mapę środowisko testowe (państwo + Settler) na suchym lądzie.
+ * POWIĄZANIA: GameManager.
+ * [EN] METHOD: CreateTestEmpire
+ * LOGIC: Injects a test environment (empire + Settler) onto dry land on the map.
+ * DEPENDENCIES: GameManager.
  */
  void PoliticalSetup::CreateTestEmpire(GameManager &gm, const std::vector<Tile> &map)
 {
@@ -42,6 +47,12 @@
     testEmpire.AddUnit(settler.ID);
     gm.AddEmpire(testEmpire);
 }
+/*
+ * [PL] METODA: CreateEmpires
+ * LOGIKA: Przyszła metoda do losowego rozmieszczania "N" imperiów komputerowych.
+ * [EN] METHOD: CreateEmpires
+ * LOGIC: Future automated method for randomly placing 'N' AI empires.
+ */
  void PoliticalSetup::CreateEmpires(GameManager &gm, const std::vector<Tile> &map, int count)
 {
     std::random_device rd;

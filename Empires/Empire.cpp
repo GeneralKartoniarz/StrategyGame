@@ -37,12 +37,22 @@ Empire::Empire(int32_t id, const std::string &name, sf::Color color)
     dasmig::culture wylosowana = allowedCultures[std::rand() % allowedCultures.size()];
     this->cultureRaw = static_cast<uint8_t>(wylosowana);
 }
-
+/*
+ * [PL] METODA: AddCity / RemoveCity
+ * LOGIKA: Zarządza ewidencją miast podległych władcy.
+ * [EN] METHOD: AddCity / RemoveCity
+ * LOGIC: Manages the registry of cities subordinate to the ruler.
+ */
 void Empire::AddCity(int32_t cityID)
 {
     this->controlledCitiesIDs.push_back(cityID);
 }
-
+/*
+ * [PL] METODA: AddCity / RemoveCity
+ * LOGIKA: Zarządza ewidencją miast podległych władcy.
+ * [EN] METHOD: AddCity / RemoveCity
+ * LOGIC: Manages the registry of cities subordinate to the ruler.
+ */
 void Empire::RemoveCity(int32_t cityID)
 {
     auto it = std::remove(this->controlledCitiesIDs.begin(), this->controlledCitiesIDs.end(), cityID);
@@ -51,6 +61,14 @@ void Empire::RemoveCity(int32_t cityID)
         this->controlledCitiesIDs.erase(it, this->controlledCitiesIDs.end());
     }
 }
+/*
+ * [PL] METODA: UpdatePrices
+ * LOGIKA: Makroekonomiczny sterownik wolnego rynku w skali państwa (korekta 5-10%).
+ * [DO ZMIANY]: Złoto musi zostać wykluczone z mechaniki zmian (standard walutowy).
+ * [EN] METHOD: UpdatePrices
+ * LOGIC: Macroeconomic driver of the free market on an empire scale (5-10% adjustment).
+ * [TO CHANGE]: Gold must be excluded from price fluctuation (currency standard).
+ */
 void Empire::UpdatePrices()
 {
     std::cout << "\n[GIELDA] --- Zmiany Cen Rynkowych ---" << std::endl;
@@ -82,6 +100,14 @@ void Empire::UpdatePrices()
         commodity.supplyLastTurn = 0.0f;
     }
 }
+/*
+ * [PL] METODA: UpdateTurn
+ * LOGIKA: Globalna pętla tury imperium. Wywołuje mechaniki dla każdego miasta.
+ * POWIĄZANIA: City, PopManager.
+ * [EN] METHOD: UpdateTurn
+ * LOGIC: Global empire turn loop. Triggers mechanics for each subordinate city.
+ * DEPENDENCIES: City, PopManager.
+ */
 void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, GameManager &gm)
 {
     for (auto &[res, comm] : this->market)

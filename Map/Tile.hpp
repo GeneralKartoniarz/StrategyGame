@@ -61,7 +61,16 @@ struct CellEdge
     sf::Vector2f p2;
     int neighborID;
 };
-
+/*
+ * [PL] STRUKTURA: Tile
+ * LOGIKA: Podstawowa jednostka terytorialna na mapie (prowincja). Przechowuje dane
+ * geograficzne (wielokąty Voronoia), klimatyczne (Terrain) oraz gospodarcze (Manufaktury).
+ * POWIĄZANIA: Industry.hpp (BuildingType, Manufacture), sf::Vector2f z SFML.
+ * * [EN] STRUCTURE: Tile
+ * LOGIC: The basic territorial unit on the map (province). Stores geographical data
+ * (Voronoi polygons), climate data (Terrain), and economic data (Manufactures).
+ * DEPENDENCIES: Industry.hpp (BuildingType, Manufacture), sf::Vector2f from SFML.
+ */
 struct Tile
 {
     std::vector<Manufacture> manufactures;
@@ -76,6 +85,19 @@ struct Tile
     std::vector<sf::Vertex> provinceBorders;
     Terrain terrain;
     std::vector<std::size_t> neighbors;
+
+    /*
+     * [PL] METODA: CanAddManufacture
+     * LOGIKA: Sprawdza, czy na danym kafelku można wybudować nową manufakturę, weryfikując
+     * obostrzenia biomu oraz limity poziomu/ilości budynków (z uwzględnieniem kolejki budowy).
+     * [DO ZMIANY]: W nowym systemie rynkowym limity mogą opierać się na wolnej sile
+     * roboczej i rentowności, a nie wyłącznie na twardych barierach liczbowych z tej funkcji.
+     * * [EN] METHOD: CanAddManufacture
+     * LOGIC: Checks if a new manufacture can be built on the tile, verifying biome
+     * restrictions and building amount/level limits (including the construction queue).
+     * [TO CHANGE]: In the new market system, limits might be based on available
+     * workforce and profitability rather than just hard numerical caps.
+     */
     bool CanAddManufacture(BuildingType newType, const std::vector<ConstructionTask> &cityQueue = {}) const
     {
         if (!BuildingRegistry::IsBiomeAllowed(newType, this->terrain.biome))

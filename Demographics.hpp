@@ -3,6 +3,17 @@
 #include <map>
 #include "Economy.hpp"
 
+/*
+ * [PL] STRUKTURA/ENUM: DemographicsConfig / SocialClass / WealthLevel
+ * LOGIKA: Definiuje drabinkę społeczną, klasy majątkowe oraz bazowe zapotrzebowanie 
+ * kaloryczne i luksusowe dla każdej z warstw.
+ * POWIĄZANIA: Używane bezpośrednio przez PopManager do kalkulacji zadowolenia i awansów.
+ * * [EN] STRUCTURE/ENUM: DemographicsConfig / SocialClass / WealthLevel
+ * LOGIC: Defines the social ladder, wealth classes, and base caloric/luxury needs 
+ * for each stratum.
+ * DEPENDENCIES: Used directly by PopManager to calculate satisfaction and class promotion.
+ */
+
 enum class WealthLevel : uint8_t
 {
     Broke,

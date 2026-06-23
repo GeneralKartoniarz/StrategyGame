@@ -41,6 +41,16 @@ void NameGenerator::ResetMemory()
 {
     generatedNames.clear();
 }
+/*
+ * [PL] METODA: GetRandomName
+ * LOGIKA: Generator nazw geograficznych (np. prowincji, nie popów!). Skleja losowe prefiksy, 
+ * rdzenie i sufiksy, aby stworzyć unikalny klimat mapy. Pilnuje unikalności przez rejestr set.
+ * POWIĄZANIA: Niezależne od NameGeneratora w folderze głównym służącego do ludności (dasmig::ng).
+ * * [EN] METHOD: GetRandomName
+ * LOGIC: Generator for geographical names (e.g., provinces, not pops!). Splices random prefixes, 
+ * cores, and suffixes to create a unique map flavor. Ensures uniqueness via a registry set.
+ * DEPENDENCIES: Independent from the main NameGenerator used for the population (dasmig::ng).
+ */
 std::string NameGenerator::GetRandomName()
 {
     thread_local std::random_device rd;

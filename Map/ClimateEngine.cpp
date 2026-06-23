@@ -26,7 +26,16 @@ ClimateEngine::ClimateEngine(unsigned int globalSeed)
     resourceNoise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     resourceNoise.SetFrequency(0.05f);
 }
-
+/*
+ * [PL] METODA: GetVertexElevation
+ * LOGIKA: Oblicza wysokość n.p.m. dla konkretnego punktu (x, y) za pomocą szumu 
+ * kontynentalnego i detali, uwzględniając spadek (falloff) na krawędziach mapy (kształt wyspy).
+ * POWIĄZANIA: FastNoiseLite.
+ * * [EN] METHOD: GetVertexElevation
+ * LOGIC: Calculates the elevation for a specific (x, y) point using continental 
+ * and detail noise, applying a falloff towards the map edges (island shaping).
+ * DEPENDENCIES: FastNoiseLite.
+ */
 float ClimateEngine::GetVertexElevation(float x, float y, float mapWidth, float mapHeight) const
 {
     sf::Vector2f mapCenter(mapWidth / 2.0f, mapHeight / 2.0f);
@@ -39,7 +48,16 @@ float ClimateEngine::GetVertexElevation(float x, float y, float mapWidth, float 
 
     return continental + (detailElevation * 0.4f) - falloff;
 }
-
+/*
+ * [PL] METODA: ApplyClimate
+ * LOGIKA: Główny motor klimatyczny. Generuje szumy (temperatura, wilgotność),
+ * wyznacza docelowy biom dla każdego kafelka i rozsiewa po nich surowce strategiczne.
+ * POWIĄZANIA: Tile.hpp, NameGenerator (nazywanie prowincji).
+ * * [EN] METHOD: ApplyClimate
+ * LOGIC: The main climate engine. Generates noise (temperature, moisture), 
+ * determines the target biome for each tile, and scatters strategic resources.
+ * DEPENDENCIES: Tile.hpp, NameGenerator (province naming).
+ */
 void ClimateEngine::ApplyClimate(std::vector<Tile> &map, int mapWidth, int mapHeight, const ClimateConfig &config)
 {
     sf::Vector2f mapCenter(mapWidth / 2.0f, mapHeight / 2.0f);
@@ -128,7 +146,40 @@ Moisture ClimateEngine::GetMoisture(float noise, const ClimateConfig &config) co
         return Moisture::Normal;
     return Moisture::Wet;
 }
-
+BiomeFlag ClimateEngine::GetBiomeFlag(BiomeType type) const
+{
+    switch (type)
+    {
+    case BiomeType::Ocean:
+        return BiomeFlag::Ocean;
+    case BiomeType::IceSheet:
+        return BiomeFlag::IceSheet;
+    case BiomeType::Tundra:
+        return BiomeFlag::Tundra;
+    case BiomeType::Taiga:
+        return BiomeFlag::Taiga;
+    case BiomeType::Forest:
+        return BiomeFlag::Forest;
+    case BiomeType::Rainforest:
+        return BiomeFlag::Rainforest;
+    case BiomeType::Plains:
+        return BiomeFlag::Plains;
+    case BiomeType::Desert:
+        return BiomeFlag::Desert;
+    case BiomeType::MountainPeak:
+        return BiomeFlag::MountainPeak;
+    default:
+        return BiomeFlag::None;
+    }
+}
+/*
+ * [PL] METODA: DetermineBiome
+ * LOGIKA: Macierz decyzyjna. Konwertuje kombinację Wysokość + Temperatura + Wilgotność 
+ * na konkretny typ biomu (np. Las, Pustynia, Tundra).
+ * * [EN] METHOD: DetermineBiome
+ * LOGIC: Decision matrix. Converts the combination of Elevation + Temperature + Moisture 
+ * into a specific biome type (e.g., Forest, Desert, Tundra).
+ */
 BiomeType ClimateEngine::DetermineBiome(Elevation elev, Temperature temp, Moisture moist) const
 {
     if (elev == Elevation::Water)
@@ -158,29 +209,3 @@ BiomeType ClimateEngine::DetermineBiome(Elevation elev, Temperature temp, Moistu
     return BiomeType::Plains;
 }
 
-BiomeFlag ClimateEngine::GetBiomeFlag(BiomeType type) const
-{
-    switch (type)
-    {
-    case BiomeType::Ocean:
-        return BiomeFlag::Ocean;
-    case BiomeType::IceSheet:
-        return BiomeFlag::IceSheet;
-    case BiomeType::Tundra:
-        return BiomeFlag::Tundra;
-    case BiomeType::Taiga:
-        return BiomeFlag::Taiga;
-    case BiomeType::Forest:
-        return BiomeFlag::Forest;
-    case BiomeType::Rainforest:
-        return BiomeFlag::Rainforest;
-    case BiomeType::Plains:
-        return BiomeFlag::Plains;
-    case BiomeType::Desert:
-        return BiomeFlag::Desert;
-    case BiomeType::MountainPeak:
-        return BiomeFlag::MountainPeak;
-    default:
-        return BiomeFlag::None;
-    }
-}
