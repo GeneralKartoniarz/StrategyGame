@@ -41,6 +41,7 @@ struct MarketNeed
 class DemographicsConfig
 {
 public:
+    //TODO DO WYJEBANIA
     static float GetIncomeForClass(SocialClass cl)
     {
         switch (cl)

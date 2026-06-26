@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "PopManager.hpp"
 #include "namegen.hpp"
+#include <iostream>
 struct City;
 struct Tile;
 class GameManager;

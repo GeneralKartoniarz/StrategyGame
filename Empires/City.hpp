@@ -11,6 +11,7 @@ class PopManager;
 
 struct Workplace
 {
+    float revenuePool = 0.0f;
     ResourceType producedResource;
     uint8_t requiredClassRaw;
     int32_t maxEmployees;
@@ -22,7 +23,6 @@ struct City
     uint32_t nameID;
     int32_t centerTileID;
     int32_t ownerEmpireID;
-    float promisedWages = 0.0f;
     float childSupportFund = 0.0f;
     std::vector<int32_t> jurisdictionTiles;
     std::vector<Workplace> workplaces;

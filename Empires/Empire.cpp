@@ -36,6 +36,7 @@ Empire::Empire(int32_t id, const std::string &name, sf::Color color)
 
     dasmig::culture wylosowana = allowedCultures[std::rand() % allowedCultures.size()];
     this->cultureRaw = static_cast<uint8_t>(wylosowana);
+    std::cout << "SZUKAJ" << std::to_string(cultureRaw);
 }
 /*
  * [PL] METODA: AddCity / RemoveCity

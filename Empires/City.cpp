@@ -103,123 +103,15 @@ void City::CollectWorkplacesFromTerritory(const std::vector<Tile> &map)
 /*
  * [PL] METODA: PerformEmploymentRegistry
  * LOGIKA: Centralny urząd pracy. Przypisuje obywateli do miejsc pracy.
- * [DO ZMIANY]: Kalkulacja państwowych płac (promisedWages) wyleci – fabryki będą 
- * płacić z dywidend.
  * POWIĄZANIA: PopManager (pobiera referencje do obywateli).
  * 
  * * [EN] METHOD: PerformEmploymentRegistry
  * LOGIC: Central employment office. Assigns citizens to available jobs.
- * [TO CHANGE]: State-funded wage calculation (promisedWages) will be removed. 
- * Factories will pay from market dividends.
  * DEPENDENCIES: PopManager (fetches and modifies citizen references).
  */
 void City::PerformEmploymentRegistry(PopManager &popManager)
 {
-    std::vector<Pop>& allPops = popManager.GetPopulationRef();
-    std::map<uint8_t, std::vector<Pop*>> availableWorkers;
-
-    int32_t childrenCount = 0;
-    int32_t mothersOnLeave = 0;
-
-    for (auto& pop : allPops)
-    {
-        if (std::find(this->jurisdictionTiles.begin(), this->jurisdictionTiles.end(), pop.locationTileID) == this->jurisdictionTiles.end())
-            continue;
-
-        pop.SetEmployed(false);
-
-        if (pop.age < 16)
-        {
-            childrenCount++;
-        }
-    }
-
-    for (auto& pop : allPops)
-    {
-        if (std::find(this->jurisdictionTiles.begin(), this->jurisdictionTiles.end(), pop.locationTileID) == this->jurisdictionTiles.end())
-            continue;
-
-        if (pop.age < 16) 
-            continue;
-
-        if (pop.IsFemale() && mothersOnLeave < childrenCount)
-        {
-            mothersOnLeave++;
-            continue; 
-        }
-
-        availableWorkers[static_cast<uint8_t>(pop.socialClass)].push_back(&pop);
-    }
-
-    for (auto& [classRaw, pool] : availableWorkers)
-    {
-        std::sort(pool.begin(), pool.end(), [](const Pop* a, const Pop* b) {
-            return a->literacy < b->literacy; 
-        });
-    }
-
-    this->promisedWages = 0.0f;
-    float baseWage = 4.0f; 
-
-    for (auto &job : this->workplaces)
-    {
-        job.currentEmployees = 0;
-        int32_t remainingJobs = job.maxEmployees;
-
-        auto assignWorkers = [&](uint8_t classRaw, bool isFallback) {
-            auto& pool = availableWorkers[classRaw];
-            int32_t recruits = 0;
-
-            while (remainingJobs > 0 && !pool.empty())
-            {
-                Pop* p = pool.back();
-                pool.pop_back();
-
-                p->SetEmployed(true);
-
-                float classMult = 1.0f;
-                if (p->socialClass == SocialClass::Bound) classMult = 0.5f;
-                else if (p->socialClass == SocialClass::Specialist) classMult = 3.0f;
-                else if (p->socialClass == SocialClass::Capitalist) classMult = 8.0f;
-                else if (p->socialClass == SocialClass::Elite) classMult = 15.0f;
-
-                this->promisedWages += baseWage * classMult * (1.0f + (p->literacy / 32.0f));
-
-                recruits++;
-                remainingJobs--;
-                job.currentEmployees++;
-            }
-
-            if (isFallback && recruits > 0)
-            {
-                std::cout << "[URZĄD PRACY] Przekwalifikowano " << recruits 
-                          << " popów z klasy " << static_cast<int>(classRaw) 
-                          << " do pracy typu " << MarketRegistry::GetResourceName(job.producedResource) << std::endl;
-            }
-        };
-
-        assignWorkers(job.requiredClassRaw, false);
-
-        if (remainingJobs > 0)
-        {
-            std::vector<uint8_t> backupClasses;
-
-            if (job.requiredClassRaw == static_cast<uint8_t>(SocialClass::Bound))
-            {
-                backupClasses = { static_cast<uint8_t>(SocialClass::Laborer), static_cast<uint8_t>(SocialClass::Specialist) };
-            }
-            else if (job.requiredClassRaw == static_cast<uint8_t>(SocialClass::Laborer))
-            {
-                backupClasses = { static_cast<uint8_t>(SocialClass::Bound), static_cast<uint8_t>(SocialClass::Specialist) };
-            }
-
-            for (uint8_t backupClassRaw : backupClasses)
-            {
-                if (remainingJobs <= 0) break;
-                assignWorkers(backupClassRaw, true);
-            }
-        }
-    }
+    
 }
 /*
  * [PL] METODA: SimulateProduction

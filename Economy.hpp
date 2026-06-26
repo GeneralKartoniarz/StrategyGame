@@ -25,12 +25,18 @@ enum class ResourceType : uint8_t
     Wood,
     Coal,
     IronOre,
+    Iron,
     Gold,
     Fur,
     Cocoa,
     Silk,
     Paper,
-    LuxuryAlcohol 
+    LuxuryAlcohol,
+    Steel,
+    Horses,
+    UraniumOre,
+    Whales,
+    Pearls
 };
 
 enum class NeedCategory : uint8_t
