@@ -61,6 +61,8 @@ add_executable(strategia
     Empires/PoliticalSetup.cpp
 
     # Moduł: Interfejs Użytkownika (UI)
+    UI/AnalyticsPanel.hpp
+    UI/AnalyticsPanel.cpp
     UI/InputController.cpp
     UI/Label.cpp
     UI/Button.hpp

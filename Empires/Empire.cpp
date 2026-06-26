@@ -122,8 +122,8 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
         city.CollectWorkplacesFromTerritory(map);
         city.PerformEmploymentRegistry(this->popManager);
         city.SimulateProduction(map, this->market);
-        //MINTING VALUE
-        float mintingAmount = 150.0f; 
+        // MINTING VALUE
+        float mintingAmount = 150.0f;
         city.money += mintingAmount;
 
         float welfareAllocationRate = 0.15f;
@@ -138,16 +138,17 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
         }
 
         int32_t capitalTileID = city.centerTileID;
-        this->popManager.UpdateTurn(
+        auto [totalPop, avgSat] = this->popManager.UpdateTurn(
             city.warehouse,
             this->market,
             static_cast<uint16_t>(this->empireID),
             0,
             capitalTileID,
             gm,
-            this->cultureRaw, 
-            city, 
+            this->cultureRaw,
+            city,
             averageClassWages);
+        city.RecordTurnStatistics(totalPop, avgSat);
     }
 
     this->UpdatePrices();

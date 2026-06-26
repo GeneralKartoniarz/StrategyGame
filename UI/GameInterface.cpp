@@ -30,9 +30,9 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
     this->sidePanel = std::make_unique<SidePanel>(sf::Vector2f({1650.0f, 20.0f}), sf::Vector2f({250.0f, 260.0f}), this->font);
     this->unitPanel = std::make_unique<UnitPanel>(sf::Vector2f({1650.0f, 300.0f}), sf::Vector2f({250.0f, 130.0f}), this->font);
     this->cityPanel = std::make_unique<CityPanel>(sf::Vector2f({1450.0f, 450.0f}), sf::Vector2f({400.0f, 180.0f}), this->font);
-    
-    this->buildPanel = std::make_unique<BuildPanel>(sf::Vector2f({20.0f, 850.0f}), sf::Vector2f({300.0f, 120.0f}), this->font);
 
+    this->buildPanel = std::make_unique<BuildPanel>(sf::Vector2f({20.0f, 850.0f}), sf::Vector2f({300.0f, 120.0f}), this->font);
+    this->analyticsPanel = std::make_unique<AnalyticsPanel>(sf::Vector2f({20.0f, 580.0f}), sf::Vector2f({400.0f, 250.0f}), this->font);
     BuildPanel::gameManagerContext = &this->gm;
 }
 
@@ -85,11 +85,15 @@ void GameInterface::NextTurn()
 void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked, std::vector<Tile> &map)
 {
     this->nextTurnButton->Update(mousePos, mouseClicked);
-    
+
     if (this->buildPanel)
     {
-        BuildPanel::mapContext = &map; 
+        BuildPanel::mapContext = &map;
         this->buildPanel->Update(mousePos, mouseClicked, this->selectedCityPtr);
+    }
+    if (this->analyticsPanel)
+    {
+        this->analyticsPanel->Update(this->selectedCityPtr);
     }
 }
 
@@ -104,6 +108,8 @@ void GameInterface::Draw(sf::RenderWindow *window)
     this->cityPanel->Draw(window);
     if (this->buildPanel)
         this->buildPanel->Draw(window);
+    if (this->analyticsPanel)
+        this->analyticsPanel->Draw(window);
 }
 
 void GameInterface::UpdateSelection(const Tile *tile)

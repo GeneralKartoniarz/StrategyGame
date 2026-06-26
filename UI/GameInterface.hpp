@@ -9,7 +9,7 @@
 #include "CityPanel.hpp"
 #include <functional>
 #include "Industry.hpp"
-
+#include "AnalyticsPanel.hpp"
 class GameManager;
 struct Tile;
 class BuildPanel;
@@ -53,6 +53,7 @@ private:
     std::unique_ptr<SidePanel> sidePanel;
     std::unique_ptr<UnitPanel> unitPanel;
     std::unique_ptr<CityPanel> cityPanel;
+    std::unique_ptr<AnalyticsPanel> analyticsPanel;
     int turnCount;
     std::unique_ptr<BuildPanel> buildPanel;
     const City *selectedCityPtr = nullptr;

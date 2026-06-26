@@ -94,25 +94,37 @@ void BuildPanel::OnRecruitSettlerClick()
 {
     if (currentCityContext && gameManagerContext && mapContext)
     {
-        int32_t realCityID = -1;
-        const auto &allCities = gameManagerContext->GetAllCities();
+        int32_t cityTileID = currentCityContext->centerTileID;
 
+        int32_t realCityVectorIndex = -1;
+        const auto& allCities = gameManagerContext->GetAllCities();
+        
         for (size_t i = 0; i < allCities.size(); ++i)
         {
-            if (&allCities[i] == currentCityContext)
+            if (allCities[i].centerTileID == cityTileID)
             {
-                realCityID = static_cast<int32_t>(i);
+                realCityVectorIndex = static_cast<int32_t>(i);
                 break;
             }
         }
 
-        if (realCityID != -1)
+        if (realCityVectorIndex != -1)
         {
-            bool success = gameManagerContext->RecruitSettler(realCityID, *mapContext);
-
-            if (!success)
+            if (GameInterface::GetInstance())
             {
-                std::cout << "[UI] Backend odrzucil zadanie werbunku (brak surowcow / zbyt mala populacja)." << std::endl;
+                GameInterface::GetInstance()->UpdateCitySelection(nullptr, "");
+            }
+            currentCityContext = nullptr;
+
+            bool success = gameManagerContext->RecruitSettler(realCityVectorIndex, *mapContext);
+            
+            if (success)
+            {
+                std::cout << "[UI] Sukces: Osadnik sformowany, interfejs miasta zresetowany." << std::endl;
+            }
+            else
+            {
+                std::cout << "[UI] Backend odrzucił werbunek." << std::endl;
             }
         }
     }

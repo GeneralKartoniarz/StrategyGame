@@ -371,7 +371,7 @@ void PopManager::StarvePopulation(int32_t deathAmount)
  * LOGIC: Orchestrates the demographic cycle (aging, market, famine, growth).
  * DEPENDENCIES: Ties the PopManager together. Relies on City.
  */
-void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city, const std::map<SocialClass, float> &averageClassWages)
+std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city, const std::map<SocialClass, float> &averageClassWages)
 {
     std::cout << "\n=================== RAPORT GOSPODARCZY (Kafel: " << tileID << ") ===================" << std::endl;
 
@@ -485,4 +485,6 @@ void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::
     }
     std::cout << "===================================================================\n"
               << std::endl;
+    float totalPeopleCount = static_cast<float>(this->population.size());
+    return {totalPeopleCount, avgSat};
 }

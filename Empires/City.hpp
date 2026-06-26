@@ -17,7 +17,13 @@ struct Workplace
     int32_t maxEmployees;
     int32_t currentEmployees;
 };
-
+struct EconomySample
+{
+    float population = 0.0f;
+    float treasury = 0.0f;
+    float averageSatisfaction = 0.0f;
+    float foodSupply = 0.0f;
+};
 struct City
 {
     uint32_t nameID;
@@ -29,7 +35,9 @@ struct City
     std::vector<Workplace> workplaces;
     std::map<ResourceType, float> warehouse;
     std::vector<ConstructionTask> buildQueue;
-
+    std::vector<EconomySample> economyHistory;
+    constexpr static size_t MAX_HISTORY_SAMPLES = 150;
+    void RecordTurnStatistics(float totalPop, float avgSat);
     void CollectWorkplacesFromTerritory(const std::vector<Tile> &map);
     void PerformEmploymentRegistry(PopManager &popManager);
     void SimulateProduction(const std::vector<Tile> &map, std::map<ResourceType, MarketCommodity> &market);

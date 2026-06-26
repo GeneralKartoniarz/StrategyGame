@@ -95,12 +95,12 @@ void TestState::HandleEvent(const sf::Event &event)
 
                 sf::View worldCamera = this->inputCtrl->GetCamera();
                 bool success = this->gm.TryPlaceBuildingAt(pixelPos, this->gui->buildingUnderCursor, this->map, worldCamera);
-                
+
                 if (success)
                 {
                     this->gui->currentInterfaceState = InterfaceState::Default;
                 }
-                return; 
+                return;
             }
             else if (mouseBtnDown->button == sf::Mouse::Button::Right)
             {
@@ -162,21 +162,6 @@ void TestState::Render(sf::RenderWindow *windowPtr)
         windowPtr->draw(highlightMesh);
     }
 
-    for (const auto &unit : this->gm.GetAllUnits())
-    {
-        sf::CircleShape unitShape(2.0f);
-        unitShape.setOrigin({2.0f, 2.0f});
-        unitShape.setPosition(unit.position);
-
-        if (unit.type == UnitType::Settler)
-        {
-            unitShape.setFillColor(sf::Color::Cyan);
-            unitShape.setOutlineThickness(.5f);
-            unitShape.setOutlineColor(sf::Color::Black);
-        }
-        windowPtr->draw(unitShape);
-    }
-
     this->mapRenderer->DrawBordersAndRivers(windowPtr);
     this->mapRenderer->DrawResources(windowPtr);
     this->mapRenderer->DrawPolitical(windowPtr);
@@ -207,7 +192,20 @@ void TestState::Render(sf::RenderWindow *windowPtr)
             windowPtr->draw(targetMarker);
         }
     }
+    for (const auto &unit : this->gm.GetAllUnits())
+    {
+        sf::CircleShape unitShape(2.0f);
+        unitShape.setOrigin({2.0f, 2.0f});
+        unitShape.setPosition(unit.position);
 
+        if (unit.type == UnitType::Settler)
+        {
+            unitShape.setFillColor(sf::Color::Cyan);
+            unitShape.setOutlineThickness(.5f);
+            unitShape.setOutlineColor(sf::Color::Black);
+        }
+        windowPtr->draw(unitShape);
+    }
     windowPtr->setView(windowPtr->getDefaultView());
     this->inputCtrl->DrawCityPlanningHighlights(this->windowPtr);
     this->gui->Draw(windowPtr);

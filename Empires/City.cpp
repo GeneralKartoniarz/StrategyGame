@@ -10,7 +10,7 @@
  * [PL] METODA: GetRequiredClassAsUint8
  * LOGIKA: Mapuje typ budynku produkcyjnego na docelową klasę społeczną wymaganą do pracy.
  * POWIĄZANIA: Industry.hpp (BuildingType), Demographics.hpp (SocialClass).
- * 
+ *
  * * [EN] METHOD: GetRequiredClassAsUint8
  * LOGIC: Maps the production building type to the target social class required for employment.
  * DEPENDENCIES: Industry.hpp (BuildingType), Demographics.hpp (SocialClass).
@@ -27,7 +27,7 @@ uint8_t Manufacture::GetRequiredClassAsUint8() const
  * [PL] METODA: ProcessConstructionQueue
  * LOGIKA: Dekrementuje liczniki tur dla budynków i fizycznie stawia je na planszy.
  * POWIĄZANIA: Map/Tile.hpp (modyfikuje wektor manufactures docelowego kafelka).
- * 
+ *
  * * [EN] METHOD: ProcessConstructionQueue
  * LOGIC: Decrements turn counters for queued buildings and physically spawns/upgrades them.
  * DEPENDENCIES: Map/Tile.hpp (modifies the 'manufactures' vector of the target tile).
@@ -78,7 +78,7 @@ void City::ProcessConstructionQueue(std::vector<Tile> &map)
  * [PL] METODA: CollectWorkplacesFromTerritory
  * LOGIKA: Agreguje manufaktury z terytorium miasta i konwertuje je na listę miejsc pracy.
  * POWIĄZANIA: Map/Tile.hpp (odczytuje manufactures z kafelków jurysdykcji).
- * 
+ *
  * * [EN] METHOD: CollectWorkplacesFromTerritory
  * LOGIC: Aggregates manufactures from the city's territory into a list of available Workplaces.
  * DEPENDENCIES: Map/Tile.hpp (reads 'manufactures' from jurisdiction tiles).
@@ -104,7 +104,7 @@ void City::CollectWorkplacesFromTerritory(const std::vector<Tile> &map)
  * [PL] METODA: PerformEmploymentRegistry
  * LOGIKA: Centralny urząd pracy. Przypisuje obywateli do miejsc pracy.
  * POWIĄZANIA: PopManager (pobiera referencje do obywateli).
- * 
+ *
  * * [EN] METHOD: PerformEmploymentRegistry
  * LOGIC: Central employment office. Assigns citizens to available jobs.
  * DEPENDENCIES: PopManager (fetches and modifies citizen references).
@@ -116,7 +116,7 @@ void City::PerformEmploymentRegistry(PopManager &popManager)
         job.currentEmployees = 0;
     }
 
-    std::map<SocialClass, std::vector<Pop*>> availableWorkers;
+    std::map<SocialClass, std::vector<Pop *>> availableWorkers;
 
     for (auto &pop : popManager.GetPopulationRef())
     {
@@ -133,10 +133,10 @@ void City::PerformEmploymentRegistry(PopManager &popManager)
     for (auto &job : this->workplaces)
     {
         SocialClass reqClass = static_cast<SocialClass>(job.requiredClassRaw);
-        
+
         while (job.currentEmployees < job.maxEmployees)
         {
-            Pop* hiredWorker = nullptr;
+            Pop *hiredWorker = nullptr;
 
             if (!availableWorkers[reqClass].empty())
             {
@@ -150,7 +150,7 @@ void City::PerformEmploymentRegistry(PopManager &popManager)
             }
             else
             {
-                break; 
+                break;
             }
 
             hiredWorker->SetEmployed(true);
@@ -158,12 +158,26 @@ void City::PerformEmploymentRegistry(PopManager &popManager)
         }
     }
 }
+void City::RecordTurnStatistics(float totalPop, float avgSat)
+{
+    EconomySample sample;
+    sample.population = totalPop;
+    sample.treasury = this->money;
+    sample.averageSatisfaction = avgSat;
+    sample.foodSupply = this->warehouse[ResourceType::Grain] + this->warehouse[ResourceType::Fish];
+
+    if (this->economyHistory.size() >= MAX_HISTORY_SAMPLES)
+    {
+        this->economyHistory.erase(this->economyHistory.begin());
+    }
+    this->economyHistory.push_back(sample);
+}
 /*
  * [PL] METODA: SimulateProduction
  * LOGIKA: Przetwarza surowce w fabrykach na podstawie wydajności zatrudnionych popów.
  * [DO ZMIANY]: Będzie obliczać zyski ze sprzedaży by zasilić pulę pensji konkretnego Workplace.
  * POWIĄZANIA: Map/Tile.hpp, Industry.hpp.
- * 
+ *
  * * [EN] METHOD: SimulateProduction
  * LOGIC: Transforms input resources into outputs based on the efficiency of employed pops.
  * [TO CHANGE]: Will calculate market sales profits to feed the wage pool of a specific Workplace.
@@ -174,16 +188,17 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
     std::cout << "--- BILANS PRODUKCJI MIASTA (KAPITALIZM) ---" << std::endl;
 
     float totalLocalWorkers = 0.0f;
-    for (const auto& job : this->workplaces)
+    for (const auto &job : this->workplaces)
     {
         if (job.producedResource == ResourceType::Grain || job.producedResource == ResourceType::Fish)
         {
             totalLocalWorkers += static_cast<float>(job.currentEmployees);
         }
     }
-    
+
     float grainSafetyBuffer = totalLocalWorkers * 1.5f;
-    if (grainSafetyBuffer <= 0.0f) grainSafetyBuffer = 20.0f;
+    if (grainSafetyBuffer <= 0.0f)
+        grainSafetyBuffer = 20.0f;
 
     float availableGrainForIndustry = std::max(0.0f, this->warehouse[ResourceType::Grain] - grainSafetyBuffer);
 
@@ -195,7 +210,7 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
         {
             if (wpIndex >= this->workplaces.size())
                 break;
-                
+
             Workplace &job = this->workplaces[wpIndex++];
 
             if (job.currentEmployees <= 0)
@@ -245,14 +260,14 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
             if (totalGenerated > 0.0f)
             {
                 this->warehouse[job.producedResource] += totalGenerated;
-                
+
                 float unitPrice = market[job.producedResource].currentPrice;
                 float batchValue = totalGenerated * unitPrice;
-                
+
                 job.revenuePool += batchValue;
 
-                std::cout << " -> [" << BuildingRegistry::GetBuildingName(manufacture.type) 
-                          << "] Wyprodukowano: " << totalGenerated << " szt. Wartość: " 
+                std::cout << " -> [" << BuildingRegistry::GetBuildingName(manufacture.type)
+                          << "] Wyprodukowano: " << totalGenerated << " szt. Wartość: "
                           << batchValue << " (Cena: " << unitPrice << ")" << std::endl;
             }
         }
@@ -268,7 +283,8 @@ std::map<SocialClass, float> City::DistributeWages()
 
     for (auto &job : this->workplaces)
     {
-        if (job.currentEmployees <= 0 || job.revenuePool <= 0.0f) continue;
+        if (job.currentEmployees <= 0 || job.revenuePool <= 0.0f)
+            continue;
 
         float totalTax = job.revenuePool * taxRate;
         float totalMaintenance = job.revenuePool * maintenanceRate;

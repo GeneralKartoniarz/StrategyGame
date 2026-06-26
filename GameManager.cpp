@@ -381,17 +381,18 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
 /*
  * [PL] METODA: RecruitSettler
  * LOGIKA: Weryfikuje zasoby i populację miasta. Jeśli miasto stać na ekspedycję,
- * ściąga 200 zboża z magazynu, błyskawicznie wycina 10 obywateli ze struktury ECS 
+ * ściąga 200 zboża z magazynu, błyskawicznie wycina 10 obywateli ze struktury ECS
  * i spawnuje jednostkę osadnika na kaflu startowym.
  */
-bool GameManager::RecruitSettler(int32_t cityID, const std::vector<Tile>& map)
+bool GameManager::RecruitSettler(int32_t cityID, const std::vector<Tile> &map)
 {
-    if (cityID < 0 || cityID >= this->cities.size()) return false;
+    if (cityID < 0 || cityID >= this->cities.size())
+        return false;
 
-    City& city = this->cities[cityID];
-    Empire& empire = this->empires[city.ownerEmpireID];
-    auto& popManager = empire.GetPopManager();
-    auto& population = popManager.GetPopulationRef();
+    City &city = this->cities[cityID];
+    Empire &empire = this->empires[city.ownerEmpireID];
+    auto &popManager = empire.GetPopManager();
+    auto &population = popManager.GetPopulationRef();
 
     if (city.warehouse[ResourceType::Grain] < 200.0f)
     {
@@ -400,7 +401,7 @@ bool GameManager::RecruitSettler(int32_t cityID, const std::vector<Tile>& map)
     }
 
     int32_t cityPopsCount = 0;
-    for (const auto& pop : population)
+    for (const auto &pop : population)
     {
         if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) != city.jurisdictionTiles.end())
         {
@@ -411,13 +412,13 @@ bool GameManager::RecruitSettler(int32_t cityID, const std::vector<Tile>& map)
     if (cityPopsCount <= 10)
     {
         std::cout << "[KOLONIZACJA] Odrzucono: Zbyt niska populacja do odcięcia 10 popów!" << std::endl;
-        return false; 
+        return false;
     }
 
     city.warehouse[ResourceType::Grain] -= 200.0f;
 
     int32_t popsToRemove = 10;
-    for (size_t i = 0; i < population.size() && popsToRemove > 0; )
+    for (size_t i = 0; i < population.size() && popsToRemove > 0;)
     {
         if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), population[i].locationTileID) != city.jurisdictionTiles.end())
         {
@@ -434,15 +435,15 @@ bool GameManager::RecruitSettler(int32_t cityID, const std::vector<Tile>& map)
     Unit settler;
     settler.type = UnitType::Settler;
     settler.ownerEmpireID = city.ownerEmpireID;
-    
+    settler.colonization = ColonizationComponent();
     settler.position = map[city.centerTileID].position;
-
+    settler.currentNodeID = this->GetNearestNodeID(settler.position);
     this->units.push_back(settler);
     int32_t newUnitID = static_cast<int32_t>(this->units.size() - 1);
     this->units.back().ID = newUnitID;
-    
+
     empire.AddUnit(newUnitID);
-    
+
     std::cout << "[KOLONIZACJA] Sukces: Sformowano ekspedycję na kafelku " << city.centerTileID << "." << std::endl;
     return true;
 }
