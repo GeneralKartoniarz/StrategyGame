@@ -121,7 +121,16 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
         city.ProcessConstructionQueue(map);
         city.CollectWorkplacesFromTerritory(map);
         city.PerformEmploymentRegistry(this->popManager);
-        city.SimulateProduction(map);
+        city.SimulateProduction(map, this->market);
+        //MINTING VALUE
+        float mintingAmount = 150.0f; 
+        city.money += mintingAmount;
+
+        float welfareAllocationRate = 0.15f;
+        city.childSupportFund = city.money * welfareAllocationRate;
+        city.money -= city.childSupportFund;
+
+        std::map<SocialClass, float> averageClassWages = city.DistributeWages();
 
         for (const auto &[res, amount] : city.warehouse)
         {
@@ -136,7 +145,9 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
             0,
             capitalTileID,
             gm,
-            this->cultureRaw, city);
+            this->cultureRaw, 
+            city, 
+            averageClassWages);
     }
 
     this->UpdatePrices();

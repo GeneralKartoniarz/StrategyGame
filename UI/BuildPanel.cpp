@@ -3,12 +3,12 @@
 #include "../GameManager.hpp"
 
 #include <iostream>
-#include <memory> 
+#include <memory>
 #include <string>
 
-const City* BuildPanel::currentCityContext = nullptr;
-GameManager* BuildPanel::gameManagerContext = nullptr;
-
+const City *BuildPanel::currentCityContext = nullptr;
+GameManager *BuildPanel::gameManagerContext = nullptr;
+const std::vector<Tile> *BuildPanel::mapContext = nullptr;
 BuildPanel::BuildPanel(const sf::Vector2f &position, const sf::Vector2f &size, const sf::Font &font)
     : panelFont(font)
 {
@@ -19,33 +19,30 @@ BuildPanel::BuildPanel(const sf::Vector2f &position, const sf::Vector2f &size, c
     this->background.setOutlineColor(sf::Color(180, 160, 110));
 
     this->sectionTitle = std::make_unique<Label>(
-        position + sf::Vector2f(10.0f, 10.0f), 
-        sf::Vector2f(size.x - 20.0f, 25.0f), 
-        font, "PRODUKCJA MIEJSKA", 12
-    );
+        position + sf::Vector2f(10.0f, 10.0f),
+        sf::Vector2f(size.x - 20.0f, 25.0f),
+        font, "PRODUKCJA MIEJSKA", 12);
 
     this->costTrackerLabel = std::make_unique<Label>(
-        position + sf::Vector2f(10.0f, 40.0f), 
-        sf::Vector2f(size.x - 20.0f, 25.0f), 
-        font, "Zasoby: Zboze: 0 | Drewno: 0", 11
-    );
+        position + sf::Vector2f(10.0f, 40.0f),
+        sf::Vector2f(size.x - 20.0f, 25.0f),
+        font, "Zasoby: Zboze: 0 | Drewno: 0", 11);
 
     this->buildButtons.push_back(std::make_unique<Button>(
-        position + sf::Vector2f(10.0f, 75.0f), 
-        sf::Vector2f(130.0f, 35.0f), 
-        font, "FARMA (10 W)", &BuildPanel::OnBuildFarmClick
-    ));
+        position + sf::Vector2f(10.0f, 75.0f),
+        sf::Vector2f(130.0f, 35.0f),
+        font, "FARMA (10 W)", &BuildPanel::OnBuildFarmClick));
 
     this->buildButtons.push_back(std::make_unique<Button>(
-        position + sf::Vector2f(150.0f, 75.0f), 
-        sf::Vector2f(130.0f, 35.0f), 
-        font, "OSADNIK (20 G)", &BuildPanel::OnRecruitSettlerClick
-    ));
+        position + sf::Vector2f(150.0f, 75.0f),
+        sf::Vector2f(130.0f, 35.0f),
+        font, "OSADNIK (200 Z)", &BuildPanel::OnRecruitSettlerClick));
 }
 
 void BuildPanel::Update(const sf::Vector2i &mousePos, bool mouseClicked, const City *activeCity)
 {
-    if (!this->isVisible || !activeCity) return;
+    if (!this->isVisible || !activeCity)
+        return;
 
     std::string info = "Spichlerz -> Zboze: " + std::to_string(static_cast<int>(activeCity->warehouse.at(ResourceType::Grain))) +
                        " | Drewno: " + std::to_string(static_cast<int>(activeCity->warehouse.at(ResourceType::Wood)));
@@ -59,7 +56,8 @@ void BuildPanel::Update(const sf::Vector2i &mousePos, bool mouseClicked, const C
 
 void BuildPanel::Draw(sf::RenderWindow *window)
 {
-    if (!this->isVisible) return;
+    if (!this->isVisible)
+        return;
 
     sf::View oldView = window->getView();
     window->setView(window->getDefaultView());
@@ -87,28 +85,35 @@ void BuildPanel::OnBuildFarmClick()
     {
         GameInterface::GetInstance()->currentInterfaceState = InterfaceState::PlacingBuilding;
         GameInterface::GetInstance()->buildingUnderCursor = BuildingType::Farm;
-        
+
         std::cout << "[INTERFEJS] Wybierz kafelek jurysdykcji dla Farmy..." << std::endl;
     }
 }
 
 void BuildPanel::OnRecruitSettlerClick()
 {
-    if (currentCityContext && gameManagerContext)
+    if (currentCityContext && gameManagerContext && mapContext)
     {
-        int32_t cityID = currentCityContext->centerTileID;
-        City& editableCity = gameManagerContext->GetCity(cityID);
+        int32_t realCityID = -1;
+        const auto &allCities = gameManagerContext->GetAllCities();
 
-        float availableGrain = editableCity.warehouse[ResourceType::Grain];
-
-        if (availableGrain >= 20.0f)
+        for (size_t i = 0; i < allCities.size(); ++i)
         {
-            editableCity.warehouse[ResourceType::Grain] -= 20.0f;
-            std::cout << "[WERBUNEK] Wydano 20 j. zboza na sformowanie grupy osadniczej." << std::endl;
+            if (&allCities[i] == currentCityContext)
+            {
+                realCityID = static_cast<int32_t>(i);
+                break;
+            }
         }
-        else
+
+        if (realCityID != -1)
         {
-            std::cout << "[WERBUNEK] Spichlerze miejskie sa puste. Nie mozna wyslac ekspedycji!" << std::endl;
+            bool success = gameManagerContext->RecruitSettler(realCityID, *mapContext);
+
+            if (!success)
+            {
+                std::cout << "[UI] Backend odrzucil zadanie werbunku (brak surowcow / zbyt mala populacja)." << std::endl;
+            }
         }
     }
 }

@@ -111,7 +111,52 @@ void City::CollectWorkplacesFromTerritory(const std::vector<Tile> &map)
  */
 void City::PerformEmploymentRegistry(PopManager &popManager)
 {
-    
+    for (auto &job : this->workplaces)
+    {
+        job.currentEmployees = 0;
+    }
+
+    std::map<SocialClass, std::vector<Pop*>> availableWorkers;
+
+    for (auto &pop : popManager.GetPopulationRef())
+    {
+        auto it = std::find(this->jurisdictionTiles.begin(), this->jurisdictionTiles.end(), pop.locationTileID);
+        if (it != this->jurisdictionTiles.end())
+        {
+            if (pop.age >= 16 && !pop.IsFemale())
+            {
+                pop.SetEmployed(false);
+                availableWorkers[pop.socialClass].push_back(&pop);
+            }
+        }
+    }
+    for (auto &job : this->workplaces)
+    {
+        SocialClass reqClass = static_cast<SocialClass>(job.requiredClassRaw);
+        
+        while (job.currentEmployees < job.maxEmployees)
+        {
+            Pop* hiredWorker = nullptr;
+
+            if (!availableWorkers[reqClass].empty())
+            {
+                hiredWorker = availableWorkers[reqClass].back();
+                availableWorkers[reqClass].pop_back();
+            }
+            else if (reqClass == SocialClass::Bound && !availableWorkers[SocialClass::Laborer].empty())
+            {
+                hiredWorker = availableWorkers[SocialClass::Laborer].back();
+                availableWorkers[SocialClass::Laborer].pop_back();
+            }
+            else
+            {
+                break; 
+            }
+
+            hiredWorker->SetEmployed(true);
+            job.currentEmployees++;
+        }
+    }
 }
 /*
  * [PL] METODA: SimulateProduction
@@ -124,28 +169,23 @@ void City::PerformEmploymentRegistry(PopManager &popManager)
  * [TO CHANGE]: Will calculate market sales profits to feed the wage pool of a specific Workplace.
  * DEPENDENCIES: Map/Tile.hpp, Industry.hpp.
  */
-void City::SimulateProduction(const std::vector<Tile> &map)
+void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceType, MarketCommodity> &market)
 {
-    std::cout << "--- BILANS PRODUKCJI MIASTA ---" << std::endl;
+    std::cout << "--- BILANS PRODUKCJI MIASTA (KAPITALIZM) ---" << std::endl;
 
-    float requiredGrainForPops = 0.0f;
-    int32_t totalLocalWorkers = 0;
+    float totalLocalWorkers = 0.0f;
     for (const auto& job : this->workplaces)
     {
         if (job.producedResource == ResourceType::Grain || job.producedResource == ResourceType::Fish)
         {
-            totalLocalWorkers += job.currentEmployees;
+            totalLocalWorkers += static_cast<float>(job.currentEmployees);
         }
     }
-    float grainSafetyBuffer = static_cast<float>(totalLocalWorkers) * 1.5f;
+    
+    float grainSafetyBuffer = totalLocalWorkers * 1.5f;
     if (grainSafetyBuffer <= 0.0f) grainSafetyBuffer = 20.0f;
 
     float availableGrainForIndustry = std::max(0.0f, this->warehouse[ResourceType::Grain] - grainSafetyBuffer);
-    
-    std::cout << "[BEZPIECZNIK] Łącznie zboża w magazynie: " << this->warehouse[ResourceType::Grain] << " j." << std::endl;
-    std::cout << "[BEZPIECZNIK] Zablokowano do spichlerza (rezerwa głodowa): " << grainSafetyBuffer << " j." << std::endl;
-    std::cout << "[BEZPIECZNIK] Wolne zboże przekazane dla przemysłu: " << availableGrainForIndustry << " j." << std::endl;
-
 
     size_t wpIndex = 0;
     for (int32_t tileID : this->jurisdictionTiles)
@@ -155,6 +195,7 @@ void City::SimulateProduction(const std::vector<Tile> &map)
         {
             if (wpIndex >= this->workplaces.size())
                 break;
+                
             Workplace &job = this->workplaces[wpIndex++];
 
             if (job.currentEmployees <= 0)
@@ -164,18 +205,16 @@ void City::SimulateProduction(const std::vector<Tile> &map)
             float inputAmountPerWorker;
             manufacture.GetInputRequirements(inputType, inputAmountPerWorker);
 
+            float totalGenerated = 0.0f;
+
             if (inputAmountPerWorker == 0.0f)
             {
-                float baseOutput = static_cast<float>(job.currentEmployees) * 2.0f;
+                totalGenerated = static_cast<float>(job.currentEmployees) * 5.0f;
 
                 if (manufacture.type == BuildingType::Farm && tile.terrain.resourceName == "Żyzna Gleba")
                 {
-                    baseOutput *= 2.0f;
+                    totalGenerated *= 2.0f;
                 }
-
-                this->warehouse[job.producedResource] += baseOutput;
-                std::cout << " -> [" << tile.terrain.resourceName << "] Wyprodukowano: " << baseOutput
-                          << " szt. " << MarketRegistry::GetResourceName(job.producedResource) << std::endl;
             }
             else
             {
@@ -200,14 +239,59 @@ void City::SimulateProduction(const std::vector<Tile> &map)
                     availableGrainForIndustry -= requiredInput;
                 }
 
-                float totalGenerated = static_cast<float>(job.currentEmployees) * 0.5f * efficiency;
-                this->warehouse[job.producedResource] += totalGenerated;
+                totalGenerated = static_cast<float>(job.currentEmployees) * 0.5f * efficiency;
+            }
 
-                std::cout << " -> Przetworzono " << requiredInput << " szt. "
-                          << MarketRegistry::GetResourceName(inputType) << " na " << totalGenerated
-                          << " szt. " << MarketRegistry::GetResourceName(job.producedResource) 
-                          << " (Wydajność: " << static_cast<int>(efficiency * 100.0f) << "%)" << std::endl;
+            if (totalGenerated > 0.0f)
+            {
+                this->warehouse[job.producedResource] += totalGenerated;
+                
+                float unitPrice = market[job.producedResource].currentPrice;
+                float batchValue = totalGenerated * unitPrice;
+                
+                job.revenuePool += batchValue;
+
+                std::cout << " -> [" << BuildingRegistry::GetBuildingName(manufacture.type) 
+                          << "] Wyprodukowano: " << totalGenerated << " szt. Wartość: " 
+                          << batchValue << " (Cena: " << unitPrice << ")" << std::endl;
             }
         }
     }
+}
+std::map<SocialClass, float> City::DistributeWages()
+{
+    constexpr float taxRate = 0.15f;
+    constexpr float maintenanceRate = 0.10f;
+
+    std::map<SocialClass, float> accumulatedWagePools;
+    std::map<SocialClass, int32_t> totalWorkersPerClass;
+
+    for (auto &job : this->workplaces)
+    {
+        if (job.currentEmployees <= 0 || job.revenuePool <= 0.0f) continue;
+
+        float totalTax = job.revenuePool * taxRate;
+        float totalMaintenance = job.revenuePool * maintenanceRate;
+        float netWagePool = job.revenuePool - totalTax - totalMaintenance;
+
+        this->money += totalTax;
+
+        SocialClass workerClass = static_cast<SocialClass>(job.requiredClassRaw);
+        accumulatedWagePools[workerClass] += netWagePool;
+        totalWorkersPerClass[workerClass] += job.currentEmployees;
+
+        job.revenuePool = 0.0f;
+    }
+
+    std::map<SocialClass, float> averageClassWages;
+    for (const auto &[sClass, pool] : accumulatedWagePools)
+    {
+        int32_t workers = totalWorkersPerClass[sClass];
+        if (workers > 0)
+        {
+            averageClassWages[sClass] = pool / static_cast<float>(workers);
+        }
+    }
+
+    return averageClassWages;
 }

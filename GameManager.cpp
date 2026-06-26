@@ -10,11 +10,11 @@
 
 /*
  * [PL] KLASA: GameManager
- * LOGIKA: Główny reżyser rozgrywki. Przechowuje globalne wektory Imperiów, Miast i Jednostek. 
+ * LOGIKA: Główny reżyser rozgrywki. Przechowuje globalne wektory Imperiów, Miast i Jednostek.
  * Obsługuje tury, przenoszenie jednostek (Pathfinding) i transformację osadników w miasta.
  * POWIĄZANIA: Spina wszystko. Zależny od MapGenerator, PathFinder i PopManager.
  * * [EN] CLASS: GameManager
- * LOGIC: The main gameplay director. Stores global vectors of Empires, Cities, and Units. 
+ * LOGIC: The main gameplay director. Stores global vectors of Empires, Cities, and Units.
  * Handles turns, unit movement (Pathfinding), and transforming settlers into cities.
  * DEPENDENCIES: Ties everything together. Relies on MapGenerator, PathFinder, and PopManager.
  */
@@ -35,14 +35,14 @@ void GameManager::AddEmpire(const Empire &empire)
 }
 void GameManager::InitializeNameGenerator()
 {
- std::filesystem::path resPath = std::filesystem::current_path() / "resources" / "full";
-    
+    std::filesystem::path resPath = std::filesystem::current_path() / "resources" / "full";
+
     std::cout << "[DEBUG] Szukam bazy w: " << resPath.string() << std::endl;
 
     if (std::filesystem::exists(resPath))
     {
         this->nameGenerator.load(resPath);
-        
+
         if (this->nameGenerator.has_resources())
             std::cout << "[INFO] Sukces! Baza załadowana." << std::endl;
         else
@@ -53,7 +53,7 @@ void GameManager::InitializeNameGenerator()
         std::cout << "[ERROR] Folder nie istnieje w: " << resPath.string() << std::endl;
     }
 }
-uint32_t GameManager::RegisterPopName(const std::wstring& name)
+uint32_t GameManager::RegisterPopName(const std::wstring &name)
 {
     this->registeredPopNames.push_back(name);
     return static_cast<uint32_t>(this->registeredPopNames.size() - 1);
@@ -61,7 +61,8 @@ uint32_t GameManager::RegisterPopName(const std::wstring& name)
 
 std::wstring GameManager::GetPopName(uint32_t id) const
 {
-    if (id < this->registeredPopNames.size()) return this->registeredPopNames[id];
+    if (id < this->registeredPopNames.size())
+        return this->registeredPopNames[id];
     return L"Anonim";
 }
 City &GameManager::GetCity(int32_t centerTileID)
@@ -164,11 +165,11 @@ bool BuildingRegistry::IsBiomeAllowed(BuildingType bType, BiomeType biome)
 {
     if (bType == BuildingType::Farm)
     {
-        return biome != BiomeType::Ocean && 
-               biome != BiomeType::IceSheet && 
+        return biome != BiomeType::Ocean &&
+               biome != BiomeType::IceSheet &&
                biome != BiomeType::MountainPeak;
     }
-    
+
     // if (bType == BuildingType::Fishery) return biome == BiomeType::Ocean;
 
     return true;
@@ -178,9 +179,11 @@ std::string BuildingRegistry::GetBuildingName(BuildingType bType)
 {
     switch (bType)
     {
-        case BuildingType::Farm: return "Farma";
-        // case BuildingType::Fishery: return "Przystan Rybacka";
-        default: return "Nieznany Obiekt";
+    case BuildingType::Farm:
+        return "Farma";
+    // case BuildingType::Fishery: return "Przystan Rybacka";
+    default:
+        return "Nieznany Obiekt";
     }
 }
 int32_t GameManager::GetNearestNodeID(sf::Vector2f worldPos) const
@@ -299,9 +302,7 @@ bool GameManager::CanFoundCity(int32_t tileID, const std::vector<Tile> &map) con
 void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_t nameID, const std::vector<Tile> &map)
 {
     if (!this->CanFoundCity(tileID, map))
-    {
         return;
-    }
 
     Unit &settler = this->units[unitID];
     int32_t empireID = settler.ownerEmpireID;
@@ -315,7 +316,9 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     newCity.warehouse[ResourceType::Grain] = 300.0f;
     newCity.warehouse[ResourceType::Fish] = 200.0f;
     newCity.warehouse[ResourceType::Wood] = 150.0f;
-    newCity.warehouse[ResourceType::Gold] = 800.0f;
+    newCity.warehouse[ResourceType::Gold] = 0.0f;
+    newCity.money = 800.0f;
+
     for (std::size_t nIdx : map[tileID].neighbors)
     {
         newCity.jurisdictionTiles.push_back(static_cast<int32_t>(nIdx));
@@ -366,7 +369,6 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     }
 
     this->cities.push_back(newCity);
-
     int32_t newCityID = static_cast<int32_t>(this->cities.size() - 1);
     this->empires[empireID].AddCity(newCityID);
 
@@ -376,7 +378,74 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
         this->units[i].ID = static_cast<int32_t>(i);
     }
 }
+/*
+ * [PL] METODA: RecruitSettler
+ * LOGIKA: Weryfikuje zasoby i populację miasta. Jeśli miasto stać na ekspedycję,
+ * ściąga 200 zboża z magazynu, błyskawicznie wycina 10 obywateli ze struktury ECS 
+ * i spawnuje jednostkę osadnika na kaflu startowym.
+ */
+bool GameManager::RecruitSettler(int32_t cityID, const std::vector<Tile>& map)
+{
+    if (cityID < 0 || cityID >= this->cities.size()) return false;
 
+    City& city = this->cities[cityID];
+    Empire& empire = this->empires[city.ownerEmpireID];
+    auto& popManager = empire.GetPopManager();
+    auto& population = popManager.GetPopulationRef();
+
+    if (city.warehouse[ResourceType::Grain] < 200.0f)
+    {
+        std::cout << "[KOLONIZACJA] Odrzucono: Za mało zboża w magazynie!" << std::endl;
+        return false;
+    }
+
+    int32_t cityPopsCount = 0;
+    for (const auto& pop : population)
+    {
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) != city.jurisdictionTiles.end())
+        {
+            cityPopsCount++;
+        }
+    }
+
+    if (cityPopsCount <= 10)
+    {
+        std::cout << "[KOLONIZACJA] Odrzucono: Zbyt niska populacja do odcięcia 10 popów!" << std::endl;
+        return false; 
+    }
+
+    city.warehouse[ResourceType::Grain] -= 200.0f;
+
+    int32_t popsToRemove = 10;
+    for (size_t i = 0; i < population.size() && popsToRemove > 0; )
+    {
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), population[i].locationTileID) != city.jurisdictionTiles.end())
+        {
+            population[i] = population.back();
+            population.pop_back();
+            popsToRemove--;
+        }
+        else
+        {
+            i++;
+        }
+    }
+
+    Unit settler;
+    settler.type = UnitType::Settler;
+    settler.ownerEmpireID = city.ownerEmpireID;
+    
+    settler.position = map[city.centerTileID].position;
+
+    this->units.push_back(settler);
+    int32_t newUnitID = static_cast<int32_t>(this->units.size() - 1);
+    this->units.back().ID = newUnitID;
+    
+    empire.AddUnit(newUnitID);
+    
+    std::cout << "[KOLONIZACJA] Sukces: Sformowano ekspedycję na kafelku " << city.centerTileID << "." << std::endl;
+    return true;
+}
 uint32_t GameManager::RegisterCityName(const std::string &name)
 {
     uint32_t assignedID = this->nextCityNameID++;

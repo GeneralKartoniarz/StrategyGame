@@ -5,11 +5,11 @@
 
 /*
  * [PL] STRUKTURA/ENUM: DemographicsConfig / SocialClass / WealthLevel
- * LOGIKA: Definiuje drabinkę społeczną, klasy majątkowe oraz bazowe zapotrzebowanie 
+ * LOGIKA: Definiuje drabinkę społeczną, klasy majątkowe oraz bazowe zapotrzebowanie
  * kaloryczne i luksusowe dla każdej z warstw.
  * POWIĄZANIA: Używane bezpośrednio przez PopManager do kalkulacji zadowolenia i awansów.
  * * [EN] STRUCTURE/ENUM: DemographicsConfig / SocialClass / WealthLevel
- * LOGIC: Defines the social ladder, wealth classes, and base caloric/luxury needs 
+ * LOGIC: Defines the social ladder, wealth classes, and base caloric/luxury needs
  * for each stratum.
  * DEPENDENCIES: Used directly by PopManager to calculate satisfaction and class promotion.
  */
@@ -41,7 +41,7 @@ struct MarketNeed
 class DemographicsConfig
 {
 public:
-    //TODO DO WYJEBANIA
+    // TODO DO WYJEBANIA
     static float GetIncomeForClass(SocialClass cl)
     {
         switch (cl)
@@ -59,12 +59,12 @@ public:
         }
         return 1.0f;
     }
-    static std::map<NeedCategory, MarketNeed> GetNeedsForClass(SocialClass cl)
+    static std::map<NeedCategory, MarketNeed> GetNeedsForClass(SocialClass cl, WealthLevel wealth)
     {
         std::map<NeedCategory, MarketNeed> needs;
+
         switch (cl)
         {
-        // TODO POPY MAJĄ WYMAGANIA INACZEJ SO WKURWIONE
         case SocialClass::Bound:
             needs[NeedCategory::Calories] = {1.0f, true};
             needs[NeedCategory::Protection] = {0.5f, false};
@@ -94,6 +94,36 @@ public:
             needs[NeedCategory::StatusGoods] = {2.0f, false};
             break;
         }
+
+        float lifestyleMultiplier = 1.0f;
+        switch (wealth)
+        {
+        case WealthLevel::Broke:
+            lifestyleMultiplier = 0.3f;
+            break;
+        case WealthLevel::Poor:
+            lifestyleMultiplier = 0.7f;
+            break;
+        case WealthLevel::Middle:
+            lifestyleMultiplier = 1.0f;
+            break;
+        case WealthLevel::Rich:
+            lifestyleMultiplier = 2.0f;
+            break;
+        case WealthLevel::FilthyRich:
+            lifestyleMultiplier = 4.0f;
+            break;
+        }
+
+        // [ZMIANA] Aplikujemy mnożnik bogactwa tylko do dóbr niefizjologicznych
+        for (auto &[cat, need] : needs)
+        {
+            if (cat != NeedCategory::Calories)
+            {
+                need.baseDemandPerCapita *= lifestyleMultiplier;
+            }
+        }
+
         return needs;
     }
 };

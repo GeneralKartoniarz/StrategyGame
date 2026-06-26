@@ -21,7 +21,8 @@ private:
     std::unique_ptr<Label> cityNameLabel;
     std::unique_ptr<Label> ownerLabel;
     std::unique_ptr<Label> tilesCountLabel;
-
+    std::unique_ptr<Label> treasuryLabel;
+    std::unique_ptr<Label> unemploymentLabel;
     std::unique_ptr<Label> totalPopLabel;
     std::unique_ptr<Label> satisfactionLabel;
     std::unique_ptr<Label> ClassDistributionLabel;

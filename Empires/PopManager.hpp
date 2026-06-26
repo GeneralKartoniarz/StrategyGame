@@ -21,8 +21,10 @@ public:
     size_t GetTotalPopulation() const { return population.size(); }
     int32_t GetGroupCount(SocialClass targetClass) const;
 
-    void ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, City &city);
-    void UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city);
+    void ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, City &city, const std::map<SocialClass, float> &averageClassWages);
+
+    void UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city, const std::map<SocialClass, float> &averageClassWages);
+
     void GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw);
     float GetAverageSatisfaction(const std::vector<const Pop *> &subGroup) const;
 

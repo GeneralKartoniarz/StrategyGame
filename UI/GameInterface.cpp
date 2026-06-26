@@ -88,6 +88,7 @@ void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseCli
     
     if (this->buildPanel)
     {
+        BuildPanel::mapContext = &map; 
         this->buildPanel->Update(mousePos, mouseClicked, this->selectedCityPtr);
     }
 }

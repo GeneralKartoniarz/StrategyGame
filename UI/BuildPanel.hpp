@@ -24,6 +24,7 @@ public:
     static void OnBuildFarmClick();
     static void OnRecruitSettlerClick();
     static const City *currentCityContext;
+    static const std::vector<Tile> *mapContext;
 
 private:
     sf::RectangleShape background;
@@ -36,7 +37,6 @@ private:
     std::vector<std::unique_ptr<Button>> buildButtons;
 
     static GameManager *gameManagerContext;
-
     friend class GameInterface;
     friend class GameManager;
     friend class InputController;

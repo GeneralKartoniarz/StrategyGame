@@ -71,7 +71,7 @@ int32_t PopManager::CalculateGrowthPotential() const
         {
             // TODO SCALE THIS SHIT OUT
             float satisfactionRatio = static_cast<float>(pop.satisfaction) / 255.0f;
-            float currentBirthChance = 0.40f + (satisfactionRatio * 0.08f);
+            float currentBirthChance = 0.06f + (satisfactionRatio * 0.08f);
 
             float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
             if (roll < currentBirthChance)
@@ -114,61 +114,22 @@ void PopManager::ProgressAgeAndMortality()
 }
 /*
  * [PL] METODA: ProcessMarketAndSatisfaction
- * LOGIKA: Symuluje wypłaty, opodatkowanie i zakupy.
- * [DO ZMIANY]: Popy przestaną być opłacane z centralnego skarbca. Wypłaty zostaną powiązane 
- * z rentownością miejsc pracy na wolnym rynku.
- * POWIĄZANIA: DemographicsConfig, MarketRegistry, City.
- * * [EN] METHOD: ProcessMarketAndSatisfaction
- * LOGIC: Simulates payouts, taxation, and market purchases.
- * [TO CHANGE]: Pops will no longer be paid from the central treasury. Payouts will be 
- * tied to workplace profitability on the free market.
- * DEPENDENCIES: DemographicsConfig, MarketRegistry, City.
+ * LOGIKA: Przetwarza fazę konsumpcji na podstawie rynkowych zarobków (averageClassWages).
+ * Pop szuka substytutów na giełdzie, zdejmuje towar z magazynu miasta i zostawia tam pieniądz.
+ * Jeśli pop jest bezrobotny (lub to dziecko/kobieta), utrzymuje się z UBI (childSupportFund) opłacanego z podatków firm.
+ * Satysfakcja i flagi głodu opierają się na faktycznych 16-bajtowych propercjach struktury Pop.
+ * POWIĄZANIA: Demographics.hpp (GetNeedsForClass z dodanym wymogiem WealthLevel).
  */
-void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, City &city)
+void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, City &city, const std::map<SocialClass, float> &averageClassWages)
 {
     float totalSalesValue = 0.0f;
-    float baseWage = 4.0f;
-    float realPromisedWages = 0.0f;
-    for (const auto &pop : this->population)
-    {
-        if (pop.IsEmployed())
-        {
-            float classMult = 1.0f;
-            if (pop.socialClass == SocialClass::Bound)
-                classMult = 0.5f;
-            else if (pop.socialClass == SocialClass::Specialist)
-                classMult = 3.0f;
-            else if (pop.socialClass == SocialClass::Capitalist)
-                classMult = 8.0f;
-            else if (pop.socialClass == SocialClass::Elite)
-                classMult = 15.0f;
-
-            realPromisedWages += baseWage * classMult * (1.0f + (pop.literacy / 32.0f));
-        }
-    }
-
-    float availableGold = city.warehouse[ResourceType::Gold];
-    float payoutRatio = 1.0f;
-
-    if (realPromisedWages > 0.0f && realPromisedWages > availableGold)
-    {
-        payoutRatio = availableGold / realPromisedWages;
-        std::cout << "[KRYZYS] Skarbiec swieci pustkami! Pensje zostana obciete do " << (payoutRatio * 100.0f) << "%" << std::endl;
-    }
-
-    float actualWagesPaid = realPromisedWages * payoutRatio;
-    city.warehouse[ResourceType::Gold] -= actualWagesPaid;
-
-    float welfareTaxRate = 0.05f;
-    float welfarePool = actualWagesPaid * welfareTaxRate;
-    city.childSupportFund += welfarePool;
 
     int32_t welfareRecipients = 0;
     for (const auto &pop : this->population)
     {
         if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) != city.jurisdictionTiles.end())
         {
-            if (!pop.IsEmployed() && (pop.age < 16 || pop.IsFemale()))
+            if (!pop.IsEmployed())
             {
                 welfareRecipients++;
             }
@@ -176,7 +137,6 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
     }
 
     float welfarePerCapita = welfareRecipients > 0 ? (city.childSupportFund / welfareRecipients) : 0.0f;
-
     if (welfareRecipients > 0)
     {
         city.childSupportFund = 0.0f;
@@ -189,54 +149,28 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
 
     for (auto &pop : this->population)
     {
-        auto personalNeeds = DemographicsConfig::GetNeedsForClass(pop.socialClass);
-        float totalSatisfactionImpact = 0.0f;
-        int32_t activeNeedsCount = 0;
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) == city.jurisdictionTiles.end())
+        {
+            continue;
+        }
 
         float popBudget = 0.0f;
 
         if (pop.IsEmployed())
         {
-            float classMult = 1.0f;
-            if (pop.socialClass == SocialClass::Bound)
-                classMult = 0.5f;
-            else if (pop.socialClass == SocialClass::Specialist)
-                classMult = 3.0f;
-            else if (pop.socialClass == SocialClass::Capitalist)
-                classMult = 8.0f;
-            else if (pop.socialClass == SocialClass::Elite)
-                classMult = 15.0f;
-
-            float expectedWage = baseWage * classMult * (1.0f + (pop.literacy / 32.0f));
-            popBudget = (expectedWage * payoutRatio) * (1.0f - welfareTaxRate);
+            if (averageClassWages.count(pop.socialClass))
+            {
+                popBudget = averageClassWages.at(pop.socialClass);
+            }
         }
-        else if (pop.age < 16 || pop.IsFemale())
+        else
         {
             popBudget = welfarePerCapita;
         }
 
-        float lifestyleTax = 0.0f;
-        switch (pop.wealth)
-        {
-        case WealthLevel::Broke:
-            lifestyleTax = 0.0f;
-            break;
-        case WealthLevel::Poor:
-            lifestyleTax = popBudget * 0.05f;
-            break;
-        case WealthLevel::Middle:
-            lifestyleTax = popBudget * 0.15f;
-            break;
-        case WealthLevel::Rich:
-            lifestyleTax = popBudget * 0.30f;
-            break;
-        case WealthLevel::FilthyRich:
-            lifestyleTax = popBudget * 0.50f;
-            break;
-        }
-
-        popBudget -= lifestyleTax;
-        totalSalesValue += lifestyleTax;
+        auto personalNeeds = DemographicsConfig::GetNeedsForClass(pop.socialClass, pop.wealth);
+        float totalSatisfactionImpact = 0.0f;
+        int32_t activeNeedsCount = 0;
 
         for (auto const &[category, marketNeed] : personalNeeds)
         {
@@ -267,7 +201,6 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
                     price = 0.01f;
 
                 float neededAmount = (targetDemand - satisfiedDemand) / efficiency;
-
                 market[resource].demandLastTurn += neededAmount;
 
                 float availableInWarehouse = (marketSupplies.count(resource)) ? marketSupplies[resource] : 0.0f;
@@ -285,34 +218,32 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
                 }
             }
 
-            
-            if (satisfiedDemand >= targetDemand)
+            if (satisfiedDemand + 0.01f >= targetDemand)
             {
                 totalSatisfactionImpact += marketNeed.isCritical ? 6.0f : 12.0f;
-                
                 if (category == NeedCategory::Calories && pop.HasStarvingWarning())
                 {
-                    pop.SetStarvingWarning(false); 
+                    pop.SetStarvingWarning(false);
                 }
             }
             else
             {
                 if (category == NeedCategory::Calories)
                 {
-                    if (satisfiedDemand >= targetDemand * 0.5f) 
+                    if (satisfiedDemand + 0.01f >= targetDemand * 0.5f)
                     {
-                         totalSatisfactionImpact -= 5.0f; 
-                    } 
-                    else 
+                        totalSatisfactionImpact -= 5.0f;
+                    }
+                    else
                     {
-                        if (!pop.HasStarvingWarning()) 
+                        if (!pop.HasStarvingWarning())
                         {
                             pop.SetStarvingWarning(true);
                             totalSatisfactionImpact -= 30.0f;
                         }
-                        else 
+                        else
                         {
-                            totalSatisfactionImpact -= 100.0f; 
+                            totalSatisfactionImpact -= 100.0f;
                         }
                     }
                 }
@@ -346,15 +277,9 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
                 pop.wealth = static_cast<WealthLevel>(static_cast<uint8_t>(pop.wealth) - 1);
             }
         }
-
-        if (popBudget > 0.0f)
-        {
-            totalSalesValue += popBudget;
-        }
     }
 
-    marketSupplies[ResourceType::Gold] += totalSalesValue;
-    std::cout << "[EKONOMIA] Zloto zwrocone do skarbca (podatki + sprzedaz + oszczednosci): +" << totalSalesValue << " j." << std::endl;
+    city.money += totalSalesValue;
 }
 /*
  * [PL] METODA: GrowPopulation
@@ -446,7 +371,7 @@ void PopManager::StarvePopulation(int32_t deathAmount)
  * LOGIC: Orchestrates the demographic cycle (aging, market, famine, growth).
  * DEPENDENCIES: Ties the PopManager together. Relies on City.
  */
-void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city)
+void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city, const std::map<SocialClass, float> &averageClassWages)
 {
     std::cout << "\n=================== RAPORT GOSPODARCZY (Kafel: " << tileID << ") ===================" << std::endl;
 
@@ -464,8 +389,7 @@ void PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::
     float grainBefore = marketSupplies[ResourceType::Grain];
     float fishBefore = marketSupplies[ResourceType::Fish];
 
-    this->ProcessMarketAndSatisfaction(marketSupplies, market, city);
-
+    this->ProcessMarketAndSatisfaction(marketSupplies, market, city, averageClassWages);
     float grainConsumed = grainBefore - marketSupplies[ResourceType::Grain];
     float fishConsumed = fishBefore - marketSupplies[ResourceType::Fish];
 

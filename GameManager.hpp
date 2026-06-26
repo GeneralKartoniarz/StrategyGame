@@ -38,6 +38,7 @@ public:
     NavigationGraph &GetNavGraph() { return navGraph; }
 
     Unit &GetUnit(int32_t id);
+    bool RecruitSettler(int32_t cityID, const std::vector<Tile>& map);
 
     void UpdateUnits(float dt);
     void ResetMovementPoints();
