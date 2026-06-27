@@ -126,9 +126,12 @@ bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType 
             std::cout << "[PLAC BUDOWY] Blad! Przekroczono limit struktur lub poziom!" << std::endl;
             return false;
         }
-
-        float cost = (type == BuildingType::Farm) ? 10.0f : 20.0f;
-        cost = (type == BuildingType::SawMill) ? 10.0f : 20.0f;
+        //RODO CZASEM SOBIE WYMRZE POPULACJA TRZEBA ZNALEŹĆ NARZĘDZIE DO TESTOW
+        float cost = 0;
+        if (type == BuildingType::Farm)
+            cost = 10.f;
+        if (type == BuildingType::SawMill)
+            cost = 10.f;
 
         if (city.warehouse[ResourceType::Wood] < cost)
         {

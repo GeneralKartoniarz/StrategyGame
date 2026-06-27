@@ -232,6 +232,10 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
                 {
                     totalGenerated *= 2.0f;
                 }
+                //TODO DO ZMIANY
+                if(manufacture.type == BuildingType::SawMill){
+                    totalGenerated *= 5;
+                }
             }
             else
             {
