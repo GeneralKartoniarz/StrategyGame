@@ -41,10 +41,10 @@ bool MarketPanel::Contains(const sf::Vector2f &point) const
     return this->isVisible && this->background.getGlobalBounds().contains(point);
 }
 
+// UI/MarketPanel.cpp
 void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased, float scrollDelta, const std::map<ResourceType, MarketCommodity> &market, const std::map<ResourceType, float> &warehouse)
 {
-    if (!this->isVisible)
-        return;
+    if (!this->isVisible) return;
     this->currentMarket = market;
     this->currentWarehouse = warehouse;
 
@@ -54,10 +54,11 @@ void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool 
     {
         this->isVisible = false;
         this->isDragging = false;
+        this->isDraggingScrollbar = false;
         return;
     }
 
-    if (leftMouseDown && !this->isDragging && this->titleBar.getGlobalBounds().contains(fMousePos))
+    if (leftMouseDown && !this->isDragging && !this->isDraggingScrollbar && this->titleBar.getGlobalBounds().contains(fMousePos))
     {
         this->isDragging = true;
         this->dragOffset = this->background.getPosition() - fMousePos;
@@ -65,34 +66,59 @@ void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool 
 
     if (this->isDragging)
     {
-        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-            this->isDragging = false;
-        else
-            this->SetPosition(fMousePos + this->dragOffset);
-    }
-
-    // OBSŁUGA SCROLLA
-    if (scrollDelta != 0.0f && this->Contains(fMousePos))
-    {
-        this->scrollOffset -= scrollDelta * 25.0f;
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) this->isDragging = false;
+        else this->SetPosition(fMousePos + this->dragOffset);
     }
 
     float rowHeight = 35.0f;
     float contentHeight = this->allResources.size() * rowHeight;
     float viewHeight = this->background.getSize().y - this->titleBar.getSize().y - 10.0f;
-
     this->maxScroll = std::max(0.0f, contentHeight - viewHeight);
 
-    if (this->scrollOffset < 0.0f)
-        this->scrollOffset = 0.0f;
-    if (this->scrollOffset > this->maxScroll)
-        this->scrollOffset = this->maxScroll;
+    if (leftMouseReleased) 
+    {
+        this->isDraggingScrollbar = false;
+    }
+
+    if (leftMouseDown && !this->isDragging && !this->isDraggingScrollbar && this->scrollbarThumb.getGlobalBounds().contains(fMousePos))
+    {
+        this->isDraggingScrollbar = true;
+        this->scrollDragOffsetY = fMousePos.y - this->scrollbarThumb.getPosition().y;
+    }
+
+    if (this->isDraggingScrollbar)
+    {
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) 
+        {
+            this->isDraggingScrollbar = false;
+        } 
+        else 
+        {
+            float trackHeight = viewHeight - this->scrollbarThumb.getSize().y;
+            float trackStartY = this->background.getPosition().y + this->titleBar.getSize().y + 5.0f;
+            
+            float newThumbY = fMousePos.y - this->scrollDragOffsetY;
+            float scrollPercent = (newThumbY - trackStartY) / trackHeight;
+            
+            scrollPercent = std::clamp(scrollPercent, 0.0f, 1.0f);
+            this->scrollOffset = scrollPercent * this->maxScroll;
+        }
+    }
+
+    if (scrollDelta != 0.0f && this->Contains(fMousePos))
+    {
+        this->scrollOffset -= scrollDelta * 40.0f; 
+    }
+
+    if (this->scrollOffset < 0.0f) this->scrollOffset = 0.0f;
+    if (this->scrollOffset > this->maxScroll) this->scrollOffset = this->maxScroll;
 
     if (this->maxScroll > 0.0f)
     {
         float scrollPercent = this->scrollOffset / this->maxScroll;
         float trackHeight = viewHeight - this->scrollbarThumb.getSize().y;
         float thumbY = this->background.getPosition().y + this->titleBar.getSize().y + 5.0f + (scrollPercent * trackHeight);
+        
         this->scrollbarThumb.setPosition({this->background.getPosition().x + this->background.getSize().x - 15.0f, thumbY});
     }
 }

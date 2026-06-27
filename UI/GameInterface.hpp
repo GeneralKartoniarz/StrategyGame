@@ -52,7 +52,7 @@ public:
     {
         if (this->marketPanel && this->marketPanel->Contains(static_cast<sf::Vector2f>(mousePos)))
         {
-            this->currentScrollDelta = delta;
+            this->currentScrollDelta += delta;
         }
     }
 

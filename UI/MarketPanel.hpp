@@ -32,7 +32,8 @@ private:
     
     float scrollOffset = 0.0f;
     float maxScroll = 0.0f;
-    
+    bool isDraggingScrollbar = false; 
+    float scrollDragOffsetY = 0.0f;
     std::map<ResourceType, MarketCommodity> currentMarket;
     std::map<ResourceType, float> currentWarehouse;
     std::vector<ResourceType> allResources;
