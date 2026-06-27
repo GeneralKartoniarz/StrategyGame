@@ -61,6 +61,8 @@ add_executable(strategia
     Empires/PoliticalSetup.cpp
 
     # Moduł: Interfejs Użytkownika (UI)
+    UI/MarketPanel.hpp
+    UI/MarketPanel.cpp
     UI/AnalyticsPanel.hpp
     UI/AnalyticsPanel.cpp
     UI/InputController.cpp
@@ -77,6 +79,7 @@ add_executable(strategia
     UI/BuildPanel.hpp
     UI/BuildPanel.cpp
     random.hpp
+
 )
 
 # ==============================================================================

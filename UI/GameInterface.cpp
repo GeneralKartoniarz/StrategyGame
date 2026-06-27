@@ -34,12 +34,15 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
     this->buildPanel = std::make_unique<BuildPanel>(sf::Vector2f({20.0f, 850.0f}), sf::Vector2f({300.0f, 120.0f}), this->font);
     this->analyticsPanel = std::make_unique<AnalyticsPanel>(sf::Vector2f({20.0f, 580.0f}), sf::Vector2f({400.0f, 250.0f}), this->font);
     BuildPanel::gameManagerContext = &this->gm;
+    this->marketPanel = std::make_unique<MarketPanel>(sf::Vector2f({500.0f, 150.0f}), sf::Vector2f({550.0f, 400.0f}), this->font);
 }
 
 bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
 {
     sf::Vector2f fMousePos = static_cast<sf::Vector2f>(mousePos);
     if (this->analyticsPanel && this->analyticsPanel->Contains(fMousePos))
+        return true;
+    if (this->marketPanel && this->marketPanel->Contains(fMousePos))
         return true;
     if (this->sidePanel && this->sidePanel->Contains(fMousePos))
         return true;
@@ -88,7 +91,14 @@ void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseCli
 {
     this->nextTurnButton->Update(mousePos, mouseClicked);
     bool isLeftMouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
-
+    if (this->marketPanel)
+    {
+        const auto &globalMarket = this->gm.GetEmpire(0).GetMarket();
+        static const std::map<ResourceType, float> emptyWarehouse;
+        const auto &localWarehouse = (this->selectedCityPtr) ? this->selectedCityPtr->warehouse : emptyWarehouse;
+        this->marketPanel->Update(mousePos, isLeftMouseDown, mouseClicked, this->currentScrollDelta, globalMarket, localWarehouse);
+    }
+    this->currentScrollDelta = 0.0f;
     if (this->buildPanel)
     {
         BuildPanel::mapContext = &map;
@@ -118,13 +128,15 @@ void GameInterface::Draw(sf::RenderWindow *window)
         this->buildPanel->Draw(window);
     if (this->analyticsPanel)
         this->analyticsPanel->Draw(window);
+    if (this->marketPanel)
+        this->marketPanel->Draw(window);
 }
 
 void GameInterface::UpdateSelection(const Tile *tile)
 {
     if (this->sidePanel)
         this->sidePanel->UpdateSelection(tile);
-    if(!this->analyticsPanel->isVisible)
+    if (!this->analyticsPanel->isVisible)
         this->analyticsPanel->isVisible = true;
 }
 

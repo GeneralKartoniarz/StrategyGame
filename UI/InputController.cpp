@@ -398,6 +398,14 @@ void InputController::HandleEvent(const sf::Event &event)
 
     if (const auto *scrollEvent = event.getIf<sf::Event::MouseWheelScrolled>())
     {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+
+        if (this->gui)
+        {
+            this->gui->ProcessScroll(scrollEvent->delta, mousePos);
+        }
+        if (this->gui && this->gui->IsMouseOverUI(mousePos))
+            return;
         if (scrollEvent->wheel == sf::Mouse::Wheel::Vertical)
         {
             if (scrollEvent->delta > 0.0f)
@@ -417,6 +425,13 @@ void InputController::HandleEvent(const sf::Event &event)
 
     if (const auto *keyEvent = event.getIf<sf::Event::KeyPressed>())
     {
+        if (keyEvent->code == sf::Keyboard::Key::M)
+        {
+            if (this->gui && this->gui->marketPanel)
+            {
+                this->gui->marketPanel->isVisible = !this->gui->marketPanel->isVisible;
+            }
+        }
         if (keyEvent->code == sf::Keyboard::Key::B)
         {
             if (this->selectedUnitID != -1 && !this->isPlanningCity)

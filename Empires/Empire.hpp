@@ -24,7 +24,7 @@ public:
     void AddCity(int32_t cityID);
     void RemoveCity(int32_t cityID);
     const std::vector<int32_t> &GetCities() const { return controlledCitiesIDs; }
-
+    const std::map<ResourceType, MarketCommodity> &GetMarket() const { return market; }
     void UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, GameManager &gm);
     void AddUnit(int32_t unitID) { controlledUnitsIDs.push_back(unitID); }
     void UpdatePrices();

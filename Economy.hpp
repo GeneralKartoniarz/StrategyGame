@@ -51,10 +51,10 @@ enum class NeedCategory : uint8_t
 struct MarketCommodity
 {
     float currentPrice = 1.0f;
-    
+    float previousPrice = 1.0f;
     float demandLastTurn = 0.0f;
     float supplyLastTurn = 0.0f;
-    
+    float productionLastTurn = 0.0f;
 
     //TODO IMPORT PO NAJNIŻSZEJ CENIE OD BYLE KTÓREGO MIASTA
     float targetImportPrice = 0.0f;

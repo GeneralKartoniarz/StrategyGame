@@ -7,6 +7,7 @@
 #include "SidePanel.hpp"
 #include "UnitPanel.hpp"
 #include "CityPanel.hpp"
+#include "MarketPanel.hpp"
 #include <functional>
 #include "Industry.hpp"
 #include "AnalyticsPanel.hpp"
@@ -43,8 +44,17 @@ public:
     std::unique_ptr<SidePanel> sidePanel;
     std::unique_ptr<UnitPanel> unitPanel;
     std::unique_ptr<CityPanel> cityPanel;
+    std::unique_ptr<MarketPanel> marketPanel;
+
     std::unique_ptr<AnalyticsPanel> analyticsPanel;
     const City *selectedCityPtr = nullptr;
+    void ProcessScroll(float delta, const sf::Vector2i &mousePos)
+    {
+        if (this->marketPanel && this->marketPanel->Contains(static_cast<sf::Vector2f>(mousePos)))
+        {
+            this->currentScrollDelta = delta;
+        }
+    }
 
 private:
     void NextTurn();
@@ -56,7 +66,7 @@ private:
     std::vector<std::unique_ptr<Label>> statLabels;
     std::unique_ptr<Label> turnCounterLabel;
     std::unique_ptr<Button> nextTurnButton;
-
+    float currentScrollDelta = 0.0f;
     int turnCount;
 
     bool isUnitSelected = false;

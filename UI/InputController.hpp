@@ -5,6 +5,7 @@
 #include "GameManager.hpp"
 #include "GameInterface.hpp"
 #include "Pathfinder.hpp"
+#include "MarketPanel.hpp"
 #include <functional>
 class InputController
 {

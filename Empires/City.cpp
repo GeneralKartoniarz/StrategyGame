@@ -232,8 +232,9 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
                 {
                     totalGenerated *= 2.0f;
                 }
-                //TODO DO ZMIANY
-                if(manufacture.type == BuildingType::SawMill){
+                // TODO DO ZMIANY
+                if (manufacture.type == BuildingType::SawMill)
+                {
                     totalGenerated *= 5;
                 }
             }
@@ -266,7 +267,7 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
             if (totalGenerated > 0.0f)
             {
                 this->warehouse[job.producedResource] += totalGenerated;
-
+                market[job.producedResource].productionLastTurn += totalGenerated;
                 float unitPrice = market[job.producedResource].currentPrice;
                 float batchValue = totalGenerated * unitPrice;
 

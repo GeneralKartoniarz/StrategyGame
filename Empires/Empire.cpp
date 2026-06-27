@@ -76,6 +76,7 @@ void Empire::UpdatePrices()
     for (auto &[resource, commodity] : this->market)
     {
         float oldPrice = commodity.currentPrice;
+        commodity.previousPrice = oldPrice;
         if (commodity.supplyLastTurn > 0.0f)
         {
             float ratio = commodity.demandLastTurn / commodity.supplyLastTurn;
@@ -112,7 +113,10 @@ void Empire::UpdatePrices()
 void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, GameManager &gm)
 {
     for (auto &[res, comm] : this->market)
+    {
         comm.supplyLastTurn = 0.0f;
+        comm.productionLastTurn = 0.0f;
+    }
 
     for (int32_t cityID : this->controlledCitiesIDs)
     {
