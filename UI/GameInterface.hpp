@@ -39,6 +39,12 @@ public:
 
     InterfaceState currentInterfaceState = InterfaceState::Default;
     BuildingType buildingUnderCursor = BuildingType::Farm;
+    std::unique_ptr<BuildPanel> buildPanel;
+    std::unique_ptr<SidePanel> sidePanel;
+    std::unique_ptr<UnitPanel> unitPanel;
+    std::unique_ptr<CityPanel> cityPanel;
+    std::unique_ptr<AnalyticsPanel> analyticsPanel;
+    const City *selectedCityPtr = nullptr;
 
 private:
     void NextTurn();
@@ -50,13 +56,9 @@ private:
     std::vector<std::unique_ptr<Label>> statLabels;
     std::unique_ptr<Label> turnCounterLabel;
     std::unique_ptr<Button> nextTurnButton;
-    std::unique_ptr<SidePanel> sidePanel;
-    std::unique_ptr<UnitPanel> unitPanel;
-    std::unique_ptr<CityPanel> cityPanel;
-    std::unique_ptr<AnalyticsPanel> analyticsPanel;
+
     int turnCount;
-    std::unique_ptr<BuildPanel> buildPanel;
-    const City *selectedCityPtr = nullptr;
+
     bool isUnitSelected = false;
     void UpdateCityPanelPosition();
 };

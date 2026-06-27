@@ -128,6 +128,8 @@ bool GameManager::TryPlaceBuildingAt(const sf::Vector2i &mousePos, BuildingType 
         }
 
         float cost = (type == BuildingType::Farm) ? 10.0f : 20.0f;
+        cost = (type == BuildingType::SawMill) ? 10.0f : 20.0f;
+
         if (city.warehouse[ResourceType::Wood] < cost)
         {
             std::cout << "[PLAC BUDOWY] Brak surowcow! Wymagane: " << cost << " j. drewna." << std::endl;
@@ -167,9 +169,16 @@ bool BuildingRegistry::IsBiomeAllowed(BuildingType bType, BiomeType biome)
     {
         return biome != BiomeType::Ocean &&
                biome != BiomeType::IceSheet &&
-               biome != BiomeType::MountainPeak;
+               biome != BiomeType::MountainPeak &&
+               biome != BiomeType::Desert;
     }
-
+    if (bType == BuildingType::SawMill)
+    {
+        return biome != BiomeType::Ocean &&
+               biome != BiomeType::IceSheet &&
+               biome != BiomeType::MountainPeak &&
+               biome != BiomeType::Desert;
+    }
     // if (bType == BuildingType::Fishery) return biome == BiomeType::Ocean;
 
     return true;
@@ -181,6 +190,8 @@ std::string BuildingRegistry::GetBuildingName(BuildingType bType)
     {
     case BuildingType::Farm:
         return "Farma";
+    case BuildingType::SawMill:
+        return "Tartak";
     // case BuildingType::Fishery: return "Przystan Rybacka";
     default:
         return "Nieznany Obiekt";
@@ -313,8 +324,8 @@ void GameManager::TransformSettlerToCity(int32_t unitID, int32_t tileID, uint32_
     newCity.ownerEmpireID = empireID;
 
     newCity.jurisdictionTiles.push_back(tileID);
-    newCity.warehouse[ResourceType::Grain] = 300.0f;
-    newCity.warehouse[ResourceType::Fish] = 200.0f;
+    newCity.warehouse[ResourceType::Grain] = 100.0f;
+    newCity.warehouse[ResourceType::Fish] = 0.0f;
     newCity.warehouse[ResourceType::Wood] = 150.0f;
     newCity.warehouse[ResourceType::Gold] = 0.0f;
     newCity.money = 800.0f;

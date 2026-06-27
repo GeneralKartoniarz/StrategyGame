@@ -22,6 +22,7 @@ public:
     bool GetVisible() const { return this->isVisible; }
 
     static void OnBuildFarmClick();
+    static void OnBuildSawMillClick();
     static void OnRecruitSettlerClick();
     static const City *currentCityContext;
     static const std::vector<Tile> *mapContext;

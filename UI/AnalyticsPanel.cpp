@@ -12,13 +12,13 @@ AnalyticsPanel::AnalyticsPanel(sf::Vector2f position, sf::Vector2f size, const s
     this->background.setOutlineColor(sf::Color(100, 110, 120));
 
     this->titlePopulation.setFont(font);
-    this->titlePopulation.setString(L"Populacja (Zółty) / Satysfakcja (Zielony)");
+    this->titlePopulation.setString("Populacja (Zolty) / Satysfakcja (Zielony)");
     this->titlePopulation.setCharacterSize(11);
     this->titlePopulation.setFillColor(sf::Color(200, 200, 200));
     this->titlePopulation.setPosition(position + sf::Vector2f(10.0f, 10.0f));
 
     this->titleFood.setFont(font);
-    this->titleFood.setString(L"Zapasy żywności (Niebieski)");
+    this->titleFood.setString("Zapasy zywnosci (Niebieski)");
     this->titleFood.setCharacterSize(11);
     this->titleFood.setFillColor(sf::Color(200, 200, 200));
     this->titleFood.setPosition(position + sf::Vector2f(10.0f, 25.0f));

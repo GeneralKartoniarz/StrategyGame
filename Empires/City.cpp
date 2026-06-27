@@ -19,6 +19,8 @@ uint8_t Manufacture::GetRequiredClassAsUint8() const
 {
     if (type == BuildingType::Farm)
         return static_cast<uint8_t>(SocialClass::Bound);
+    if (type == BuildingType::SawMill)
+        return static_cast<uint8_t>(SocialClass::Laborer);
     if (type == BuildingType::PaperMill)
         return static_cast<uint8_t>(SocialClass::Specialist);
     return static_cast<uint8_t>(SocialClass::Laborer);
@@ -226,7 +228,7 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
             {
                 totalGenerated = static_cast<float>(job.currentEmployees) * 5.0f;
 
-                if (manufacture.type == BuildingType::Farm && tile.terrain.resourceName == "Żyzna Gleba")
+                if ((manufacture.type == BuildingType::Farm || manufacture.type == BuildingType::SawMill) && tile.terrain.resourceName == "Żyzna Gleba")
                 {
                     totalGenerated *= 2.0f;
                 }

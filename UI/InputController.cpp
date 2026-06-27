@@ -94,9 +94,20 @@ void InputController::HandleEvent(const sf::Event &event)
             {
                 if (this->typedCityName.empty())
                     this->typedCityName = "Nowa Osada";
-                uint32_t assignedNameID = this->gm.RegisterCityName(this->typedCityName);
-                this->gm.TransformSettlerToCity(this->settlerUnitIDForCity, this->pendingCityTileID, assignedNameID, this->map);
 
+                uint32_t assignedNameID = this->gm.RegisterCityName(this->typedCityName);
+
+                this->gm.TransformSettlerToCity(this->settlerUnitIDForCity, this->pendingCityTileID, assignedNameID, this->map);
+                if (this->gui)
+                {
+                    this->gui->selectedCityPtr = nullptr;
+
+                    if (this->gui->analyticsPanel)
+                    {
+                        this->gui->analyticsPanel->Update(nullptr);
+                    }
+
+                }
                 this->isTypingCityName = false;
                 this->selectedUnitID = -1;
                 this->validCityTiles.clear();

@@ -5,12 +5,12 @@
 /*
  * [PL] STRUKTURA: BuildingType / Manufacture
  * LOGIKA: Definiuje typy budynków, poziomy, łańcuchy produkcyjne i obostrzenia biomów.
- * [DO ZMIANY]: Wprowadzimy tu pulę kapitału (dywidendę), z którego fabryka 
+ * [DO ZMIANY]: Wprowadzimy tu pulę kapitału (dywidendę), z którego fabryka
  * będzie samodzielnie wypłacać rynkowe pensje.
  * POWIĄZANIA: City (SimulateProduction).
  * * [EN] STRUCTURE: BuildingType / Manufacture
  * LOGIC: Defines building types, levels, production chains, and biome restrictions.
- * [TO CHANGE]: Will soon introduce a capital pool (dividend) from which 
+ * [TO CHANGE]: Will soon introduce a capital pool (dividend) from which
  * the factory will independently pay market wages.
  * DEPENDENCIES: City (SimulateProduction).
  */
@@ -20,6 +20,7 @@ enum class BuildingType : uint8_t
     None,
     Farm,
     Fishery,
+    SawMill,
     Mine,
     Distillery,
     PaperMill
@@ -42,12 +43,20 @@ struct Manufacture
     {
         switch (type)
         {
-            case BuildingType::Farm:       return level * 3;
-            case BuildingType::Fishery:    return level * 3;
-            case BuildingType::Mine:       return level * 5;
-            case BuildingType::Distillery: return level * 1;
-            case BuildingType::PaperMill:  return level * 1;
-            default: return 0;
+        case BuildingType::Farm:
+            return level * 3;
+        case BuildingType::Fishery:
+            return level * 3;
+        case BuildingType::Mine:
+            return level * 5;
+        case BuildingType::Distillery:
+            return level * 1;
+        case BuildingType::PaperMill:
+            return level * 1;
+        case BuildingType::SawMill:
+            return level * 2;
+        default:
+            return 0;
         }
     }
 
@@ -57,29 +66,43 @@ struct Manufacture
     {
         switch (type)
         {
-            case BuildingType::Farm:       return ResourceType::Grain;
-            case BuildingType::Fishery:    return ResourceType::Fish;
-            case BuildingType::Mine:       return ResourceType::Coal; 
-            case BuildingType::Distillery: return ResourceType::LuxuryAlcohol;
-            case BuildingType::PaperMill:  return ResourceType::Paper;
-            default:                       return ResourceType::Grain;
+        case BuildingType::Farm:
+            return ResourceType::Grain;
+        case BuildingType::Fishery:
+            return ResourceType::Fish;
+        case BuildingType::Mine:
+            return ResourceType::Coal;
+        case BuildingType::Distillery:
+            return ResourceType::LuxuryAlcohol;
+        case BuildingType::PaperMill:
+            return ResourceType::Paper;
+        case BuildingType::SawMill:
+        return ResourceType::Wood;
+        default:
+            return ResourceType::Grain;
         }
     }
 
-    void GetInputRequirements(ResourceType& outType, float& outAmountPerWorker) const
+    void GetInputRequirements(ResourceType &outType, float &outAmountPerWorker) const
     {
         switch (type)
         {
-            case BuildingType::Distillery:
-                outType = ResourceType::Grain; outAmountPerWorker = 0.5f; break;
-            case BuildingType::PaperMill:
-                outType = ResourceType::Wood; outAmountPerWorker = 1.0f; break;
-            default:
-                outType = ResourceType::Grain; outAmountPerWorker = 0.0f; break;
+        case BuildingType::Distillery:
+            outType = ResourceType::Grain;
+            outAmountPerWorker = 0.5f;
+            break;
+        case BuildingType::PaperMill:
+            outType = ResourceType::Wood;
+            outAmountPerWorker = 1.0f;
+            break;
+        default:
+            outType = ResourceType::Grain;
+            outAmountPerWorker = 0.0f;
+            break;
         }
     }
 };
-enum class BiomeType; 
+enum class BiomeType;
 
 class BuildingRegistry
 {

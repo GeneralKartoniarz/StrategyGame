@@ -32,10 +32,13 @@ BuildPanel::BuildPanel(const sf::Vector2f &position, const sf::Vector2f &size, c
         position + sf::Vector2f(10.0f, 75.0f),
         sf::Vector2f(130.0f, 35.0f),
         font, "FARMA (10 W)", &BuildPanel::OnBuildFarmClick));
-
     this->buildButtons.push_back(std::make_unique<Button>(
         position + sf::Vector2f(150.0f, 75.0f),
         sf::Vector2f(130.0f, 35.0f),
+        font, "TARTAK (10 W)", &BuildPanel::OnBuildSawMillClick));
+    this->buildButtons.push_back(std::make_unique<Button>(
+        position + sf::Vector2f(10.0f, 120.0f),
+        sf::Vector2f(270.0f, 35.0f),
         font, "OSADNIK (200 Z)", &BuildPanel::OnRecruitSettlerClick));
 }
 
@@ -89,7 +92,16 @@ void BuildPanel::OnBuildFarmClick()
         std::cout << "[INTERFEJS] Wybierz kafelek jurysdykcji dla Farmy..." << std::endl;
     }
 }
+void BuildPanel::OnBuildSawMillClick()
+{
+    if (GameInterface::GetInstance())
+    {
+        GameInterface::GetInstance()->currentInterfaceState = InterfaceState::PlacingBuilding;
+        GameInterface::GetInstance()->buildingUnderCursor = BuildingType::SawMill;
 
+        std::cout << "[INTERFEJS] Wybierz kafelek jurysdykcji dla Tartaka..." << std::endl;
+    }
+}
 void BuildPanel::OnRecruitSettlerClick()
 {
     if (currentCityContext && gameManagerContext && mapContext)
@@ -97,8 +109,8 @@ void BuildPanel::OnRecruitSettlerClick()
         int32_t cityTileID = currentCityContext->centerTileID;
 
         int32_t realCityVectorIndex = -1;
-        const auto& allCities = gameManagerContext->GetAllCities();
-        
+        const auto &allCities = gameManagerContext->GetAllCities();
+
         for (size_t i = 0; i < allCities.size(); ++i)
         {
             if (allCities[i].centerTileID == cityTileID)
@@ -117,7 +129,7 @@ void BuildPanel::OnRecruitSettlerClick()
             currentCityContext = nullptr;
 
             bool success = gameManagerContext->RecruitSettler(realCityVectorIndex, *mapContext);
-            
+
             if (success)
             {
                 std::cout << "[UI] Sukces: Osadnik sformowany, interfejs miasta zresetowany." << std::endl;

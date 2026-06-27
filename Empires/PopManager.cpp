@@ -147,12 +147,31 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
         city.childSupportFund = 0.0f;
     }
 
-    for (auto &pop : this->population)
+    std::vector<size_t> localPopIndices;
+    localPopIndices.reserve(this->population.size());
+
+    for (size_t i = 0; i < this->population.size(); ++i)
     {
-        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) == city.jurisdictionTiles.end())
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), this->population[i].locationTileID) != city.jurisdictionTiles.end())
         {
-            continue;
+            localPopIndices.push_back(i);
         }
+    }
+    std::sort(localPopIndices.begin(), localPopIndices.end(), [this](size_t a, size_t b) {
+        const auto& popA = this->population[a];
+        const auto& popB = this->population[b];
+
+        if (popA.IsEmployed() != popB.IsEmployed())
+        {
+            return popA.IsEmployed() > popB.IsEmployed();
+        }
+
+        return popA.age < popB.age;
+    });
+
+    for (size_t popIndex : localPopIndices)
+    {
+        auto &pop = this->population[popIndex];
 
         float popBudget = 0.0f;
 
