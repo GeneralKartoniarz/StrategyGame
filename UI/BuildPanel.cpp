@@ -18,27 +18,24 @@ BuildPanel::BuildPanel(const sf::Vector2f &position, const sf::Vector2f &size, c
     this->background.setOutlineThickness(1.5f);
     this->background.setOutlineColor(sf::Color(180, 160, 110));
 
-    this->sectionTitle = std::make_unique<Label>(
-        position + sf::Vector2f(10.0f, 10.0f),
-        sf::Vector2f(size.x - 20.0f, 25.0f),
-        font, "PRODUKCJA MIEJSKA", 12);
-
-    this->costTrackerLabel = std::make_unique<Label>(
-        position + sf::Vector2f(10.0f, 40.0f),
-        sf::Vector2f(size.x - 20.0f, 25.0f),
-        font, "Zasoby: Zboze: 0 | Drewno: 0", 11);
-
+    float contentWidth = 270.0f;        
+    float buttonHeight = 35.0f;         
+    float gapX = 10.0f;                 
+    float gapY = 10.0f;                 
+    float contentHeight = (buttonHeight * 2.0f) + gapY; 
+    float startX = (size.x - contentWidth) / 2.0f;
+    float startY = (size.y - contentHeight) / 2.0f;
     this->buildButtons.push_back(std::make_unique<Button>(
-        position + sf::Vector2f(10.0f, 75.0f),
-        sf::Vector2f(130.0f, 35.0f),
+        position + sf::Vector2f(startX, startY),
+        sf::Vector2f(130.0f, buttonHeight),
         font, "FARMA (10 W)", &BuildPanel::OnBuildFarmClick));
     this->buildButtons.push_back(std::make_unique<Button>(
-        position + sf::Vector2f(150.0f, 75.0f),
-        sf::Vector2f(130.0f, 35.0f),
+        position + sf::Vector2f(startX + 130.0f + gapX, startY),
+        sf::Vector2f(130.0f, buttonHeight),
         font, "TARTAK (10 W)", &BuildPanel::OnBuildSawMillClick));
     this->buildButtons.push_back(std::make_unique<Button>(
-        position + sf::Vector2f(10.0f, 120.0f),
-        sf::Vector2f(270.0f, 35.0f),
+        position + sf::Vector2f(startX, startY + buttonHeight + gapY),
+        sf::Vector2f(270.0f, buttonHeight),
         font, "OSADNIK (200 Z)", &BuildPanel::OnRecruitSettlerClick));
 }
 
@@ -46,11 +43,6 @@ void BuildPanel::Update(const sf::Vector2i &mousePos, bool mouseClicked, const C
 {
     if (!this->isVisible || !activeCity)
         return;
-
-    std::string info = "Spichlerz -> Zboze: " + std::to_string(static_cast<int>(activeCity->warehouse.at(ResourceType::Grain))) +
-                       " | Drewno: " + std::to_string(static_cast<int>(activeCity->warehouse.at(ResourceType::Wood)));
-    this->costTrackerLabel->SetText(info);
-
     for (auto &btn : this->buildButtons)
     {
         btn->Update(mousePos, mouseClicked);
@@ -66,9 +58,6 @@ void BuildPanel::Draw(sf::RenderWindow *window)
     window->setView(window->getDefaultView());
 
     window->draw(this->background);
-    this->sectionTitle->Draw(window);
-    this->costTrackerLabel->Draw(window);
-
     for (auto &btn : this->buildButtons)
     {
         btn->Draw(window);

@@ -15,6 +15,7 @@ public:
     void SetPosition(sf::Vector2f position);
     void UpdateCityData(const City &city, const PopManager &popMgr);
     bool isVisible;
+    void Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased);
 
 private:
     sf::RectangleShape background;
@@ -26,4 +27,9 @@ private:
     std::unique_ptr<Label> totalPopLabel;
     std::unique_ptr<Label> satisfactionLabel;
     std::unique_ptr<Label> ClassDistributionLabel;
+    sf::RectangleShape titleBar;
+    sf::RectangleShape closeButton;
+
+    bool isDragging = false;
+    sf::Vector2f dragOffset;
 };

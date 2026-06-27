@@ -39,6 +39,8 @@ GameInterface::GameInterface(sf::RenderWindow *window, GameManager &gm) : gm(gm)
 bool GameInterface::IsMouseOverUI(const sf::Vector2i &mousePos) const
 {
     sf::Vector2f fMousePos = static_cast<sf::Vector2f>(mousePos);
+    if (this->analyticsPanel && this->analyticsPanel->Contains(fMousePos))
+        return true;
     if (this->sidePanel && this->sidePanel->Contains(fMousePos))
         return true;
     if (this->unitPanel && this->unitPanel->Contains(fMousePos))
@@ -85,6 +87,7 @@ void GameInterface::NextTurn()
 void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseClicked, std::vector<Tile> &map)
 {
     this->nextTurnButton->Update(mousePos, mouseClicked);
+    bool isLeftMouseDown = sf::Mouse::isButtonPressed(sf::Mouse::Button::Left);
 
     if (this->buildPanel)
     {
@@ -93,7 +96,12 @@ void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseCli
     }
     if (this->analyticsPanel)
     {
-        this->analyticsPanel->Update(this->selectedCityPtr);
+        this->analyticsPanel->Update(this->selectedCityPtr, mousePos, isLeftMouseDown, mouseClicked);
+    }
+
+    if (this->cityPanel)
+    {
+        this->cityPanel->Update(mousePos, isLeftMouseDown, mouseClicked);
     }
 }
 
@@ -116,6 +124,8 @@ void GameInterface::UpdateSelection(const Tile *tile)
 {
     if (this->sidePanel)
         this->sidePanel->UpdateSelection(tile);
+    if(!this->analyticsPanel->isVisible)
+        this->analyticsPanel->isVisible = true;
 }
 
 void GameInterface::UpdateCitySelection(const City *city, const std::string &empireName)

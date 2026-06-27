@@ -2,10 +2,9 @@
 #include <algorithm>
 #include <limits>
 
-AnalyticsPanel::AnalyticsPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font& font)
-    : font(font),titleFood(font), titlePopulation(font)
+AnalyticsPanel::AnalyticsPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font &font)
+    : font(font), titleFood(font), titlePopulation(font)
 {
-    this->background.setPosition(position);
     this->background.setSize(size);
     this->background.setFillColor(sf::Color(20, 20, 25, 220));
     this->background.setOutlineThickness(1.5f);
@@ -15,23 +14,63 @@ AnalyticsPanel::AnalyticsPanel(sf::Vector2f position, sf::Vector2f size, const s
     this->titlePopulation.setString("Populacja (Zolty) / Satysfakcja (Zielony)");
     this->titlePopulation.setCharacterSize(11);
     this->titlePopulation.setFillColor(sf::Color(200, 200, 200));
-    this->titlePopulation.setPosition(position + sf::Vector2f(10.0f, 10.0f));
 
     this->titleFood.setFont(font);
     this->titleFood.setString("Zapasy zywnosci (Niebieski)");
     this->titleFood.setCharacterSize(11);
     this->titleFood.setFillColor(sf::Color(200, 200, 200));
+    this->titleBar.setFillColor(sf::Color(40, 40, 45, 240));
+    this->titleBar.setSize(sf::Vector2f(size.x, 42.0f));
+    this->closeButton.setFillColor(sf::Color(159, 91, 92));
+    this->closeButton.setSize(sf::Vector2f(20.0f, 20.0f));
+    this->SetPosition(position);
+}
+void AnalyticsPanel::SetPosition(sf::Vector2f position)
+{
+    this->titleBar.setPosition(position);
+    this->background.setPosition(position);
+    this->titlePopulation.setPosition(position + sf::Vector2f(10.0f, 10.0f));
     this->titleFood.setPosition(position + sf::Vector2f(10.0f, 25.0f));
+    this->closeButton.setPosition({position.x + this->background.getSize().x - 22.5f, position.y + 2.5f});
 }
 
-void AnalyticsPanel::Update(const City* activeCity)
+void AnalyticsPanel::Update(const City *activeCity, const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased)
 {
     this->cityContext = activeCity;
+    if (!this->isVisible)
+        return;
+
+    sf::Vector2f fMousePos(mousePos.x, mousePos.y);
+
+    if (leftMouseReleased && this->closeButton.getGlobalBounds().contains(fMousePos))
+    {
+        this->isVisible = false;
+        this->isDragging = false;
+        return;
+    }
+
+    if (leftMouseDown && !this->isDragging && this->titleBar.getGlobalBounds().contains(fMousePos))
+    {
+        this->isDragging = true;
+        this->dragOffset = this->background.getPosition() - fMousePos;
+    }
+    if (this->isDragging)
+    {
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            this->isDragging = false;
+        }
+        else
+        {
+            this->SetPosition(fMousePos + this->dragOffset);
+        }
+    }
 }
 
-void AnalyticsPanel::RenderLine(sf::RenderWindow* window, const std::vector<float>& data, sf::Color color, float maxVal)
+void AnalyticsPanel::RenderLine(sf::RenderWindow *window, const std::vector<float> &data, sf::Color color, float maxVal)
 {
-    if (data.size() < 2) return;
+    if (data.size() < 2)
+        return;
 
     sf::VertexArray line(sf::PrimitiveType::LineStrip);
     sf::Vector2f bgPos = this->background.getPosition();
@@ -43,28 +82,31 @@ void AnalyticsPanel::RenderLine(sf::RenderWindow* window, const std::vector<floa
     float chartHeight = bgSize.y - chartMarginY - 15.0f;
 
     float stepX = chartWidth / static_cast<float>(City::MAX_HISTORY_SAMPLES - 1);
-    
-    if (maxVal <= 0.0f) maxVal = 1.0f;
+
+    if (maxVal <= 0.0f)
+        maxVal = 1.0f;
 
     for (size_t i = 0; i < data.size(); ++i)
     {
         float x = bgPos.x + chartMarginX + (static_cast<float>(i) * stepX);
         float y = bgPos.y + bgSize.y - 15.0f - ((data[i] / maxVal) * chartHeight);
-        
+
         line.append(sf::Vertex({sf::Vector2f(x, y), color}));
     }
 
     window->draw(line);
 }
 
-void AnalyticsPanel::Draw(sf::RenderWindow* window)
+void AnalyticsPanel::Draw(sf::RenderWindow *window)
 {
-    if (!this->isVisible || !this->cityContext || this->cityContext->economyHistory.empty()) return;
+    if (!this->isVisible || !this->cityContext || this->cityContext->economyHistory.empty())
+        return;
 
     sf::View oldView = window->getView();
     window->setView(window->getDefaultView());
-
     window->draw(this->background);
+    window->draw(this->titleBar);
+    window->draw(this->closeButton);
     window->draw(this->titlePopulation);
     window->draw(this->titleFood);
 
@@ -75,19 +117,27 @@ void AnalyticsPanel::Draw(sf::RenderWindow* window)
     float maxPop = 10.0f;
     float maxFood = 100.0f;
 
-    for (const auto& sample : this->cityContext->economyHistory)
+    for (const auto &sample : this->cityContext->economyHistory)
     {
         popData.push_back(sample.population);
         satData.push_back(sample.averageSatisfaction);
         foodData.push_back(sample.foodSupply);
 
-        if (sample.population > maxPop) maxPop = sample.population;
-        if (sample.foodSupply > maxFood) maxFood = sample.foodSupply;
+        if (sample.population > maxPop)
+            maxPop = sample.population;
+        if (sample.foodSupply > maxFood)
+            maxFood = sample.foodSupply;
     }
 
-    this->RenderLine(window, popData, sf::Color(240, 200, 50), maxPop);        
-    this->RenderLine(window, satData, sf::Color(50, 220, 100), 255.0f);       
-    this->RenderLine(window, foodData, sf::Color(50, 150, 250), maxFood);    
+    this->RenderLine(window, popData, sf::Color(240, 200, 50), maxPop);
+    this->RenderLine(window, satData, sf::Color(50, 220, 100), 255.0f);
+    this->RenderLine(window, foodData, sf::Color(50, 150, 250), maxFood);
 
     window->setView(oldView);
+}
+bool AnalyticsPanel::Contains(const sf::Vector2f& point) const
+{
+    if (!this->isVisible) return false;
+
+    return this->background.getGlobalBounds().contains(point);
 }

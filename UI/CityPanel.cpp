@@ -4,8 +4,10 @@
 CityPanel::CityPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font &font)
     : isVisible(false)
 {
-    if (size.x < 460.0f) size.x = 460.0f;
-    if (size.y < 220.0f) size.y = 220.0f;
+    if (size.x < 460.0f)
+        size.x = 460.0f;
+    if (size.y < 220.0f)
+        size.y = 220.0f;
 
     this->background.setFillColor(sf::Color(25, 25, 30, 240));
     this->background.setOutlineThickness(1.0f);
@@ -25,14 +27,48 @@ CityPanel::CityPanel(sf::Vector2f position, sf::Vector2f size, const sf::Font &f
     this->treasuryLabel = std::make_unique<Label>(position, sf::Vector2f(halfWidth, 25.0f), font, "Skarbiec: 0 $", 12);
     this->unemploymentLabel = std::make_unique<Label>(position, sf::Vector2f(halfWidth, 25.0f), font, "Bezrobocie: 0%", 12);
     this->ClassDistributionLabel = std::make_unique<Label>(position, sf::Vector2f(fullWidth, 50.0f), font, "Struktura...", 11);
-
+    this->titleBar.setFillColor(sf::Color(40, 40, 45, 240));
+    this->titleBar.setSize(sf::Vector2f(size.x, 25.0f));
+    this->closeButton.setFillColor(sf::Color(159, 91, 92));
+    this->closeButton.setSize(sf::Vector2f(20.0f, 20.0f));
     this->SetPosition(position);
 }
+void CityPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased)
+{
+    if (!this->isVisible)
+        return;
 
+    sf::Vector2f fMousePos(mousePos.x, mousePos.y);
+
+    if (leftMouseReleased && this->closeButton.getGlobalBounds().contains(fMousePos))
+    {
+        this->isVisible = false;
+        this->isDragging = false;
+        return;
+    }
+    if (leftMouseDown && !this->isDragging && this->titleBar.getGlobalBounds().contains(fMousePos))
+    {
+        this->isDragging = true;
+        this->dragOffset = this->background.getPosition() - fMousePos;
+    }
+
+    if (this->isDragging)
+    {
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            this->isDragging = false;
+        }
+        else
+        {
+            this->SetPosition(fMousePos + this->dragOffset);
+        }
+    }
+}
 void CityPanel::SetPosition(sf::Vector2f position)
 {
     this->background.setPosition(position);
-    
+    this->titleBar.setPosition(position);
+    this->closeButton.setPosition({position.x + this->background.getSize().x - 22.5f, position.y + 2.5f});
     float margin = 10.0f;
     float spacing = 10.0f;
     float fullWidth = this->background.getSize().x - (2.0f * margin);
@@ -41,17 +77,17 @@ void CityPanel::SetPosition(sf::Vector2f position)
     float leftX = position.x + margin;
     float rightX = position.x + margin + halfWidth + spacing;
 
-    this->cityNameLabel->SetPosition(sf::Vector2f(leftX, position.y + 10.0f));
-    this->ownerLabel->SetPosition(sf::Vector2f(leftX, position.y + 45.0f));
-    this->totalPopLabel->SetPosition(sf::Vector2f(rightX, position.y + 45.0f));
-    
-    this->tilesCountLabel->SetPosition(sf::Vector2f(leftX, position.y + 75.0f));
-    this->satisfactionLabel->SetPosition(sf::Vector2f(rightX, position.y + 75.0f));
-    
-    this->treasuryLabel->SetPosition(sf::Vector2f(leftX, position.y + 105.0f));
-    this->unemploymentLabel->SetPosition(sf::Vector2f(rightX, position.y + 105.0f));
+    this->cityNameLabel->SetPosition(sf::Vector2f(leftX, position.y + 35.0f));
+    this->ownerLabel->SetPosition(sf::Vector2f(leftX, position.y + 70.0f));
+    this->totalPopLabel->SetPosition(sf::Vector2f(rightX, position.y + 70.0f));
 
-    this->ClassDistributionLabel->SetPosition(sf::Vector2f(leftX, position.y + 135.0f));
+    this->tilesCountLabel->SetPosition(sf::Vector2f(leftX, position.y + 105.0f));
+    this->satisfactionLabel->SetPosition(sf::Vector2f(rightX, position.y + 105.0f));
+
+    this->treasuryLabel->SetPosition(sf::Vector2f(leftX, position.y + 130.0f));
+    this->unemploymentLabel->SetPosition(sf::Vector2f(rightX, position.y + 130.0f));
+
+    this->ClassDistributionLabel->SetPosition(sf::Vector2f(leftX, position.y + 160.0f));
 }
 
 void CityPanel::UpdateCityData(const City &city, const PopManager &popMgr)
@@ -86,17 +122,29 @@ void CityPanel::UpdateCityData(const City &city, const PopManager &popMgr)
         if (popPtr->age >= 16 && !popPtr->IsFemale())
         {
             laborForce++;
-            if (popPtr->IsEmployed()) employedCount++;
+            if (popPtr->IsEmployed())
+                employedCount++;
         }
 
         switch (popPtr->socialClass)
         {
-            case SocialClass::Bound:      bound++; break;
-            case SocialClass::Laborer:    laborers++; break;
-            case SocialClass::Specialist: specialists++; break;
-            case SocialClass::Capitalist: capitalists++; break;
-            case SocialClass::Elite:      elite++; break;
-            default: break;
+        case SocialClass::Bound:
+            bound++;
+            break;
+        case SocialClass::Laborer:
+            laborers++;
+            break;
+        case SocialClass::Specialist:
+            specialists++;
+            break;
+        case SocialClass::Capitalist:
+            capitalists++;
+            break;
+        case SocialClass::Elite:
+            elite++;
+            break;
+        default:
+            break;
         }
     }
 
@@ -110,11 +158,14 @@ void CityPanel::UpdateCityData(const City &city, const PopManager &popMgr)
 
 void CityPanel::Draw(sf::RenderWindow *window)
 {
-    if (!this->isVisible) return;   
+    if (!this->isVisible)
+        return;
     sf::View oldView = window->getView();
     window->setView(window->getDefaultView());
 
     window->draw(this->background);
+    window->draw(this->titleBar);
+    window->draw(this->closeButton);
     this->cityNameLabel->Draw(window);
     this->ownerLabel->Draw(window);
     this->tilesCountLabel->Draw(window);

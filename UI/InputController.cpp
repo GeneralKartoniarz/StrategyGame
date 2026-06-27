@@ -104,9 +104,8 @@ void InputController::HandleEvent(const sf::Event &event)
 
                     if (this->gui->analyticsPanel)
                     {
-                        this->gui->analyticsPanel->Update(nullptr);
+                        this->gui->analyticsPanel->Update(nullptr, sf::Vector2i({0, 0}), false, false);
                     }
-
                 }
                 this->isTypingCityName = false;
                 this->selectedUnitID = -1;
@@ -125,15 +124,49 @@ void InputController::HandleEvent(const sf::Event &event)
         return;
     }
 
+    bool isLeftPressed = false;
+    bool isLeftReleased = false;
+
     if (const auto *mouseEvent = event.getIf<sf::Event::MouseButtonPressed>())
     {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+        if (mouseEvent->button == sf::Mouse::Button::Left)
+        {
+            isLeftPressed = true;
+        }
+    }
+    else if (const auto *mouseReleaseEvent = event.getIf<sf::Event::MouseButtonReleased>())
+    {
+        if (mouseReleaseEvent->button == sf::Mouse::Button::Left)
+        {
+            isLeftReleased = true;
+        }
+    }
+
+    sf::Vector2i mousePos = sf::Mouse::getPosition(*this->windowPtr);
+
+    if (this->gui)
+    {
+        if (this->gui->analyticsPanel)
+        {
+            this->gui->analyticsPanel->Update(this->gui->selectedCityPtr, mousePos, isLeftPressed, isLeftReleased);
+        }
+
+        if (this->gui->cityPanel)
+        {
+            this->gui->cityPanel->Update(mousePos, isLeftPressed, isLeftReleased);
+        }
+    }
+
+    if (const auto *mouseEvent = event.getIf<sf::Event::MouseButtonPressed>())
+    {
         sf::Vector2f worldPos = this->windowPtr->mapPixelToCoords(mousePos, this->camera);
 
         if (mouseEvent->button == sf::Mouse::Button::Left)
         {
             if (this->gui && this->gui->IsMouseOverUI(mousePos))
+            {
                 return;
+            }
             if (GameInterface::GetInstance() && GameInterface::GetInstance()->currentInterfaceState == InterfaceState::PlacingBuilding)
             {
                 int32_t clickedTileIndex = -1;

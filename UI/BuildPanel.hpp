@@ -31,10 +31,6 @@ private:
     sf::RectangleShape background;
     sf::Font panelFont;
     bool isVisible = false;
-
-    std::unique_ptr<Label> sectionTitle;
-    std::unique_ptr<Label> costTrackerLabel;
-
     std::vector<std::unique_ptr<Button>> buildButtons;
 
     static GameManager *gameManagerContext;
