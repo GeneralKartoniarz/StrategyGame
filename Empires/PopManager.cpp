@@ -58,10 +58,19 @@ float PopManager::GetAverageSatisfaction(const std::vector<const Pop *> &subGrou
  * [EN] METHOD: CalculateGrowthPotential
  * LOGIC: Estimates natural growth based on satisfaction, gender, and reproductive age (16-45).
  */
-int32_t PopManager::CalculateGrowthPotential() const
+int32_t PopManager::CalculateGrowthPotential(City &city) const
 {
     if (this->population.empty())
         return 0;
+
+    int32_t currentPopulation = static_cast<int32_t>(this->population.size());
+
+    int32_t maxSustainablePop = static_cast<int32_t>(city.producedFood);
+
+    if (currentPopulation >= maxSustainablePop)
+    {
+        return 0;
+    }
 
     int32_t totalNewborns = 0;
 
@@ -69,7 +78,6 @@ int32_t PopManager::CalculateGrowthPotential() const
     {
         if (pop.IsFemale() && pop.age >= 16 && pop.age <= 45)
         {
-            // TODO SCALE THIS SHIT OUT
             float satisfactionRatio = static_cast<float>(pop.satisfaction) / 255.0f;
             float currentBirthChance = 0.06f + (satisfactionRatio * 0.08f);
 
@@ -79,6 +87,11 @@ int32_t PopManager::CalculateGrowthPotential() const
                 totalNewborns++;
             }
         }
+    }
+
+    if (currentPopulation + totalNewborns > maxSustainablePop)
+    {
+        totalNewborns = maxSustainablePop - currentPopulation;
     }
 
     return totalNewborns;
@@ -157,7 +170,8 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
             localPopIndices.push_back(i);
         }
     }
-    std::sort(localPopIndices.begin(), localPopIndices.end(), [this](size_t a, size_t b) {
+    std::sort(localPopIndices.begin(), localPopIndices.end(), [this](size_t a, size_t b)
+              {
         const auto& popA = this->population[a];
         const auto& popB = this->population[b];
 
@@ -166,8 +180,7 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
             return popA.IsEmployed() > popB.IsEmployed();
         }
 
-        return popA.age < popB.age;
-    });
+        return popA.age < popB.age; });
 
     for (size_t popIndex : localPopIndices)
     {
@@ -407,7 +420,6 @@ std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &ma
 
     float grainBefore = marketSupplies[ResourceType::Grain];
     float fishBefore = marketSupplies[ResourceType::Fish];
-
     this->ProcessMarketAndSatisfaction(marketSupplies, market, city, averageClassWages);
     float grainConsumed = grainBefore - marketSupplies[ResourceType::Grain];
     float fishConsumed = fishBefore - marketSupplies[ResourceType::Fish];
@@ -442,7 +454,7 @@ std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &ma
     }
     else if (avgSat > 165.0f && !this->population.empty())
     {
-        int32_t potentialGrowth = this->CalculateGrowthPotential();
+        int32_t potentialGrowth = this->CalculateGrowthPotential(city);
         if (potentialGrowth > 0)
         {
             size_t popBeforeGrowth = this->population.size();

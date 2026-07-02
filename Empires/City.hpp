@@ -31,6 +31,7 @@ struct City
     int32_t ownerEmpireID;
     float money = 0.0f;
     float childSupportFund = 0.0f;
+    float producedFood = 0.0f;
     std::vector<int32_t> jurisdictionTiles;
     std::vector<Workplace> workplaces;
     std::map<ResourceType, float> warehouse;

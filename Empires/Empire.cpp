@@ -65,14 +65,12 @@ void Empire::RemoveCity(int32_t cityID)
 /*
  * [PL] METODA: UpdatePrices
  * LOGIKA: Makroekonomiczny sterownik wolnego rynku w skali państwa (korekta 5-10%).
- * [DO ZMIANY]: Złoto musi zostać wykluczone z mechaniki zmian (standard walutowy).
  * [EN] METHOD: UpdatePrices
  * LOGIC: Macroeconomic driver of the free market on an empire scale (5-10% adjustment).
  * [TO CHANGE]: Gold must be excluded from price fluctuation (currency standard).
  */
 void Empire::UpdatePrices()
 {
-    std::cout << "\n[GIELDA] --- Zmiany Cen Rynkowych ---" << std::endl;
     for (auto &[resource, commodity] : this->market)
     {
         float oldPrice = commodity.currentPrice;
@@ -91,13 +89,6 @@ void Empire::UpdatePrices()
         }
 
         commodity.currentPrice = std::clamp(commodity.currentPrice, 0.05f, 500.0f);
-        if (std::abs(commodity.currentPrice - oldPrice) > 0.01f)
-        {
-            std::cout << " -> " << MarketRegistry::GetResourceName(resource)
-                      << ": " << oldPrice << " -> " << commodity.currentPrice
-                      << " zl (Popyt: " << commodity.demandLastTurn << " | Podaz: " << commodity.supplyLastTurn << ")" << std::endl;
-        }
-
         commodity.demandLastTurn = 0.0f;
         commodity.supplyLastTurn = 0.0f;
     }

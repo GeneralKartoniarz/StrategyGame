@@ -187,8 +187,7 @@ void City::RecordTurnStatistics(float totalPop, float avgSat)
  */
 void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceType, MarketCommodity> &market)
 {
-    std::cout << "--- BILANS PRODUKCJI MIASTA (KAPITALIZM) ---" << std::endl;
-
+    this->producedFood = 0.0f;
     float totalLocalWorkers = 0.0f;
     for (const auto &job : this->workplaces)
     {
@@ -268,6 +267,12 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
             {
                 this->warehouse[job.producedResource] += totalGenerated;
                 market[job.producedResource].productionLastTurn += totalGenerated;
+
+                if (job.producedResource == ResourceType::Grain || job.producedResource == ResourceType::Fish) 
+                {
+                    this->producedFood += totalGenerated;
+                }
+
                 float unitPrice = market[job.producedResource].currentPrice;
                 float batchValue = totalGenerated * unitPrice;
 

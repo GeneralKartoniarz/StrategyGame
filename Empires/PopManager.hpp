@@ -28,7 +28,7 @@ public:
     void GrowPopulation(int32_t growthAmount, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw);
     float GetAverageSatisfaction(const std::vector<const Pop *> &subGroup) const;
 
-    int32_t CalculateGrowthPotential() const;
+    int32_t CalculateGrowthPotential(City &city) const;
     void StarvePopulation(int32_t deathAmount);
 
 private:

@@ -258,6 +258,7 @@ void GameManager::UpdateUnits(float dt)
 
 void GameManager::NextTurn(std::vector<Tile> &map)
 {
+    
     for (auto &empire : this->empires)
     {
         empire.UpdateTurn(map, this->cities, *this);
