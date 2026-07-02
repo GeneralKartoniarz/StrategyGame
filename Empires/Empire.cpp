@@ -71,10 +71,15 @@ void Empire::RemoveCity(int32_t cityID)
  */
 void Empire::UpdatePrices()
 {
+    
     for (auto &[resource, commodity] : this->market)
     {
         float oldPrice = commodity.currentPrice;
         commodity.previousPrice = oldPrice;
+        
+        commodity.uiDemandDisplay = commodity.demandLastTurn;
+        commodity.uiProductionDisplay = commodity.productionLastTurn;
+
         if (commodity.supplyLastTurn > 0.0f)
         {
             float ratio = commodity.demandLastTurn / commodity.supplyLastTurn;
@@ -89,8 +94,13 @@ void Empire::UpdatePrices()
         }
 
         commodity.currentPrice = std::clamp(commodity.currentPrice, 0.05f, 500.0f);
-        commodity.demandLastTurn = 0.0f;
-        commodity.supplyLastTurn = 0.0f;
+        
+    }
+    for (auto &[res, comm] : this->market)
+    {
+        comm.demandLastTurn = 0.0f;
+        comm.supplyLastTurn = 0.0f;
+        comm.productionLastTurn = 0.0f;
     }
 }
 /*

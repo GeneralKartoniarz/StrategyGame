@@ -44,7 +44,8 @@ bool MarketPanel::Contains(const sf::Vector2f &point) const
 // UI/MarketPanel.cpp
 void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased, float scrollDelta, const std::map<ResourceType, MarketCommodity> &market, const std::map<ResourceType, float> &warehouse)
 {
-    if (!this->isVisible) return;
+    if (!this->isVisible)
+        return;
     this->currentMarket = market;
     this->currentWarehouse = warehouse;
 
@@ -66,8 +67,10 @@ void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool 
 
     if (this->isDragging)
     {
-        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) this->isDragging = false;
-        else this->SetPosition(fMousePos + this->dragOffset);
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            this->isDragging = false;
+        else
+            this->SetPosition(fMousePos + this->dragOffset);
     }
 
     float rowHeight = 35.0f;
@@ -75,7 +78,7 @@ void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool 
     float viewHeight = this->background.getSize().y - this->titleBar.getSize().y - 10.0f;
     this->maxScroll = std::max(0.0f, contentHeight - viewHeight);
 
-    if (leftMouseReleased) 
+    if (leftMouseReleased)
     {
         this->isDraggingScrollbar = false;
     }
@@ -88,18 +91,18 @@ void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool 
 
     if (this->isDraggingScrollbar)
     {
-        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) 
+        if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
         {
             this->isDraggingScrollbar = false;
-        } 
-        else 
+        }
+        else
         {
             float trackHeight = viewHeight - this->scrollbarThumb.getSize().y;
             float trackStartY = this->background.getPosition().y + this->titleBar.getSize().y + 5.0f;
-            
+
             float newThumbY = fMousePos.y - this->scrollDragOffsetY;
             float scrollPercent = (newThumbY - trackStartY) / trackHeight;
-            
+
             scrollPercent = std::clamp(scrollPercent, 0.0f, 1.0f);
             this->scrollOffset = scrollPercent * this->maxScroll;
         }
@@ -107,18 +110,20 @@ void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool 
 
     if (scrollDelta != 0.0f && this->Contains(fMousePos))
     {
-        this->scrollOffset -= scrollDelta * 40.0f; 
+        this->scrollOffset -= scrollDelta * 40.0f;
     }
 
-    if (this->scrollOffset < 0.0f) this->scrollOffset = 0.0f;
-    if (this->scrollOffset > this->maxScroll) this->scrollOffset = this->maxScroll;
+    if (this->scrollOffset < 0.0f)
+        this->scrollOffset = 0.0f;
+    if (this->scrollOffset > this->maxScroll)
+        this->scrollOffset = this->maxScroll;
 
     if (this->maxScroll > 0.0f)
     {
         float scrollPercent = this->scrollOffset / this->maxScroll;
         float trackHeight = viewHeight - this->scrollbarThumb.getSize().y;
         float thumbY = this->background.getPosition().y + this->titleBar.getSize().y + 5.0f + (scrollPercent * trackHeight);
-        
+
         this->scrollbarThumb.setPosition({this->background.getPosition().x + this->background.getSize().x - 15.0f, thumbY});
     }
 }
@@ -148,7 +153,7 @@ void MarketPanel::Draw(sf::RenderWindow *window)
     sf::Vector2u winSize = window->getSize();
     sf::FloatRect viewport({bgPos.x / winSize.x,
                             contentY / winSize.y},
-                            {contentW / winSize.x,
+                           {contentW / winSize.x,
                             contentH / winSize.y});
 
     sf::View scrollView;
@@ -170,8 +175,8 @@ void MarketPanel::Draw(sf::RenderWindow *window)
         // Pobieramy dane
         float currentPrice = this->currentMarket.count(res) ? this->currentMarket[res].currentPrice : 1.0f;
         float prevPrice = this->currentMarket.count(res) ? this->currentMarket[res].previousPrice : 1.0f;
-        float demand = this->currentMarket.count(res) ? this->currentMarket[res].demandLastTurn : 0.0f;
-        float production = this->currentMarket.count(res) ? this->currentMarket[res].productionLastTurn : 0.0f;
+        float demand = this->currentMarket.count(res) ? this->currentMarket[res].uiDemandDisplay : 0.0f;
+        float production = this->currentMarket.count(res) ? this->currentMarket[res].uiProductionDisplay : 0.0f;
         float inWarehouse = this->currentWarehouse.count(res) ? this->currentWarehouse[res] : 0.0f;
 
         sf::RectangleShape rowBg(sf::Vector2f(contentW, 30.0f));
