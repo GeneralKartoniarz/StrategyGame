@@ -405,11 +405,6 @@ void PopManager::StarvePopulation(int32_t deathAmount)
  */
 std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &marketSupplies, std::map<ResourceType, MarketCommodity> &market, uint16_t cultureID, uint8_t religionID, int32_t tileID, GameManager &gm, uint8_t empireCultureRaw, City &city, const std::map<SocialClass, float> &averageClassWages)
 {
-    std::cout << "\n=================== RAPORT GOSPODARCZY (Kafel: " << tileID << ") ===================" << std::endl;
-
-    std::cout << "[MAGAZYN START] Zboze: " << marketSupplies[ResourceType::Grain]
-              << " j. | Zloto: " << marketSupplies[ResourceType::Gold] << " j." << std::endl;
-
     size_t popBeforeLines = this->population.size();
     this->ProgressAgeAndMortality();
     size_t naturalDeaths = popBeforeLines - this->population.size();
@@ -417,31 +412,22 @@ std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &ma
     {
         std::cout << "[KOSTUCHA] Ze starosci zmarlo: " << naturalDeaths << " popow." << std::endl;
     }
-
-    float grainBefore = marketSupplies[ResourceType::Grain];
-    float fishBefore = marketSupplies[ResourceType::Fish];
     this->ProcessMarketAndSatisfaction(marketSupplies, market, city, averageClassWages);
-    float grainConsumed = grainBefore - marketSupplies[ResourceType::Grain];
-    float fishConsumed = fishBefore - marketSupplies[ResourceType::Fish];
-
-    std::cout << "[KONSUMPCJA] Popy kupily: " << grainConsumed << " Zboza i " << fishConsumed << " Ryb." << std::endl;
-    std::cout << "[MAGAZYN KONIEC] Pozostalo -> Zboze: " << marketSupplies[ResourceType::Grain]
-              << " j. | Ryby: " << marketSupplies[ResourceType::Fish] << " j." << std::endl;
-
     float avgSat = 0.0f;
     int32_t starvingPopsCount = 0;
-
+    int32_t localPopsCount = 0;
     for (const auto &p : this->population)
     {
-        avgSat += p.satisfaction;
-        if (p.satisfaction < 50 || p.HasStarvingWarning())
-            starvingPopsCount++;
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), p.locationTileID) != city.jurisdictionTiles.end())
+        {
+            avgSat += p.satisfaction;
+            if (p.satisfaction < 50 || p.HasStarvingWarning())
+                starvingPopsCount++;
+
+            localPopsCount++;
+        }
     }
-    avgSat = this->population.empty() ? 0.0f : (avgSat / this->population.size());
-
-    std::cout << "[RYNEK] Srednie zadowolenie: " << static_cast<int>((avgSat / 255.0f) * 100.0f)
-              << "% | Popy na skraju glodu/biedy: " << starvingPopsCount << "/" << this->population.size() << std::endl;
-
+    avgSat = (localPopsCount == 0) ? 0.0f : (avgSat / localPopsCount);
     if (marketSupplies[ResourceType::Grain] <= 0.0f && marketSupplies[ResourceType::Fish] <= 0.0f && !this->population.empty())
     {
         int32_t starveDeaths = std::max(1, static_cast<int32_t>(this->population.size() * 0.10f));
@@ -450,7 +436,6 @@ std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &ma
         this->StarvePopulation(starveDeaths);
 
         size_t actualStarveDeaths = sizeBeforeStarve - this->population.size();
-        std::cout << "[ALARM - GLOD] Magazyny sa PUSTE! Z glodu umiera: " << actualStarveDeaths << " popow!" << std::endl;
     }
     else if (avgSat > 165.0f && !this->population.empty())
     {
@@ -516,6 +501,6 @@ std::pair<float, float> PopManager::UpdateTurn(std::map<ResourceType, float> &ma
     }
     std::cout << "===================================================================\n"
               << std::endl;
-    float totalPeopleCount = static_cast<float>(this->population.size());
+    float totalPeopleCount = static_cast<float>(localPopsCount);
     return {totalPeopleCount, avgSat};
 }

@@ -71,12 +71,12 @@ void Empire::RemoveCity(int32_t cityID)
  */
 void Empire::UpdatePrices()
 {
-    
+
     for (auto &[resource, commodity] : this->market)
     {
         float oldPrice = commodity.currentPrice;
         commodity.previousPrice = oldPrice;
-        
+
         commodity.uiDemandDisplay = commodity.demandLastTurn;
         commodity.uiProductionDisplay = commodity.productionLastTurn;
 
@@ -94,7 +94,6 @@ void Empire::UpdatePrices()
         }
 
         commodity.currentPrice = std::clamp(commodity.currentPrice, 0.05f, 500.0f);
-        
     }
     for (auto &[res, comm] : this->market)
     {
@@ -128,9 +127,30 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
         city.PerformEmploymentRegistry(this->popManager);
         city.SimulateProduction(map, this->market);
         // MINTING VALUE
-        float mintingAmount = 150.0f;
+        float cityGDP = city.CalculateCurrentGDP();
+        float mintingAmount = cityGDP * 0.05f; 
         city.money += mintingAmount;
 
+        std::cout << "[MINTING] Miasto o ID " << city.centerTileID
+                  << " | PKB: " << cityGDP << "$ | Wybito monety: " << mintingAmount << "$" << std::endl;
+
+        float targetCash = 300.0f;
+        static std::map<int32_t, float> globalStateReserves;
+
+        if (city.money > targetCash)
+        {
+            float surplus = (city.money - targetCash) * 0.20f;
+            globalStateReserves[city.centerTileID] += surplus;
+            city.money -= surplus;
+        }
+        else if (city.money < targetCash && globalStateReserves[city.centerTileID] > 0.0f)
+        {
+            float injection = std::min(targetCash - city.money, globalStateReserves[city.centerTileID]);
+            globalStateReserves[city.centerTileID] -= injection;
+            city.money += injection;
+            std::cout << "[SKARBIEC] Kryzys płynności w mieście " << city.centerTileID
+                      << "! Wstrzyknięto z rezerw: " << injection << "$" << std::endl;
+        }
         float welfareAllocationRate = 0.15f;
         city.childSupportFund = city.money * welfareAllocationRate;
         city.money -= city.childSupportFund;

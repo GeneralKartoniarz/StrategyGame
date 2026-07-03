@@ -174,6 +174,21 @@ void City::RecordTurnStatistics(float totalPop, float avgSat)
     }
     this->economyHistory.push_back(sample);
 }
+
+float City::CalculateCurrentGDP() const
+{
+    float totalGDP = 0.0f;
+    for (const auto &job : this->workplaces)
+    {
+        if (job.currentEmployees > 0 && job.revenuePool > 0.0f)
+        {
+            totalGDP += job.revenuePool;
+        }
+    }
+    return totalGDP;
+}
+
+
 /*
  * [PL] METODA: SimulateProduction
  * LOGIKA: Przetwarza surowce w fabrykach na podstawie wydajności zatrudnionych popów.
@@ -277,10 +292,6 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
                 float batchValue = totalGenerated * unitPrice;
 
                 job.revenuePool += batchValue;
-
-                std::cout << " -> [" << BuildingRegistry::GetBuildingName(manufacture.type)
-                          << "] Wyprodukowano: " << totalGenerated << " szt. Wartość: "
-                          << batchValue << " (Cena: " << unitPrice << ")" << std::endl;
             }
         }
     }

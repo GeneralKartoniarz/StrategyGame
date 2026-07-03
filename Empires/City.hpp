@@ -41,6 +41,7 @@ struct City
     void RecordTurnStatistics(float totalPop, float avgSat);
     void CollectWorkplacesFromTerritory(const std::vector<Tile> &map);
     void PerformEmploymentRegistry(PopManager &popManager);
+    float CalculateCurrentGDP() const;
     void SimulateProduction(const std::vector<Tile> &map, std::map<ResourceType, MarketCommodity> &market);
     std::map<SocialClass, float> DistributeWages();
     void ProcessConstructionQueue(std::vector<Tile> &map);
