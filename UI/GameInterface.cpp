@@ -94,9 +94,7 @@ void GameInterface::Update(float dt, const sf::Vector2i &mousePos, bool mouseCli
     if (this->marketPanel)
     {
         const auto &globalMarket = this->gm.GetEmpire(0).GetMarket();
-        static const std::map<ResourceType, float> emptyWarehouse;
-        const auto &localWarehouse = (this->selectedCityPtr) ? this->selectedCityPtr->warehouse : emptyWarehouse;
-        this->marketPanel->Update(mousePos, isLeftMouseDown, mouseClicked, this->currentScrollDelta, globalMarket, localWarehouse);
+        this->marketPanel->Update(mousePos, isLeftMouseDown, mouseClicked, this->currentScrollDelta, globalMarket, this->selectedCityPtr);
     }
     this->currentScrollDelta = 0.0f;
     if (this->buildPanel)

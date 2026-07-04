@@ -188,7 +188,6 @@ float City::CalculateCurrentGDP() const
     return totalGDP;
 }
 
-
 /*
  * [PL] METODA: SimulateProduction
  * LOGIKA: Przetwarza surowce w fabrykach na podstawie wydajności zatrudnionych popów.
@@ -281,9 +280,8 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
             if (totalGenerated > 0.0f)
             {
                 this->warehouse[job.producedResource] += totalGenerated;
-                market[job.producedResource].productionLastTurn += totalGenerated;
-
-                if (job.producedResource == ResourceType::Grain || job.producedResource == ResourceType::Fish) 
+                this->localProductionLastTurn[job.producedResource] += totalGenerated;
+                if (job.producedResource == ResourceType::Grain || job.producedResource == ResourceType::Fish)
                 {
                     this->producedFood += totalGenerated;
                 }
@@ -296,6 +294,8 @@ void City::SimulateProduction(const std::vector<Tile> &map, std::map<ResourceTyp
         }
     }
 }
+// TODO MIASTO KURDE TEN KILKA MANUFAKTURR
+// TODO PKB MACHEN
 std::map<SocialClass, float> City::DistributeWages()
 {
     constexpr float taxRate = 0.15f;

@@ -42,15 +42,19 @@ bool MarketPanel::Contains(const sf::Vector2f &point) const
 }
 
 // UI/MarketPanel.cpp
-void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased, float scrollDelta, const std::map<ResourceType, MarketCommodity> &market, const std::map<ResourceType, float> &warehouse)
+void MarketPanel::Update(const sf::Vector2i &mousePos, bool leftMouseDown, bool leftMouseReleased, float scrollDelta, const std::map<ResourceType, MarketCommodity> &market, const City *activeCity)
 {
     if (!this->isVisible)
         return;
+        
     this->currentMarket = market;
-    this->currentWarehouse = warehouse;
-
+    this->activeCityContext = activeCity; 
+    if (activeCity) {
+        this->currentWarehouse = activeCity->warehouse;
+    } else {
+        this->currentWarehouse.clear();
+    }
     sf::Vector2f fMousePos(mousePos.x, mousePos.y);
-
     if (leftMouseReleased && this->closeButton.getGlobalBounds().contains(fMousePos))
     {
         this->isVisible = false;
@@ -172,12 +176,23 @@ void MarketPanel::Draw(sf::RenderWindow *window)
 
     for (ResourceType res : this->allResources)
     {
-        // Pobieramy dane
-        float currentPrice = this->currentMarket.count(res) ? this->currentMarket[res].currentPrice : 1.0f;
-        float prevPrice = this->currentMarket.count(res) ? this->currentMarket[res].previousPrice : 1.0f;
-        float demand = this->currentMarket.count(res) ? this->currentMarket[res].uiDemandDisplay : 0.0f;
-        float production = this->currentMarket.count(res) ? this->currentMarket[res].uiProductionDisplay : 0.0f;
-        float inWarehouse = this->currentWarehouse.count(res) ? this->currentWarehouse[res] : 0.0f;
+        float currentPrice = this->currentMarket.count(res) ? this->currentMarket.at(res).currentPrice : 1.0f;
+        float prevPrice = this->currentMarket.count(res) ? this->currentMarket.at(res).previousPrice : 1.0f;
+
+        float demand = 0.0f;
+        float production = 0.0f;
+        float inWarehouse = 0.0f;
+
+        if (this->activeCityContext)
+        {
+            const auto &cDemand = this->activeCityContext->uiLocalDemandDisplay;
+            const auto &cProd = this->activeCityContext->uiLocalProductionDisplay;
+            const auto &cWh = this->activeCityContext->warehouse;
+
+            demand = cDemand.count(res) ? cDemand.at(res) : 0.0f;
+            production = cProd.count(res) ? cProd.at(res) : 0.0f;
+            inWarehouse = cWh.count(res) ? cWh.at(res) : 0.0f;
+        }
 
         sf::RectangleShape rowBg(sf::Vector2f(contentW, 30.0f));
         rowBg.setPosition({bgPos.x, rowY});

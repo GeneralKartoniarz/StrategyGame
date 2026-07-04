@@ -37,6 +37,10 @@ struct City
     std::map<ResourceType, float> warehouse;
     std::vector<ConstructionTask> buildQueue;
     std::vector<EconomySample> economyHistory;
+    std::map<ResourceType, float> localDemandLastTurn;
+    std::map<ResourceType, float> localProductionLastTurn;
+    std::map<ResourceType, float> uiLocalDemandDisplay;
+    std::map<ResourceType, float> uiLocalProductionDisplay;
     constexpr static size_t MAX_HISTORY_SAMPLES = 150;
     void RecordTurnStatistics(float totalPop, float avgSat);
     void CollectWorkplacesFromTerritory(const std::vector<Tile> &map);

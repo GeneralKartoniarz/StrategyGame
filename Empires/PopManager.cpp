@@ -62,36 +62,43 @@ int32_t PopManager::CalculateGrowthPotential(City &city) const
 {
     if (this->population.empty())
         return 0;
-
-    int32_t currentPopulation = static_cast<int32_t>(this->population.size());
+    int32_t localPopulation = 0;
+    for (const auto &pop : this->population)
+    {
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) != city.jurisdictionTiles.end())
+        {
+            localPopulation++;
+        }
+    }
 
     int32_t maxSustainablePop = static_cast<int32_t>(city.producedFood);
 
-    if (currentPopulation >= maxSustainablePop)
+    if (localPopulation >= maxSustainablePop)
     {
         return 0;
     }
 
     int32_t totalNewborns = 0;
-
     for (const auto &pop : this->population)
     {
-        if (pop.IsFemale() && pop.age >= 16 && pop.age <= 45)
+        if (std::find(city.jurisdictionTiles.begin(), city.jurisdictionTiles.end(), pop.locationTileID) != city.jurisdictionTiles.end())
         {
-            float satisfactionRatio = static_cast<float>(pop.satisfaction) / 255.0f;
-            float currentBirthChance = 0.06f + (satisfactionRatio * 0.08f);
-
-            float roll = static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX);
-            if (roll < currentBirthChance)
+            if (pop.IsFemale() && pop.age >= 16 && pop.age <= 45)
             {
-                totalNewborns++;
+                float satisfactionRatio = static_cast<float>(pop.satisfaction) / 255.0f;
+                float currentBirthChance = 0.06f + (satisfactionRatio * 0.08f);
+
+                if ((static_cast<float>(std::rand()) / RAND_MAX) < currentBirthChance)
+                {
+                    totalNewborns++;
+                }
             }
         }
     }
 
-    if (currentPopulation + totalNewborns > maxSustainablePop)
+    if (localPopulation + totalNewborns > maxSustainablePop)
     {
-        totalNewborns = maxSustainablePop - currentPopulation;
+        totalNewborns = maxSustainablePop - localPopulation;
     }
 
     return totalNewborns;
@@ -233,8 +240,7 @@ void PopManager::ProcessMarketAndSatisfaction(std::map<ResourceType, float> &mar
                     price = 0.01f;
 
                 float neededAmount = (targetDemand - satisfiedDemand) / efficiency;
-                market[resource].demandLastTurn += neededAmount;
-
+                city.localDemandLastTurn[resource] += neededAmount;
                 float availableInWarehouse = (marketSupplies.count(resource)) ? marketSupplies[resource] : 0.0f;
 
                 float maxAffordable = popBudget / price;

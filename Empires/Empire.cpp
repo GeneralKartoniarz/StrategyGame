@@ -114,26 +114,24 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
 {
     for (auto &[res, comm] : this->market)
     {
+        comm.demandLastTurn = 0.0f;
         comm.supplyLastTurn = 0.0f;
         comm.productionLastTurn = 0.0f;
     }
-
     for (int32_t cityID : this->controlledCitiesIDs)
     {
         City &city = allCities[cityID];
-
+        city.localDemandLastTurn.clear();
+        city.localProductionLastTurn.clear();
         city.ProcessConstructionQueue(map);
         city.CollectWorkplacesFromTerritory(map);
         city.PerformEmploymentRegistry(this->popManager);
         city.SimulateProduction(map, this->market);
-        // MINTING VALUE
         float cityGDP = city.CalculateCurrentGDP();
-        float mintingAmount = cityGDP * 0.05f; 
+        float mintingAmount = cityGDP * 0.05f;
         city.money += mintingAmount;
-
         std::cout << "[MINTING] Miasto o ID " << city.centerTileID
                   << " | PKB: " << cityGDP << "$ | Wybito monety: " << mintingAmount << "$" << std::endl;
-
         float targetCash = 300.0f;
         static std::map<int32_t, float> globalStateReserves;
 
@@ -154,14 +152,11 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
         float welfareAllocationRate = 0.15f;
         city.childSupportFund = city.money * welfareAllocationRate;
         city.money -= city.childSupportFund;
-
         std::map<SocialClass, float> averageClassWages = city.DistributeWages();
-
         for (const auto &[res, amount] : city.warehouse)
         {
             this->market[res].supplyLastTurn += amount;
         }
-
         int32_t capitalTileID = city.centerTileID;
         auto [totalPop, avgSat] = this->popManager.UpdateTurn(
             city.warehouse,
@@ -174,7 +169,16 @@ void Empire::UpdateTurn(std::vector<Tile> &map, std::vector<City> &allCities, Ga
             city,
             averageClassWages);
         city.RecordTurnStatistics(totalPop, avgSat);
+        for (auto const &[res, val] : city.localDemandLastTurn)
+        {
+            city.uiLocalDemandDisplay[res] = val;
+            this->market[res].demandLastTurn += val; 
+        }
+        for (auto const &[res, val] : city.localProductionLastTurn)
+        {
+            city.uiLocalProductionDisplay[res] = val;
+            this->market[res].productionLastTurn += val; 
+        }
     }
-
     this->UpdatePrices();
 }
